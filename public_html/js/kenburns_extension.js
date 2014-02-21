@@ -39,8 +39,6 @@ $.fn.kenburns_extension = function() {
 
     var inside = false;
 
-
-
     //Status bar
     if (args.status_bar == true) {
         sliderDiv = document.createElement("div");
@@ -136,27 +134,51 @@ $.fn.kenburns_extension = function() {
             if ($(this).parent().attr("class") == "pause") {
                 $(this).parent().attr("class", "play");
                 ken.pause();
+                $(".background")[0].pause();
+                $(".speech")[indexGeneral].pause();
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
+                $(".background")[0].play();
+                $(".speech")[indexGeneral].play();
             }
         });
 
         $(firstButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
+            var speech = $(".speech")[indexGeneral];
+            if (indexGeneral == 0) {
+                speech.load();
+                fadeIn(speech);
+            } else {
+                speech.pause();
+            }
             ken.setUpdateTime(0);
         });
+
         $(lastButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
+            var speech = $(".speech")[indexGeneral];
+            if (indexGeneral == (arrayTime.length - 1)) {
+                speech.load();
+                fadeIn(speech);
+            } else {
+                speech.pause();
+            }
             ken.setUpdateTime(20000);
         });
+
         $(prevButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
+            $(".speech")[indexGeneral].pause();
             if (indexGeneral != 0)
                 indexGeneral = (indexGeneral - 1) % arrayTime.length;
+            else
+                indexGeneral = arrayTime.length - 1;
             ken.setUpdateTime(arrayTime[indexGeneral]);
         });
         $(nextButton).click(function() {
+            $(".speech")[indexGeneral].pause();
             $(pauseButton).parent().attr("class", "pause");
             indexGeneral = (indexGeneral + 1) % arrayTime.length;
             ken.setUpdateTime(arrayTime[indexGeneral]);
@@ -167,8 +189,10 @@ $.fn.kenburns_extension = function() {
     $(this).append(html);
 
     initSliders(args);
+    initAudio(args, this);
     $(loaderDiv).hide();
     startAnimation(args);
+
 };
 
 function initSliders(args) {
@@ -201,6 +225,51 @@ function initSliders(args) {
     });
 }
 
+function initAudio(args, main) {
+
+    //****AUDIO BACKGROUND********************************
+    var audio_background_element = args.audio_background[0];
+
+    if (audio_background_element.src_ogg == null || audio_background_element.src_mp3 == null) {
+        alert("Insert correct information to load audio");
+        return;
+    }
+
+    var audio_background = document.createElement("audio");
+    $(audio_background).attr("preload", true).attr("class", "background");
+    if (audio_background_element.autoplay != null && audio_background_element.autoplay == true) {
+        $(audio_background).attr("autoplay", true).attr("loop", true);
+    }
+    var source_background = document.createElement("source");
+    $(source_background).attr("src", audio_background_element.src_ogg).attr("type", "audio/ogg");
+    var source_background2 = document.createElement("source");
+    $(source_background2).attr("src", audio_background_element.src_mp3).attr("type", "audio/mpeg");
+    $(audio_background).append(source_background);
+    $(audio_background).append(source_background2);
+    $(main).append(audio_background);
+    audio_background.volume = 0;
+    //****************************************************
+
+    //*** AUDIO TRACE ************************************
+    var audioArray = args.audio_for_images;
+    for (var i = 0; i < audioArray.length; i++) {
+        var audio = document.createElement("audio");
+        $(audio).attr("preload", true).attr("class", "speech");
+        if (audioArray[i].src_ogg == null || audioArray[i].src_mp3 == null) {
+            alert("Insert correct information to load audio");
+            return;
+        }
+        var source = document.createElement("source");
+        $(source).attr("src", audioArray[i].src_ogg).attr("type", "audio/ogg");
+        var source2 = document.createElement("source");
+        $(source2).attr("src", audioArray[i].src_mp3).attr("type", "audio/mpeg");
+        $(audio).append(source);
+        $(audio).append(source2);
+        $(main).append(audio);
+    }
+    //****************************************************
+}
+
 function startAnimation(args) {
     ken = $(canvas).kenburns({
         debug: args.debug,
@@ -212,8 +281,9 @@ function startAnimation(args) {
         zoom: args.zoom,
         pan: args.pan,
         post_render_callback: function($canvas, context) {
-            if (args.status_bar == true)
+            if (args.status_bar == true) {
                 $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
+            }
             // Called after the effect is rendered
             // Draw anything you like on to of the canvas
             return;
@@ -248,47 +318,58 @@ function startAnimation(args) {
         },
         post_display_image_callback: function(slide_number) {
 //            setTimeout(function() {
-            slider.goToSlide(slide_number);
             indexGeneral = slide_number;
-//                playAudio(slide_number);
+            slider.goToSlide(slide_number);
+            playAudio(slide_number);
 //            }, 0);
         }
     });
 }
 
-
 function playAudio(slideNumber) {
-    console.debug('playAudio ' + slideNumber);
+    var index = (slideNumber != 0) ? (slideNumber - 1) : arrayTime.length - 1;
 
-    if (slideNumber === 1) {
-        //$('audio')[0].volume = .8;
-        $('audio')[0].play();
-        $('#main').animate({volume: 0.8}, 5000);
-    }
+    console.log("precedente: " + index);
+    console.log("successiva: " + slideNumber);
 
-    if (slideNumber === 4) {
-        $('#main').animate({volume: 0.2}, 5000);
-        //$('audio')[0].volume = .1;
-        $('audio')[1].volume = .2;
-        $('audio')[1].play();
-    }
+    var audioAttuale = $('.speech')[slideNumber];
+    audioAttuale.load();
+    fadeIn(audioAttuale);
 
-    if (slideNumber === 23) { // desert wind
-        $('audio')[2].volume = .5;
-        $('audio')[2].play();
-        //$('#desert').animate({volume: 0}, 10000);
-    }
+    var audioPrecedente = $('.speech')[index];
+    fadeOut(audioPrecedente);
 
-    if (slideNumber === 25) { // eagle
-        $('#desert').animate({volume: 0}, 10000);
-        $('audio')[3].play();
-    }
-
-    if (slideNumber > 4)
-        $('audio')[slideNumber].play();
 }
-//
-//function audioReady(number) {
-//    console.debug('audioReady ' + number);
-//    $('#loader').Text($('#loader').Text() + ' ' + number);
-//}
+
+
+function fadeIn(audio) {
+    audio.volume = 0;
+    audio.play();
+    var vol = 0;
+    var interval = 200;
+    var intervalID = setInterval(function() {
+        if (vol < 1) {
+            vol += 0.1;
+            if (vol >= 0 && vol <= 1)
+                audio.volume = vol;
+        } else {
+            clearInterval(intervalID);
+        }
+    }, interval);
+}
+
+function fadeOut(audioPrecedente) {
+    console.log(audioPrecedente);
+    var vol = 0.1;
+    var interval = 200;
+    var intervalID = setInterval(function() {
+        if (vol >= 0.1) {
+            vol -= 0.1;
+            if (vol >= 0 && vol <= 1)
+                audioPrecedente.volume = vol;
+        } else {
+            audioPrecedente.pause();
+            clearInterval(intervalID);
+        }
+    }, interval);
+}

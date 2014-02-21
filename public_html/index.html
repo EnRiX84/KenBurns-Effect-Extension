@@ -29,20 +29,30 @@
                 width: 1000,
                 height: 400,
                 status_bar: true, //set if you want see the status bar
-                slide_controller: true, //set if you want see the slide controller:
+                slide_controller: true, //set if you want see the slide controller
                 images: [//select path of your images
                     './img/1.jpg', // 1
                     './img/2.jpg', // 2
                     './img/3.jpg', // 3
                     './img/4.jpg', // 4
-                    './img/2.jpg', // 4
+                    './img/5.jpg', // 5
+                ],
+                audio_background: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
+                    {src_mp3: './audio/6.mp3', src_ogg: './audio/6.ogg', autoplay: true}
+                ],
+                audio_for_images: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
+                    {src_mp3: './audio/1.mp3', src_ogg: './audio/1.ogg'}, // 1
+                    {src_mp3: './audio/2.mp3', src_ogg: './audio/2.ogg'}, // 2
+                    {src_mp3: './audio/3.mp3', src_ogg: './audio/3.ogg'}, // 3
+                    {src_mp3: './audio/4.mp3', src_ogg: './audio/4.ogg'}, // 4
+                    {src_mp3: './audio/5.mp3', src_ogg: './audio/5.ogg'}  // 5
                 ],
                 display_times: [//set for every image how many time it is showed
                     5000, // Slide 1
                     5000, // Slide 2
                     5000, // Slide 3
                     5000, // Slide 4
-                    5000,
+                    5000, // Slide 5
                 ],
                 zoom: [//set for every image the zoom
                     1.1, // 1
@@ -52,16 +62,16 @@
                     1.1  // 5
                 ],
                 pan: [
-                    {x: 0, y: 1}, // 1 
-                    {x: 1, y: 1}, // 2 
-                    {x: 1, y: 2}, // 3 
-                    {x: 2, y: 0}, // 4 
-                    {x: 2, y: 0}, // 4 
+                    {x: 0, y: 1}, // 1
+                    {x: 1, y: 1}, // 2
+                    {x: 1, y: 2}, // 3
+                    {x: 2, y: 0}, // 4
+                    {x: 2, y: 0}, // 5
                 ],
                 debug: false, // true if you want to show debug info.
-                frames_per_second: 25, // frames_per_second
-                fade_time: 6000, // fade_time
-                background_color: '#000000', // background_color
+                frames_per_second: 25, // frames per second
+                fade_time: 6000, // fade time
+                background_color: '#000000', // background color
             });
         });
     </script>

@@ -206,7 +206,6 @@
             return current_time - start_time;
         }
 
-
         var update_time;
         var stopped_time = false;
 //        var forward_backword_time = true;
@@ -342,18 +341,6 @@
             clearInterval(intervalVar);
             intervalVar = setInterval(update, frame_time);
         };
-
-
-//        this.forward = function forward() {
-//            clearInterval(intervalVar);
-//            return;
-//        };
-//
-//        this.backward = function backward() {
-//            clearInterval(intervalVar);
-//            return;
-//        };
-
 
         return this;
     };
