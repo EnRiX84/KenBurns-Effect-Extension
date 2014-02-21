@@ -184,8 +184,8 @@ $.fn.kenburns_extension = function() {
     initAudio(args, this);
     $(loaderDiv).hide();
     startAnimation(args);
-
 };
+
 
 function initSliders(args) {
     if (args.status_bar == true) {
@@ -196,6 +196,7 @@ function initSliders(args) {
             ticksFrequency: 5000,
             value: 0,
             step: 5000,
+            mode: 'fixed',
             showButtons: false,
             ticksPosition: 'bottom',
         }).on('slideEnd', function(event) {
