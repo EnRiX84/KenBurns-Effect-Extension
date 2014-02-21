@@ -33,30 +33,27 @@ $.fn.kenburns_extension = function() {
 
     var html = document.createElement("div");
 
-    sliderDiv = document.createElement("div");
-    $(sliderDiv).attr("class", "sliderDiv");
-
-    var slideShowController = document.createElement("div");
-    $(slideShowController).attr("class", "slideshow-controller");
-    var divForSlide = document.createElement("div");
-    $(divForSlide).append(slideShowController);
-    $(divForSlide).attr("style", "width: " + args.width + "px; height:" + args.height + "px; margin-top:-" + args.height + "px;");
     canvas = document.createElement("canvas");
     $(canvas).attr("id", "canvas").attr("width", args.width).attr("height", args.height);
     $(canvas).append("<p>Your browser does not support canvas!</p>");
 
     var inside = false;
-    $(sliderDiv).mouseover(function() {
-        inside = true;
-    }).mouseout(function() {
-        inside = false;
-    });
-    $(slideShowController).mouseover(function() {
-        inside = true;
-    }).mouseout(function() {
-        inside = false;
-    });
 
+
+
+    //Status bar
+    if (args.status_bar == true) {
+        sliderDiv = document.createElement("div");
+        $(sliderDiv).attr("class", "sliderDiv");
+        $(sliderDiv).mouseover(function() {
+            inside = true;
+        }).mouseout(function() {
+            inside = false;
+        });
+    }
+    //*******************
+
+    //apply events to canvas
     $(canvas).mousemove(function() {
         $(html).append(sliderDiv);
         $(html).append(divForSlide);
@@ -71,8 +68,8 @@ $.fn.kenburns_extension = function() {
         }, 10);
     });
 
+    //CAPTIONS
     var loaderDiv = document.createElement("div");
-
     caption = document.createElement("div");
     var slides = "";
     for (var i = 0; i < 10; i++) {
@@ -81,76 +78,91 @@ $.fn.kenburns_extension = function() {
     $(caption).html(slides);
     $(html).append(canvas);
     $(html).append(loaderDiv);
-    $(html).append(document.createElement("br"));
     $(html).append(caption);
+    //***********************************
 
 //    <div id="Slideshow-1392891124688" class="slideshow-captions" aria-busy="false" aria-hidden="false" role="description" style="height: 22px; visibility: visible; opacity: 0.7;">2 seconda descrizione</div>
 
-    var ul = document.createElement("ul");
-    $(ul).attr("role", "menu");
-    $(slideShowController).append(ul);
+    if (args.slide_controller == true) {
+        // SLIDE SHOW CONTROLLER
+        var divForSlide = document.createElement("div");
+        var slideShowController = document.createElement("div");
+        $(slideShowController).attr("class", "slideshow-controller");
+        $(divForSlide).append(slideShowController);
+        $(divForSlide).attr("style", "width: " + args.width + "px; height:" + args.height + "px; margin-top:-" + args.height + "px;");
 
-    var li0 = document.createElement("li");
-    $(li0).attr("class", "first");
-    $(ul).append(li0);
-    var firstButton = document.createElement("a");
-    $(li0).append(firstButton);
+        $(slideShowController).mouseover(function() {
+            inside = true;
+        }).mouseout(function() {
+            inside = false;
+        });
 
-    var li1 = document.createElement("li");
-    $(li1).attr("class", "prev");
-    $(ul).append(li1);
-    var prevButton = document.createElement("a");
-    $(li1).append(prevButton);
+        //slide controller buttons
+        var ul = document.createElement("ul");
+        $(ul).attr("role", "menu");
+        $(slideShowController).append(ul);
 
-    var li2 = document.createElement("li");
-    $(li2).attr("class", "pause");
-    $(ul).append(li2);
-    pauseButton = document.createElement("a");
-    $(li2).append(pauseButton);
+        var li0 = document.createElement("li");
+        $(li0).attr("class", "first");
+        $(ul).append(li0);
+        var firstButton = document.createElement("a");
+        $(li0).append(firstButton);
 
-    var li3 = document.createElement("li");
-    $(li3).attr("class", "next");
-    $(ul).append(li3);
-    var nextButton = document.createElement("a");
-    $(li3).append(nextButton);
+        var li1 = document.createElement("li");
+        $(li1).attr("class", "prev");
+        $(ul).append(li1);
+        var prevButton = document.createElement("a");
+        $(li1).append(prevButton);
 
-    var li4 = document.createElement("li");
-    $(li4).attr("class", "last");
-    $(ul).append(li4);
-    var lastButton = document.createElement("a");
-    $(li4).append(lastButton);
+        var li2 = document.createElement("li");
+        $(li2).attr("class", "pause");
+        $(ul).append(li2);
+        pauseButton = document.createElement("a");
+        $(li2).append(pauseButton);
 
+        var li3 = document.createElement("li");
+        $(li3).attr("class", "next");
+        $(ul).append(li3);
+        var nextButton = document.createElement("a");
+        $(li3).append(nextButton);
 
+        var li4 = document.createElement("li");
+        $(li4).attr("class", "last");
+        $(ul).append(li4);
+        var lastButton = document.createElement("a");
+        $(li4).append(lastButton);
 
-    $(pauseButton).click(function() {
-        if ($(this).parent().attr("class") == "pause") {
-            $(this).parent().attr("class", "play");
-            ken.pause();
-        } else {
-            $(this).parent().attr("class", "pause");
-            ken.play();
-        }
-    });
+        $(pauseButton).click(function() {
+            if ($(this).parent().attr("class") == "pause") {
+                $(this).parent().attr("class", "play");
+                ken.pause();
+            } else {
+                $(this).parent().attr("class", "pause");
+                ken.play();
+            }
+        });
 
-    $(firstButton).click(function() {
-        $(pauseButton).parent().attr("class", "pause");
-        ken.setUpdateTime(0);
-    });
-    $(lastButton).click(function() {
-        $(pauseButton).parent().attr("class", "pause");
-        ken.setUpdateTime(20000);
-    });
-    $(prevButton).click(function() {
-        $(pauseButton).parent().attr("class", "pause");
-        if (indexGeneral != 0)
-            indexGeneral = (indexGeneral - 1) % arrayTime.length;
-        ken.setUpdateTime(arrayTime[indexGeneral]);
-    });
-    $(nextButton).click(function() {
-        $(pauseButton).parent().attr("class", "pause");
-        indexGeneral = (indexGeneral + 1) % arrayTime.length;
-        ken.setUpdateTime(arrayTime[indexGeneral]);
-    });
+        $(firstButton).click(function() {
+            $(pauseButton).parent().attr("class", "pause");
+            ken.setUpdateTime(0);
+        });
+        $(lastButton).click(function() {
+            $(pauseButton).parent().attr("class", "pause");
+            ken.setUpdateTime(20000);
+        });
+        $(prevButton).click(function() {
+            $(pauseButton).parent().attr("class", "pause");
+            if (indexGeneral != 0)
+                indexGeneral = (indexGeneral - 1) % arrayTime.length;
+            ken.setUpdateTime(arrayTime[indexGeneral]);
+        });
+        $(nextButton).click(function() {
+            $(pauseButton).parent().attr("class", "pause");
+            indexGeneral = (indexGeneral + 1) % arrayTime.length;
+            ken.setUpdateTime(arrayTime[indexGeneral]);
+        });
+        //*********************************
+    }
 
     $(this).append(html);
 
@@ -160,20 +172,22 @@ $.fn.kenburns_extension = function() {
 };
 
 function initSliders(args) {
-    $(sliderDiv).jqxSlider({
-        width: args.width,
-        min: 0,
-        max: 25000,
-        ticksFrequency: 5000,
-        value: 0,
-        step: 5000,
-        showButtons: false,
-        ticksPosition: 'bottom',
-    }).on('slideEnd', function(event) {
-        $(pauseButton).parent().attr("class", "pause");
-        var time = parseInt($(this).jqxSlider('value'));
-        ken.setUpdateTime(time);
-    });
+    if (args.status_bar == true) {
+        $(sliderDiv).jqxSlider({
+            width: args.width,
+            min: 0,
+            max: 25000,
+            ticksFrequency: 5000,
+            value: 0,
+            step: 5000,
+            showButtons: false,
+            ticksPosition: 'bottom',
+        }).on('slideEnd', function(event) {
+            $(pauseButton).parent().attr("class", "pause");
+            var time = parseInt($(this).jqxSlider('value'));
+            ken.setUpdateTime(time);
+        });
+    }
 
     slider = $(caption).bxSlider({
         controls: false,
@@ -198,7 +212,8 @@ function startAnimation(args) {
         zoom: args.zoom,
         pan: args.pan,
         post_render_callback: function($canvas, context) {
-            $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
+            if (args.status_bar == true)
+                $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
             // Called after the effect is rendered
             // Draw anything you like on to of the canvas
             return;
