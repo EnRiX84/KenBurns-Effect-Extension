@@ -23,6 +23,7 @@ var caption;
 var canvas;
 var ken;
 var pauseButton;
+var audioOnAir;
 
 var indexGeneral = 0;
 var arrayTime = [0, 5000, 10000, 15000, 20000];
@@ -135,42 +136,33 @@ $.fn.kenburns_extension = function() {
                 $(this).parent().attr("class", "play");
                 ken.pause();
                 $(".background")[0].pause();
-                $(".speech")[indexGeneral].pause();
+                pauseAudio();
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
                 $(".background")[0].play();
-                $(".speech")[indexGeneral].play();
+                audioOnAir.play()
+//                $(".speech")[indexGeneral].play();
             }
         });
 
         $(firstButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
-            var speech = $(".speech")[indexGeneral];
-            if (indexGeneral == 0) {
-                speech.load();
-                fadeIn(speech);
-            } else {
-                speech.pause();
-            }
+            pauseAudio();
+            playAudio(0);
             ken.setUpdateTime(0);
         });
 
         $(lastButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
-            var speech = $(".speech")[indexGeneral];
-            if (indexGeneral == (arrayTime.length - 1)) {
-                speech.load();
-                fadeIn(speech);
-            } else {
-                speech.pause();
-            }
+            pauseAudio();
+            playAudio(arrayTime.length - 1);
             ken.setUpdateTime(20000);
         });
 
         $(prevButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
-            $(".speech")[indexGeneral].pause();
+            pauseAudio();
             if (indexGeneral != 0)
                 indexGeneral = (indexGeneral - 1) % arrayTime.length;
             else
@@ -178,7 +170,7 @@ $.fn.kenburns_extension = function() {
             ken.setUpdateTime(arrayTime[indexGeneral]);
         });
         $(nextButton).click(function() {
-            $(".speech")[indexGeneral].pause();
+            pauseAudio();
             $(pauseButton).parent().attr("class", "pause");
             indexGeneral = (indexGeneral + 1) % arrayTime.length;
             ken.setUpdateTime(arrayTime[indexGeneral]);
@@ -326,21 +318,27 @@ function startAnimation(args) {
     });
 }
 
-function playAudio(slideNumber) {
-    var index = (slideNumber != 0) ? (slideNumber - 1) : arrayTime.length - 1;
-
-    console.log("precedente: " + index);
-    console.log("successiva: " + slideNumber);
-
-    var audioAttuale = $('.speech')[slideNumber];
-    audioAttuale.load();
-    fadeIn(audioAttuale);
-
-    var audioPrecedente = $('.speech')[index];
-    fadeOut(audioPrecedente);
-
+function pauseAudio() {
+    var children = $('.speech').length;
+    for (var i = 0; i < children; i++) {
+        $('.speech')[i].pause();
+    }
 }
 
+function playAudio(slideNumber) {
+    var audioAttuale = $('.speech')[slideNumber];
+    var children = $('.speech').length;
+    for (var i = 0; i < children; i++) {
+        if (i != slideNumber) {
+            $('.speech')[i].pause();
+        }
+    }
+
+    audioAttuale.load();
+    audioOnAir = audioAttuale;
+    fadeIn(audioAttuale);
+
+}
 
 function fadeIn(audio) {
     audio.volume = 0;
@@ -359,7 +357,6 @@ function fadeIn(audio) {
 }
 
 function fadeOut(audioPrecedente) {
-    console.log(audioPrecedente);
     var vol = 0.1;
     var interval = 200;
     var intervalID = setInterval(function() {
