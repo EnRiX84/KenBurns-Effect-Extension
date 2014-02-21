@@ -142,7 +142,6 @@ $.fn.kenburns_extension = function() {
                 ken.play();
                 $(".background")[0].play();
                 audioOnAir.play()
-//                $(".speech")[indexGeneral].play();
             }
         });
 
@@ -164,11 +163,12 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             pauseAudio();
             if (indexGeneral != 0)
-                indexGeneral = (indexGeneral - 1) % arrayTime.length;
+                indexGeneral = indexGeneral - 1;
             else
                 indexGeneral = arrayTime.length - 1;
             ken.setUpdateTime(arrayTime[indexGeneral]);
         });
+
         $(nextButton).click(function() {
             pauseAudio();
             $(pauseButton).parent().attr("class", "pause");

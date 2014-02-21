@@ -232,7 +232,7 @@
             var frame_start_time = 0;
             for (i = 0; i < display_times.length; i++) {
                 frame_start_time = (i > 0) ? display_times[i - 1] : 0;
-                if (update_time > frame_start_time && update_time < display_times[i]) {
+                if (update_time > frame_start_time && update_time <= display_times[i]) {
                     top_frame = i;
                     display_time = display_times[i] - frame_start_time;
                     break;
