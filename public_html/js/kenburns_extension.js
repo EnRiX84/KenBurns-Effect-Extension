@@ -186,7 +186,6 @@ $.fn.kenburns_extension = function() {
     startAnimation(args);
 };
 
-
 function initSliders(args) {
     if (args.status_bar == true) {
         $(sliderDiv).jqxSlider({

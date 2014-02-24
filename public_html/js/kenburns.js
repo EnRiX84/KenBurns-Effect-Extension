@@ -271,7 +271,7 @@
 
             if (top_frame != last_frame) {
                 if (options.post_display_image_callback) {
-                    console.debug('DEBUG: image=' + top_frame + ' update_time=' + update_time);
+//                    console.debug('DEBUG: image=' + top_frame + ' update_time=' + update_time);
                     options.post_display_image_callback(top_frame);
                 }
                 last_frame = top_frame;
