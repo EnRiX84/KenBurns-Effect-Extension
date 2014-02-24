@@ -62,9 +62,11 @@
 
         var images = [];
         $(image_paths).each(function(i, image_path) {
-            images.push({path: image_path,
+            images.push({
+                path: image_path.src,
                 initialized: false,
-                loaded: false});
+                loaded: false
+            });
         });
 
         function interpolate_point(x1, y1, x2, y2, i) {

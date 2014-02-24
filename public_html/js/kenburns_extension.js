@@ -73,8 +73,8 @@ $.fn.kenburns_extension = function() {
     var loaderDiv = document.createElement("div");
     caption = document.createElement("div");
     var slides = "";
-    for (var i = 0; i < 10; i++) {
-        slides += '<div class="slide">Testo ' + i + '</div>';
+    for (var i = 0; i < args.images.length; i++) {
+        slides += '<div class="slide">' + args.images[i].caption + '</div>';
     }
     $(caption).html(slides);
     $(html).append(canvas);
@@ -159,7 +159,7 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             pauseAudio();
             playAudio(arrayTime.length - 1);
-            $(".background")[0].currentTime = arrayTime[arrayTime.length - 1]/1000;
+            $(".background")[0].currentTime = arrayTime[arrayTime.length - 1] / 1000;
             ken.setUpdateTime(arrayTime[arrayTime.length - 1]);
         });
 
@@ -172,9 +172,8 @@ $.fn.kenburns_extension = function() {
                 indexGeneral = arrayTime.length - 1;
 
             var current_time = getRealTime(indexGeneral);
-            $(".background")[0].currentTime = current_time/1000;
+            $(".background")[0].currentTime = current_time / 1000;
             ken.setUpdateTime(current_time);
-            
         });
 
         $(nextButton).click(function() {
@@ -182,9 +181,8 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             indexGeneral = (indexGeneral + 1) % arrayTime.length;
             var current_time = getRealTime(indexGeneral);
-            $(".background")[0].currentTime = current_time/1000;
+            $(".background")[0].currentTime = current_time / 1000;
             ken.setUpdateTime(current_time);
-            
         });
         //*********************************
     }
@@ -227,7 +225,7 @@ function initSliders(args) {
             $(pauseButton).parent().attr("class", "pause");
             var time = parseInt($(this).jqxSlider('value'));
             ken.setUpdateTime(time);
-            $(".background")[0].currentTime = time/1000;
+            $(".background")[0].currentTime = time / 1000;
         });
     }
 
