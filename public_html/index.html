@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="author" content="Enrico Maria Caruso"/>
 
-        <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="js/jquery-2.0.2.min.js"></script>
         <script type="text/javascript" src="js/jqx-all.js"></script>
         <script type="text/javascript" src="js/jquery.bxslider.js"></script>
         <script type="text/javascript" src="js/kenburns.js"></script>
@@ -33,42 +33,162 @@
                 status_bar: true, //set if you want see the status bar
                 slide_controller: true, //set if you want see the slide controller
                 images: [//select path of your images
-                    './img/1.jpg', // 1
-                    './img/2.jpg', // 2
-                    './img/3.jpg', // 3
-                    './img/4.jpg', // 4
-                    './img/5.jpg', // 5
+                    './img/title_majesty.png', // 1
+                    './img/title_university.png', // 2
+                    './img/title_erc.png', // 3
+                    './img/title_salut.png', // 4
+                    './img/mondo.jpg', // 5
+                    './img/mappa-arabia.jpg', // 6
+                    './img/costa.jpg', // 7
+                    './img/mesopotamia.jpg', // 8
+                    './img/gudea_2.jpg', // 9
+                    './img/pettine.jpg', //10
+                    './img/sigillobarca.jpg', //11
+                    './img/nave-magan.jpg', //12
+                    // seconda parte
+                    './img/sumhuram4.jpg', //13
+                    './img/nave-khor.jpg', //14
+                    './img/incisione_incenso.jpg', //15
+                    './img/mondo-viaggi.jpg', //16
+                    // terza parte
+                    './img/Johnson.jpg', //17
+                    './img/astrolabio2.jpg', //18
+                    './img/barca.jpg', //19
+                    './img/craft-oman.jpg', //20
+                    './img/sailors.jpg', //21
+                    './img/sultana.jpg', //22
+                    // quarta parte
+                    './img/txt_00.png', //23
+                    './img/txt_01.png', //24
+                    './img/salut-IMG_1916.jpg', //25
+                    './img/eagle.jpg', //26
+                    './img/txt-end.png', //27
                 ],
                 audio_background: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
-                    {src_mp3: './audio/6.mp3', src_ogg: './audio/6.ogg', autoplay: true}
+                    {src_mp3: './audio/sultano.mp3', src_ogg: './audio/sultano.ogg', autoplay: true}
                 ],
                 audio_for_images: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
-                    {src_mp3: './audio/1.mp3', src_ogg: './audio/1.ogg'}, // 1
-                    {src_mp3: './audio/2.mp3', src_ogg: './audio/2.ogg'}, // 2
-                    {src_mp3: './audio/3.mp3', src_ogg: './audio/3.ogg'}, // 3
-                    {src_mp3: './audio/4.mp3', src_ogg: './audio/4.ogg'}, // 4
-                    {src_mp3: './audio/5.mp3', src_ogg: './audio/5.ogg'}  // 5
+                    {src_mp3: './audio/ocean.mp3', src_ogg: './audio/ocean.ogg'},
+                    {src_mp3: './audio/desert-simple.mp3', src_ogg: './audio/desert-simple.ogg'},
+                    {src_mp3: './audio/eagle.mp3', src_ogg: './audio/eagle.ogg'},
+                    {src_mp3: './audio/Oman_Speech_06.mp3', src_ogg: './audio/Oman_Speech_06.ogg'}, // 1
+                    {src_mp3: './audio/Oman_Speech_07.mp3', src_ogg: './audio/Oman_Speech_07.ogg'}, // 2
+                    {src_mp3: './audio/Oman_Speech_08.mp3', src_ogg: './audio/Oman_Speech_08.ogg'}, // 3
+                    {src_mp3: './audio/Oman_Speech_09.mp3', src_ogg: './audio/Oman_Speech_09.ogg'}, // 4
+                    {src_mp3: './audio/Oman_Speech_10.mp3', src_ogg: './audio/Oman_Speech_10.ogg'}, // 5
+                    {src_mp3: './audio/Oman_Speech_11.mp3', src_ogg: './audio/Oman_Speech_11.ogg'},
+                    {src_mp3: './audio/Oman_Speech_12.mp3', src_ogg: './audio/Oman_Speech_12.ogg'},
+                    {src_mp3: './audio/Oman_Speech_13.mp3', src_ogg: './audio/Oman_Speech_13.ogg'},
+                    {src_mp3: './audio/Oman_Speech_14.mp3', src_ogg: './audio/Oman_Speech_14.ogg'},
+                    {src_mp3: './audio/Oman_Speech_15.mp3', src_ogg: './audio/Oman_Speech_15.ogg'}, // 10
+                    {src_mp3: './audio/Oman_Speech_16.mp3', src_ogg: './audio/Oman_Speech_16.ogg'},
+                    {src_mp3: './audio/Oman_Speech_17.mp3', src_ogg: './audio/Oman_Speech_17.ogg'},
+                    {src_mp3: './audio/Oman_Speech_18.mp3', src_ogg: './audio/Oman_Speech_18.ogg'},
+                    {src_mp3: './audio/Oman_Speech_19.mp3', src_ogg: './audio/Oman_Speech_19.ogg'},
+                    {src_mp3: './audio/Oman_Speech_20.mp3', src_ogg: './audio/Oman_Speech_20.ogg'}, // 15
+                    {src_mp3: './audio/Oman_Speech_21.mp3', src_ogg: './audio/Oman_Speech_21.ogg'},
+                    {src_mp3: './audio/Oman_Speech_22.mp3', src_ogg: './audio/Oman_Speech_22.ogg'},
+                    {src_mp3: './audio/Oman_Speech_23.mp3', src_ogg: './audio/Oman_Speech_23.ogg'},
+                    {src_mp3: './audio/Oman_Speech_24.mp3', src_ogg: './audio/Oman_Speech_24.ogg'}
                 ],
-                display_times: [//set for every image how many time it is showed
-                    5000, // Slide 1
+                display_times: [
+                    0, // Slide 1
                     5000, // Slide 2
                     5000, // Slide 3
                     5000, // Slide 4
                     5000, // Slide 5
+                    11000, // Slide 6
+                    13000, // Slide 7
+                    7000, // Slide 8
+                    7000, // Slide 9
+                    6000, // Slide 10
+                    12500, // Slide 11
+                    16000, // Slide 12
+                    // seconda parte
+                    8500, // Slide 13 
+                    7000, // Slide 14
+                    6300, // Slide 15
+                    5000, // Slide 16
+                    // terza parte
+                    9000, // Slide 17 
+                    11500, // Slide 18
+                    8500, // Slide 19
+                    9500, // Slide 20
+                    8000, // Slide 21 
+                    12000, // Slide 22
+                    // quarta parte
+                    8000, // Slide 23 
+                    10000, // Slide 24 
+                    6000, // Slide 25
+                    5000, // Slide 26
+                    10000, // Slide 27
                 ],
-                zoom: [//set for every image the zoom
-                    1.1, // 1
-                    1.2, // 2
-                    1.1, // 3
-                    1.2, // 4
-                    1.1  // 5
+                zoom: [
+                    1, // 1
+                    1,
+                    1,
+                    1,
+                    1.3, // 5
+                    1.3,
+                    1.2,
+                    1.3,
+                    1.3,
+                    -1.3, // 10
+                    -1.2, // 11
+                    -1.4, // 12
+                    1.3,
+                    1.2,
+                    -1.4, //15
+                    -1.4,
+                    1.2,
+                    1.5,
+                    -1.2,
+                    1.2, //20
+                    -1.2,
+                    1.3,
+                    1,
+                    1,
+                    1.2, //25
+                    -1.1,
+                    1 //27
                 ],
                 pan: [
-                    {x: 0, y: 1}, // 1
-                    {x: 1, y: 1}, // 2
-                    {x: 1, y: 2}, // 3
-                    {x: 2, y: 0}, // 4
-                    {x: 2, y: 0}, // 5
+                    {x: 0, y: 0}, // 1 marchi
+                    {x: 0, y: 0}, // 2 marchi
+                    {x: 0, y: 0}, // 3 marchi
+                    {x: 0, y: 0}, // 4 marchi
+                    {x: 0, y: 1}, // 5 mondo
+                    {x: 2, y: 0}, // 6 mappa
+                    {x: 2, y: -1}, // 7 mappa
+                    {x: 0, y: 0}, // 8 sigillo/barca
+                    {x: 0, y: 0}, // 9 testa
+                    {x: 0, y: 0}, // 10 pettine
+                    {x: 0, y: 0}, // 11 sigillo/barca
+                    {x: 0, y: 0}, // 12 barca magan
+                    //
+                    // seconda parte
+
+                    {x: 0, y: -1}, // 13 ex 12 sumhuram
+                    {x: 0, y: 0}, // 14 ex 13 disegno khor
+                    {x: 0, y: 0}, // 15 ex 14 incenso
+                    {x: 0, y: 0}, // 16 ex 15 viaggi
+
+                    // terza parte
+
+                    {x: 0, y: 0}, // 17 ex 16 veliero
+                    {x: 0, y: 0}, // 18 ex 17 astrolabio
+                    {x: 0, y: 0}, // 19 ex 18 veliero2
+                    {x: 0, y: 0}, // 20 veliero2 bis
+                    {x: 1, y: 1}, // 21 ex 19 navi
+                    {x: 0, y: 1}, // 22 ex 20 sultana
+
+                    // quarta parte
+
+                    {x: 1, y: 1}, // 23 ex 21 scritta txt 00
+                    {x: 1, y: 1}, // 24 ex 22 scritta txt 01
+                    {x: 0, y: 0}, // 25 ex 23 desert
+                    {x: 2, y: 1}, // 26 ex 24 eagle
+                    {x: 1, y: 1}, // 28 scritta txt end
                 ],
                 debug: false, // true if you want to show debug info.
                 frames_per_second: 25, // frames per second

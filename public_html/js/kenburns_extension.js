@@ -26,11 +26,13 @@ var pauseButton;
 var audioOnAir;
 
 var indexGeneral = 0;
-var arrayTime = [0, 5000, 10000, 15000, 20000];
+var arrayTime;
 
 $.fn.kenburns_extension = function() {
 
     var args = arguments[0] || {};
+
+    arrayTime = args.display_times;
 
     var html = document.createElement("div");
 
@@ -149,6 +151,7 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             pauseAudio();
             playAudio(0);
+            $(".background")[0].currentTime = 0;
             ken.setUpdateTime(0);
         });
 
@@ -156,7 +159,8 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             pauseAudio();
             playAudio(arrayTime.length - 1);
-            ken.setUpdateTime(20000);
+            $(".background")[0].currentTime = arrayTime[arrayTime.length - 1]/1000;
+            ken.setUpdateTime(arrayTime[arrayTime.length - 1]);
         });
 
         $(prevButton).click(function() {
@@ -166,14 +170,21 @@ $.fn.kenburns_extension = function() {
                 indexGeneral = indexGeneral - 1;
             else
                 indexGeneral = arrayTime.length - 1;
-            ken.setUpdateTime(arrayTime[indexGeneral]);
+
+            var current_time = getRealTime(indexGeneral);
+            $(".background")[0].currentTime = current_time/1000;
+            ken.setUpdateTime(current_time);
+            
         });
 
         $(nextButton).click(function() {
             pauseAudio();
             $(pauseButton).parent().attr("class", "pause");
             indexGeneral = (indexGeneral + 1) % arrayTime.length;
-            ken.setUpdateTime(arrayTime[indexGeneral]);
+            var current_time = getRealTime(indexGeneral);
+            $(".background")[0].currentTime = current_time/1000;
+            ken.setUpdateTime(current_time);
+            
         });
         //*********************************
     }
@@ -186,22 +197,37 @@ $.fn.kenburns_extension = function() {
     startAnimation(args);
 };
 
+function getRealTime(indexPosition) {
+    var position = 0;
+    for (var i = 0; i < indexPosition; i++) {
+        position += arrayTime[i];
+    }
+    return position;
+}
+
 function initSliders(args) {
+    var maxTime = 0;
+    for (var i = 0; i < arrayTime.length; i++) {
+        maxTime += arrayTime[i];
+    }
+
     if (args.status_bar == true) {
         $(sliderDiv).jqxSlider({
             width: args.width,
             min: 0,
-            max: 25000,
-            ticksFrequency: 5000,
+            max: maxTime,
             value: 0,
-            step: 5000,
-            mode: 'fixed',
+            step: 1000,
+            showTicks: false,
             showButtons: false,
-            ticksPosition: 'bottom',
+//            ticksFrequency: 5000,
+//            ticksPosition: 'bottom',
+//            mode: 'fixed',
         }).on('slideEnd', function(event) {
             $(pauseButton).parent().attr("class", "pause");
             var time = parseInt($(this).jqxSlider('value'));
             ken.setUpdateTime(time);
+            $(".background")[0].currentTime = time/1000;
         });
     }
 
@@ -239,12 +265,21 @@ function initAudio(args, main) {
     $(audio_background).append(source_background);
     $(audio_background).append(source_background2);
     $(main).append(audio_background);
-    audio_background.volume = 0;
+    audio_background.volume = 0.2;
     //****************************************************
+
+    /*
+     #!/bin/bash
+     #for file in *.mp3
+     #    do avconv -i "${file}" "`echo ${file%.mp3}.ogg`";
+     #done
+     
+     */
 
     //*** AUDIO TRACE ************************************
     var audioArray = args.audio_for_images;
     for (var i = 0; i < audioArray.length; i++) {
+
         var audio = document.createElement("audio");
         $(audio).attr("preload", true).attr("class", "speech");
         if (audioArray[i].src_ogg == null || audioArray[i].src_mp3 == null) {
@@ -257,6 +292,8 @@ function initAudio(args, main) {
         $(source2).attr("src", audioArray[i].src_mp3).attr("type", "audio/mpeg");
         $(audio).append(source);
         $(audio).append(source2);
+//        var audio = new Audio();
+//        audio.canPlayType('audio/ogg; codecs="vorbis"');
         $(main).append(audio);
     }
     //****************************************************
@@ -334,7 +371,8 @@ function playAudio(slideNumber) {
         }
     }
 
-    audioAttuale.load();
+    if (audioAttuale != null)
+        audioAttuale.load();
     audioOnAir = audioAttuale;
     fadeIn(audioAttuale);
 
