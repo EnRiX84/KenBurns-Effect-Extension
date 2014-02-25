@@ -26,13 +26,17 @@ var pauseButton;
 var audioOnAir;
 
 var indexGeneral = 0;
-var arrayTime;
+var arrayTime = [];
+var slideDrag = false;
 
 $.fn.kenburns_extension = function() {
 
     var args = arguments[0] || {};
 
-    arrayTime = args.display_times;
+    var images = args.images;
+    for (var i = 0; i < images.length; i++) {
+        arrayTime.push(images[i].display_time);
+    }
 
     var html = document.createElement("div");
 
@@ -223,11 +227,15 @@ function initSliders(args) {
 //            ticksFrequency: 5000,
 //            ticksPosition: 'bottom',
 //            mode: 'fixed',
-        }).on('slideEnd', function(event) {
+        }).on('slideEnd', function(event) { //slideEnd
+            console.log(event);
             $(pauseButton).parent().attr("class", "pause");
             var time = parseInt($(this).jqxSlider('value'));
             ken.setUpdateTime(time);
             $(".background")[0].currentTime = time / 1000;
+            slideDrag = false;
+        }).on('slideStart', function(event) { //slideEnd
+            slideDrag = true;
         });
     }
 
@@ -299,18 +307,20 @@ function initAudio(args, main) {
     //****************************************************
 }
 
+
+
 function startAnimation(args) {
     ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
         display_times: args.display_times,
+        zoom: args.zoom,
         frames_per_second: args.frames_per_second,
         fade_time: args.fade_time,
         background_color: args.background_color,
-        zoom: args.zoom,
         pan: args.pan,
         post_render_callback: function($canvas, context) {
-            if (args.status_bar == true) {
+            if (args.status_bar == true && slideDrag == false) {
                 $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
             }
             // Called after the effect is rendered

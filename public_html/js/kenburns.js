@@ -43,10 +43,10 @@
         var last_frame = -1;
 
         var zoom_levels = [];
-        $(options.zoom).each(function(i, zoom) {
-            zoom_level = 1 / zoom;
-            zoom_levels.push(zoom_level);
-        });
+//        $(options.zoom).each(function(i, zoom) {
+//            zoom_level = 1 / zoom;
+//            zoom_levels.push(zoom_level);
+//        });
 
         var pan_directions = [];
         $(options.pan).each(function(i, pan_direction) {
@@ -55,10 +55,10 @@
 
         var display_times = [];
         var total_time = 0;
-        $(options.display_times).each(function(i, display_time) {
-            total_time += display_time;
-            display_times.push(total_time);
-        });
+//        $(options.display_times).each(function(i, display_time) {
+//            total_time += display_time;
+//            display_times.push(total_time);
+//        });
 
         var images = [];
         $(image_paths).each(function(i, image_path) {
@@ -67,6 +67,12 @@
                 initialized: false,
                 loaded: false
             });
+
+            total_time += image_path.display_time;
+            display_times.push(total_time);
+
+            zoom_level = 1 / image_path.zoom;
+            zoom_levels.push(zoom_level);
         });
 
         function interpolate_point(x1, y1, x2, y2, i) {
