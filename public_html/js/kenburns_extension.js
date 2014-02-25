@@ -158,9 +158,11 @@ $.fn.kenburns_extension = function() {
         $(lastButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
             pauseAudio();
-            playAudio(arrayTime.length - 1);
-            $(".background")[0].currentTime = arrayTime[arrayTime.length - 1] / 1000;
-            ken.setUpdateTime(arrayTime[arrayTime.length - 1]);
+            var slidenumber = arrayTime.length - 1;
+            playAudio(slidenumber);
+            var current_time = getRealTime(slidenumber);
+            $(".background")[0].currentTime = current_time / 1000;
+            ken.setUpdateTime(current_time);
         });
 
         $(prevButton).click(function() {
@@ -279,7 +281,7 @@ function initAudio(args, main) {
     for (var i = 0; i < audioArray.length; i++) {
 
         var audio = document.createElement("audio");
-        $(audio).attr("preload", true).attr("class", "speech");
+        $(audio).attr("class", "speech");
         if (audioArray[i].src_ogg == null || audioArray[i].src_mp3 == null) {
             alert("Insert correct information to load audio");
             return;
@@ -369,11 +371,11 @@ function playAudio(slideNumber) {
         }
     }
 
-    if (audioAttuale != null)
+    if (audioAttuale != null) {
         audioAttuale.load();
-    audioOnAir = audioAttuale;
-    fadeIn(audioAttuale);
-
+        audioOnAir = audioAttuale;
+        fadeIn(audioAttuale);
+    }
 }
 
 function fadeIn(audio) {
