@@ -48,7 +48,7 @@ body {
     line-height: 16px;
     min-width: 1100px; 
     background: #fff  left top scroll repeat-x;
-    
+
 }
 
 .class_img{
@@ -92,9 +92,7 @@ body {
     margin-right: auto; 
     margin-left: auto; 
     background: #000000;
-    background: url(images/bg_footer.jpg) #000000 no-repeat; 
-    background-position: bottom;
-
+    background: url(images/bg_footer.jpg) #000000 no-repeat bottom; 
     padding: 20px;
 
 }

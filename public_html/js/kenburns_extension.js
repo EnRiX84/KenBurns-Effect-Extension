@@ -76,9 +76,7 @@ $.fn.kenburns_extension = function() {
     //CAPTIONS
     var loaderDiv = document.createElement("div");
     caption = document.createElement("div");
-
     $(caption).attr("class", "slider-wrapper");
-
     var slides = "";
     for (var i = 0; i < args.images.length; i++) {
         slides += '<div class="slide">' + args.images[i].caption + '</div>';
@@ -90,8 +88,6 @@ $.fn.kenburns_extension = function() {
     $(html).append(sliderPosition);
     $(html).append(caption);
     //***********************************
-
-//    <div id="Slideshow-1392891124688" class="slideshow-captions" aria-busy="false" aria-hidden="false" role="description" style="height: 22px; visibility: visible; opacity: 0.7;">2 seconda descrizione</div>
 
     if (args.slide_controller == true) {
         // SLIDE SHOW CONTROLLER
@@ -170,7 +166,9 @@ $.fn.kenburns_extension = function() {
             var slidenumber = arrayTime.length - 1;
             playAudio(slidenumber);
             var current_time = getRealTime(slidenumber);
-            $(".background")[0].currentTime = current_time / 1000;
+
+
+            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
             ken.setUpdateTime(current_time);
         });
 
@@ -183,7 +181,7 @@ $.fn.kenburns_extension = function() {
                 indexGeneral = arrayTime.length - 1;
 
             var current_time = getRealTime(indexGeneral);
-            $(".background")[0].currentTime = current_time / 1000;
+            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
             ken.setUpdateTime(current_time);
         });
 
@@ -192,7 +190,11 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             indexGeneral = (indexGeneral + 1) % arrayTime.length;
             var current_time = getRealTime(indexGeneral);
-            $(".background")[0].currentTime = current_time / 1000;
+
+            var duration = $(".background")[0].duration;
+            console.log(duration);
+            console.log(current_time);
+            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
             ken.setUpdateTime(current_time);
         });
         //*********************************
@@ -233,11 +235,10 @@ function initSliders(args) {
 //            ticksPosition: 'bottom',
 //            mode: 'fixed',
         }).on('slideEnd', function(event) { //slideEnd
-            console.log(event);
             $(pauseButton).parent().attr("class", "pause");
             var time = parseInt($(this).jqxSlider('value'));
             ken.setUpdateTime(time);
-            $(".background")[0].currentTime = time / 1000;
+            $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
             slideDrag = false;
         }).on('slideStart', function(event) { //slideEnd
             slideDrag = true;
