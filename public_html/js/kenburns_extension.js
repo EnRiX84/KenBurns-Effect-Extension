@@ -60,8 +60,8 @@ $.fn.kenburns_extension = function() {
 
     //apply events to canvas
     $(canvas).mousemove(function() {
-        $(html).append(sliderDiv);
-        $(html).append(divForSlide);
+        $(sliderPosition).append(sliderDiv);
+        $(sliderPosition).append(divForSlide);
         $(sliderDiv).fadeIn("slow");
         $(slideShowController).fadeIn("slow");
     }).mouseout(function() {
@@ -76,6 +76,9 @@ $.fn.kenburns_extension = function() {
     //CAPTIONS
     var loaderDiv = document.createElement("div");
     caption = document.createElement("div");
+
+    $(caption).attr("class", "slider-wrapper");
+
     var slides = "";
     for (var i = 0; i < args.images.length; i++) {
         slides += '<div class="slide">' + args.images[i].caption + '</div>';
@@ -83,6 +86,8 @@ $.fn.kenburns_extension = function() {
     $(caption).html(slides);
     $(html).append(canvas);
     $(html).append(loaderDiv);
+    var sliderPosition = document.createElement("div");
+    $(html).append(sliderPosition);
     $(html).append(caption);
     //***********************************
 
@@ -389,19 +394,19 @@ function playAudio(slideNumber) {
 }
 
 function fadeIn(audio) {
-    audio.volume = 0;
+//    audio.volume = 0;
     audio.play();
-    var vol = 0;
-    var interval = 200;
-    var intervalID = setInterval(function() {
-        if (vol < 1) {
-            vol += 0.1;
-            if (vol >= 0 && vol <= 1)
-                audio.volume = vol;
-        } else {
-            clearInterval(intervalID);
-        }
-    }, interval);
+//    var vol = 0;
+//    var interval = 200;
+//    var intervalID = setInterval(function() {
+//        if (vol < 1) {
+//            vol += 0.1;
+//            if (vol >= 0 && vol <= 1)
+//                audio.volume = vol;
+//        } else {
+//            clearInterval(intervalID);
+//        }
+//    }, interval);
 }
 
 function fadeOut(audioPrecedente) {
