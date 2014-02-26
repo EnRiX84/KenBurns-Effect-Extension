@@ -221,6 +221,18 @@ $.fn.kenburns_extension = function() {
     startAnimation(args);
 };
 
+function getStartTime(realtime) {
+    var value = 0;
+    for (var i = 0; i < arrayTime.length; i++) {
+        value += arrayTime[i];
+        if (value >= realtime) {
+            return value - arrayTime[i];
+            break;
+        }
+    }
+    return false;
+}
+
 function getRealTime(indexPosition) {
     var position = 0;
     for (var i = 0; i < indexPosition; i++) {
@@ -250,7 +262,7 @@ function initSliders(args) {
         }).on('slideEnd', function(event) { //slideEnd
             $(pauseButton).parent().attr("class", "pause");
             var time = parseInt($(this).jqxSlider('value'));
-            ken.setUpdateTime(time);
+            ken.setUpdateTime(getStartTime(time));
             $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
             slideDrag = false;
         }).on('slideStart', function(event) { //slideEnd
@@ -274,25 +286,22 @@ function initAudio(args, main) {
 
     //****AUDIO BACKGROUND********************************
     var audio_background_element = args.audio_background[0];
-
-    if (audio_background_element.src_ogg == null || audio_background_element.src_mp3 == null) {
-        alert("Insert correct information to load audio");
-        return;
+    if (audio_background_element != null && audio_background_element.src_ogg != null
+            && audio_background_element.src_mp3 != null) {
+        var audio_background = document.createElement("audio");
+        $(audio_background).attr("preload", true).attr("class", "background");
+        if (audio_background_element.autoplay != null && audio_background_element.autoplay == true) {
+            $(audio_background).attr("autoplay", true).attr("loop", true);
+        }
+        var source_background = document.createElement("source");
+        $(source_background).attr("src", audio_background_element.src_ogg).attr("type", "audio/ogg");
+        var source_background2 = document.createElement("source");
+        $(source_background2).attr("src", audio_background_element.src_mp3).attr("type", "audio/mpeg");
+        $(audio_background).append(source_background);
+        $(audio_background).append(source_background2);
+        $(main).append(audio_background);
+        audio_background.volume = 0.2;
     }
-
-    var audio_background = document.createElement("audio");
-    $(audio_background).attr("preload", true).attr("class", "background");
-    if (audio_background_element.autoplay != null && audio_background_element.autoplay == true) {
-        $(audio_background).attr("autoplay", true).attr("loop", true);
-    }
-    var source_background = document.createElement("source");
-    $(source_background).attr("src", audio_background_element.src_ogg).attr("type", "audio/ogg");
-    var source_background2 = document.createElement("source");
-    $(source_background2).attr("src", audio_background_element.src_mp3).attr("type", "audio/mpeg");
-    $(audio_background).append(source_background);
-    $(audio_background).append(source_background2);
-    $(main).append(audio_background);
-    audio_background.volume = 0.2;
     //****************************************************
 
     /*
@@ -300,7 +309,6 @@ function initAudio(args, main) {
      #for file in *.mp3
      #    do avconv -i "${file}" "`echo ${file%.mp3}.ogg`";
      #done
-     
      */
 
     //*** AUDIO TRACE ************************************
@@ -318,8 +326,8 @@ function initAudio(args, main) {
             $(audio).append(source2);
         }
         $(main).append(audio);
-        //****************************************************
     }
+    //****************************************************
 }
 
 function startAnimation(args) {
