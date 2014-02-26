@@ -152,50 +152,63 @@ $.fn.kenburns_extension = function() {
             }
         });
 
+        var previousData = new Date().getTime();
         $(firstButton).click(function() {
-            $(pauseButton).parent().attr("class", "pause");
-            pauseAudio();
-            playAudio(0);
-            $(".background")[0].currentTime = 0;
-            ken.setUpdateTime(0);
+            var actuallyData = new Date().getTime();
+            if ((actuallyData - previousData) > 1000) {
+                $(pauseButton).parent().attr("class", "pause");
+                pauseAudio();
+                playAudio(0);
+                $(".background")[0].currentTime = 0;
+                ken.setUpdateTime(0);
+                previousData = new Date().getTime();
+            }
         });
 
         $(lastButton).click(function() {
-            $(pauseButton).parent().attr("class", "pause");
-            pauseAudio();
-            var slidenumber = arrayTime.length - 1;
-            playAudio(slidenumber);
-            var current_time = getRealTime(slidenumber);
+            var actuallyData = new Date().getTime();
+            if ((actuallyData - previousData) > 1000) {
+                $(pauseButton).parent().attr("class", "pause");
+                pauseAudio();
+                var slidenumber = arrayTime.length - 1;
+                playAudio(slidenumber);
+                var current_time = getRealTime(slidenumber);
 
 
-            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-            ken.setUpdateTime(current_time);
+                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                ken.setUpdateTime(current_time);
+                previousData = new Date().getTime();
+            }
         });
 
         $(prevButton).click(function() {
-            $(pauseButton).parent().attr("class", "pause");
-            pauseAudio();
-            if (indexGeneral != 0)
-                indexGeneral = indexGeneral - 1;
-            else
-                indexGeneral = arrayTime.length - 1;
+            var actuallyData = new Date().getTime();
+            if ((actuallyData - previousData) > 1000) {
+                $(pauseButton).parent().attr("class", "pause");
+                pauseAudio();
+                if (indexGeneral != 0)
+                    indexGeneral = indexGeneral - 1;
+                else
+                    indexGeneral = arrayTime.length - 1;
 
-            var current_time = getRealTime(indexGeneral);
-            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-            ken.setUpdateTime(current_time);
+                var current_time = getRealTime(indexGeneral);
+                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                ken.setUpdateTime(current_time);
+                previousData = new Date().getTime();
+            }
         });
 
         $(nextButton).click(function() {
-            pauseAudio();
-            $(pauseButton).parent().attr("class", "pause");
-            indexGeneral = (indexGeneral + 1) % arrayTime.length;
-            var current_time = getRealTime(indexGeneral);
-
-            var duration = $(".background")[0].duration;
-            console.log(duration);
-            console.log(current_time);
-            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-            ken.setUpdateTime(current_time);
+            var actuallyData = new Date().getTime();
+            if ((actuallyData - previousData) > 1000) {
+                pauseAudio();
+                $(pauseButton).parent().attr("class", "pause");
+                indexGeneral = (indexGeneral + 1) % arrayTime.length;
+                var current_time = getRealTime(indexGeneral);
+                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                ken.setUpdateTime(current_time);
+                previousData = new Date().getTime();
+            }
         });
         //*********************************
     }
@@ -293,27 +306,21 @@ function initAudio(args, main) {
     //*** AUDIO TRACE ************************************
     var audioArray = args.audio_for_images;
     for (var i = 0; i < audioArray.length; i++) {
-
         var audio = document.createElement("audio");
-        $(audio).attr("class", "speech");
-        if (audioArray[i].src_ogg == null || audioArray[i].src_mp3 == null) {
-            alert("Insert correct information to load audio");
-            return;
+        $(audio).attr("class", "speech").attr("preload", true);
+        if (audioArray[i].src_ogg != "" && audioArray[i].src_ogg != null
+                && audioArray[i].src_mp3 != "" && audioArray[i].src_mp3 != null) {
+            var source = document.createElement("source");
+            $(source).attr("src", audioArray[i].src_ogg).attr("type", "audio/ogg");
+            var source2 = document.createElement("source");
+            $(source2).attr("src", audioArray[i].src_mp3).attr("type", "audio/mpeg");
+            $(audio).append(source);
+            $(audio).append(source2);
         }
-        var source = document.createElement("source");
-        $(source).attr("src", audioArray[i].src_ogg).attr("type", "audio/ogg");
-        var source2 = document.createElement("source");
-        $(source2).attr("src", audioArray[i].src_mp3).attr("type", "audio/mpeg");
-        $(audio).append(source);
-        $(audio).append(source2);
-//        var audio = new Audio();
-//        audio.canPlayType('audio/ogg; codecs="vorbis"');
         $(main).append(audio);
+        //****************************************************
     }
-    //****************************************************
 }
-
-
 
 function startAnimation(args) {
     ken = $(canvas).kenburns({
@@ -366,7 +373,7 @@ function startAnimation(args) {
             indexGeneral = slide_number;
             slider.goToSlide(slide_number);
             playAudio(slide_number);
-//            }, 0);
+//            }, 10);
         }
     });
 }
@@ -380,17 +387,17 @@ function pauseAudio() {
 
 function playAudio(slideNumber) {
     var audioAttuale = $('.speech')[slideNumber];
-    var children = $('.speech').length;
-    for (var i = 0; i < children; i++) {
-        if (i != slideNumber) {
-            $('.speech')[i].pause();
-        }
-    }
-
     if (audioAttuale != null) {
         audioAttuale.load();
-        audioOnAir = audioAttuale;
         fadeIn(audioAttuale);
+        audioOnAir = audioAttuale;
+    }
+
+    var children = $('.speech').length;
+    for (var i = 0; i < children; i++) {
+        if (i != slideNumber && $('.speech')[i] != audioAttuale) {
+            $('.speech')[i].pause();
+        }
     }
 }
 
