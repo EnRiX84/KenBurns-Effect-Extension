@@ -44,37 +44,15 @@ $.fn.kenburns_extension = function() {
     $(canvas).attr("id", "canvas").attr("width", args.width).attr("height", args.height);
     $(canvas).append("<p>Your browser does not support canvas!</p>");
 
-    var inside = false;
-
     //Status bar
     if (args.status_bar == true) {
         sliderDiv = document.createElement("div");
         $(sliderDiv).attr("class", "sliderDiv");
-        $(sliderDiv).mouseover(function() {
-            inside = true;
-        }).mouseout(function() {
-            inside = false;
-        });
     }
-    //*******************
-
-    //apply events to canvas
-    $(canvas).mousemove(function() {
-        $(sliderPosition).append(sliderDiv);
-        $(sliderPosition).append(divForSlide);
-        $(sliderDiv).fadeIn("slow");
-        $(slideShowController).fadeIn("slow");
-    }).mouseout(function() {
-        setTimeout(function() {
-            if (inside == false) {
-                $(sliderDiv).fadeOut("slow");
-                $(slideShowController).fadeOut("slow");
-            }
-        }, 10);
-    });
 
     //CAPTIONS
     var loaderDiv = document.createElement("div");
+    $(loaderDiv).html("Your browser do not support HTML 5 standard");
     caption = document.createElement("div");
     $(caption).attr("class", "slider-wrapper");
     var slides = "";
@@ -82,10 +60,27 @@ $.fn.kenburns_extension = function() {
         slides += '<div class="slide">' + args.images[i].caption + '</div>';
     }
     $(caption).html(slides);
-    $(html).append(canvas);
-    $(html).append(loaderDiv);
+
+    var containerForCanvasLoaderSlider = document.createElement("div");
+    $(containerForCanvasLoaderSlider).append(canvas);
+    $(containerForCanvasLoaderSlider).append(loaderDiv);
     var sliderPosition = document.createElement("div");
-    $(html).append(sliderPosition);
+    $(containerForCanvasLoaderSlider).append(sliderPosition);
+
+    //apply events to containerForCanvasLoaderSlider
+    $(containerForCanvasLoaderSlider).mouseenter(function() {
+        $(sliderPosition).append(sliderDiv);
+        $(sliderPosition).append(divForSlide);
+        $(sliderDiv).fadeIn("slow");
+        $(slideShowController).fadeIn("slow");
+    }).mouseleave(function() {
+        console.log("OUT 1");
+        $(sliderDiv).fadeOut("slow");
+        $(slideShowController).fadeOut("slow");
+
+    });
+
+    $(html).append(containerForCanvasLoaderSlider);
     $(html).append(caption);
     //***********************************
 
@@ -395,34 +390,30 @@ function pauseAudio() {
 
 function playAudio(slideNumber) {
     var audioAttuale = $('.speech')[slideNumber];
+    var children = $('.speech').length;
+    for (var i = 0; i < children; i++) {
+//        if (i != slideNumber) {
+        $('.speech')[i].pause();
+//        }
+    }
+
     if (audioAttuale != null) {
         fadeIn(audioAttuale);
         audioOnAir = audioAttuale;
     }
 
-    var children = $('.speech').length;
-    for (var i = 0; i < children; i++) {
-        if (i != slideNumber && $('.speech')[i] != audioAttuale) {
-            $('.speech')[i].pause();
-        }
-    }
 }
 
 function fadeIn(audio) {
     audio.volume = 1;
     audio.play();
-    console.log("---");
-//    console.log("canPlayType: "+audio.canPlayType());
-    console.log("Duration: " + audio.duration);
-    var buffered = audio.buffered;
-    console.log(buffered);
+
     var isSeeking = audio.seeking;
     var isSeekable = audio.seekable && audio.seekable.length > 0;
-//    var seekableEnd = audio.seekable.end();
-
+    console.log("---");
+    console.log("Duration: " + audio.duration);
     console.log("isSeeking: " + isSeeking);
     console.log("isSeekable: " + isSeekable);
-//    console.log("seekableEnd: " + seekableEnd);
     console.log("---");
 
 //    var vol = 0;
