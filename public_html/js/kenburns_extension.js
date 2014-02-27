@@ -289,7 +289,7 @@ function initAudio(args, main) {
     if (audio_background_element != null && audio_background_element.src_ogg != null
             && audio_background_element.src_mp3 != null) {
         var audio_background = document.createElement("audio");
-        $(audio_background).attr("preload", true).attr("class", "background");
+        $(audio_background).attr("preload", "auto").attr("class", "background");
         if (audio_background_element.autoplay != null && audio_background_element.autoplay == true) {
             $(audio_background).attr("autoplay", true).attr("loop", true);
         }
@@ -315,7 +315,7 @@ function initAudio(args, main) {
     var audioArray = args.audio_for_images;
     for (var i = 0; i < audioArray.length; i++) {
         var audio = document.createElement("audio");
-        $(audio).attr("class", "speech").attr("preload", true);
+        $(audio).attr("class", "speech").attr("preload", "auto").attr("autobuffer", true);
         if (audioArray[i].src_ogg != "" && audioArray[i].src_ogg != null
                 && audioArray[i].src_mp3 != "" && audioArray[i].src_mp3 != null) {
             var source = document.createElement("source");
@@ -396,7 +396,6 @@ function pauseAudio() {
 function playAudio(slideNumber) {
     var audioAttuale = $('.speech')[slideNumber];
     if (audioAttuale != null) {
-        audioAttuale.load();
         fadeIn(audioAttuale);
         audioOnAir = audioAttuale;
     }
@@ -410,8 +409,22 @@ function playAudio(slideNumber) {
 }
 
 function fadeIn(audio) {
-//    audio.volume = 0;
+    audio.volume = 1;
     audio.play();
+    console.log("---");
+//    console.log("canPlayType: "+audio.canPlayType());
+    console.log("Duration: " + audio.duration);
+    var buffered = audio.buffered;
+    console.log(buffered);
+    var isSeeking = audio.seeking;
+    var isSeekable = audio.seekable && audio.seekable.length > 0;
+//    var seekableEnd = audio.seekable.end();
+
+    console.log("isSeeking: " + isSeeking);
+    console.log("isSeekable: " + isSeekable);
+//    console.log("seekableEnd: " + seekableEnd);
+    console.log("---");
+
 //    var vol = 0;
 //    var interval = 200;
 //    var intervalID = setInterval(function() {
