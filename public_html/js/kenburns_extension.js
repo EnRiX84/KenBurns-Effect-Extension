@@ -23,7 +23,6 @@ var caption;
 var canvas;
 var ken;
 var pauseButton;
-var audioOnAir;
 
 var indexGeneral = 0;
 var arrayTime = [];
@@ -74,10 +73,8 @@ $.fn.kenburns_extension = function() {
         $(sliderDiv).fadeIn("slow");
         $(slideShowController).fadeIn("slow");
     }).mouseleave(function() {
-        console.log("OUT 1");
         $(sliderDiv).fadeOut("slow");
         $(slideShowController).fadeOut("slow");
-
     });
 
     $(html).append(containerForCanvasLoaderSlider);
@@ -91,12 +88,6 @@ $.fn.kenburns_extension = function() {
         $(slideShowController).attr("class", "slideshow-controller");
         $(divForSlide).append(slideShowController);
         $(divForSlide).attr("style", "width: " + args.width + "px; height:" + args.height + "px; margin-top:-" + args.height + "px;");
-
-        $(slideShowController).mouseover(function() {
-            inside = true;
-        }).mouseout(function() {
-            inside = false;
-        });
 
         //slide controller buttons
         var ul = document.createElement("ul");
@@ -138,72 +129,51 @@ $.fn.kenburns_extension = function() {
                 $(this).parent().attr("class", "play");
                 ken.pause();
                 $(".background")[0].pause();
-                pauseAudio();
+                myplayList.pause();
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
                 $(".background")[0].play();
-                audioOnAir.play()
+                myplayList.play();
             }
         });
 
-        var previousData = new Date().getTime();
         $(firstButton).click(function() {
-            var actuallyData = new Date().getTime();
-            if ((actuallyData - previousData) > 1000) {
-                $(pauseButton).parent().attr("class", "pause");
-                pauseAudio();
-                playAudio(0);
-                $(".background")[0].currentTime = 0;
-                ken.setUpdateTime(0);
-                previousData = new Date().getTime();
-            }
+            $(pauseButton).parent().attr("class", "pause");
+            myplayList.play(0);
+            $(".background")[0].currentTime = 0;
+            ken.setUpdateTime(0);
         });
 
         $(lastButton).click(function() {
-            var actuallyData = new Date().getTime();
-            if ((actuallyData - previousData) > 1000) {
-                $(pauseButton).parent().attr("class", "pause");
-                pauseAudio();
-                var slidenumber = arrayTime.length - 1;
-                playAudio(slidenumber);
-                var current_time = getRealTime(slidenumber);
-
-
-                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-                ken.setUpdateTime(current_time);
-                previousData = new Date().getTime();
-            }
+            $(pauseButton).parent().attr("class", "pause");
+            var slidenumber = arrayTime.length - 1;
+            myplayList.play(-1);
+            var current_time = getRealTime(slidenumber);
+            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+            ken.setUpdateTime(current_time);
         });
 
         $(prevButton).click(function() {
-            var actuallyData = new Date().getTime();
-            if ((actuallyData - previousData) > 1000) {
-                $(pauseButton).parent().attr("class", "pause");
-                pauseAudio();
-                if (indexGeneral != 0)
-                    indexGeneral = indexGeneral - 1;
-                else
-                    indexGeneral = arrayTime.length - 1;
+            $(pauseButton).parent().attr("class", "pause");
+            if (indexGeneral != 0)
+                indexGeneral = indexGeneral - 1;
+            else
+                indexGeneral = arrayTime.length - 1;
 
-                var current_time = getRealTime(indexGeneral);
-                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-                ken.setUpdateTime(current_time);
-                previousData = new Date().getTime();
-            }
+            myplayList.previous();
+            var current_time = getRealTime(indexGeneral);
+            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+            ken.setUpdateTime(current_time);
         });
 
         $(nextButton).click(function() {
-            var actuallyData = new Date().getTime();
-            if ((actuallyData - previousData) > 1000) {
-                pauseAudio();
-                $(pauseButton).parent().attr("class", "pause");
-                indexGeneral = (indexGeneral + 1) % arrayTime.length;
-                var current_time = getRealTime(indexGeneral);
-                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-                ken.setUpdateTime(current_time);
-                previousData = new Date().getTime();
-            }
+            $(pauseButton).parent().attr("class", "pause");
+            indexGeneral = (indexGeneral + 1) % arrayTime.length;
+            var current_time = getRealTime(indexGeneral);
+            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+            ken.setUpdateTime(current_time);
+            myplayList.next();
         });
         //*********************************
     }
@@ -255,13 +225,11 @@ function initSliders(args) {
 //            ticksPosition: 'bottom',
 //            mode: 'fixed',
         }).on('slideEnd', function(event) { //slideEnd
-            $(pauseButton).parent().attr("class", "pause");
-            var time = parseInt($(this).jqxSlider('value'));
-            ken.setUpdateTime(getStartTime(time));
-            $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
-            slideDrag = false;
-        }).on('slideStart', function(event) { //slideEnd
+            slideMove();
+        }).on('slideStart', function(event) {
             slideDrag = true;
+        }).on('mousedown', function(event) {
+            slideMove();
         });
     }
 
@@ -277,6 +245,14 @@ function initSliders(args) {
     });
 }
 
+function slideMove() {
+    $(pauseButton).parent().attr("class", "pause");
+    var time = parseInt($(sliderDiv).jqxSlider('value'));
+//    $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
+    ken.setUpdateTime(getStartTime(time));
+    slideDrag = false;
+}
+var myplayList;
 function initAudio(args, main) {
 
     //****AUDIO BACKGROUND********************************
@@ -284,7 +260,7 @@ function initAudio(args, main) {
     if (audio_background_element != null && audio_background_element.src_ogg != null
             && audio_background_element.src_mp3 != null) {
         var audio_background = document.createElement("audio");
-        $(audio_background).attr("preload", "auto").attr("class", "background");
+        $(audio_background).attr("preload", "auto").attr("autobuffer", true).attr("class", "background");
         if (audio_background_element.autoplay != null && audio_background_element.autoplay == true) {
             $(audio_background).attr("autoplay", true).attr("loop", true);
         }
@@ -299,6 +275,36 @@ function initAudio(args, main) {
     }
     //****************************************************
 
+//
+//    var jplayerBackground = document.createElement("div");
+//    $(jplayerBackground).attr("id", "jplayerBackground").attr("class", "jp-jplayer");
+//
+//    var jplayerDiv = document.createElement("div");
+//    $(jplayerDiv).attr("id", "jquery_jplayer_1").attr("class", "jp-jplayer");
+//    var source = document.createElement("div");
+//    $(source).attr("id", "jp_container_1").attr("class", "jp-audio");
+//    $(source).html('<div class="jp-type-playlist"  style="display: none; height: 0px; width: 0px;"><div class="jp-playlist"><ol><li></li></ol></div></div>');
+//    $(main).append(jplayerDiv);
+//    $(main).append(source);
+
+//
+//    myplayList = new jPlayerPlaylist({
+//        jPlayer: "#jquery_jplayer_1",
+//        cssSelectorAncestor: "#jp_container_1"
+//    }, toJPlayerList, {
+//        swfPath: "js/",
+//        supplied: "oga,mp3",
+//        wmode: "window",
+//        solution: "flash, html",
+//        ready: function() {
+////            $(this).jPlayer("play");
+//        },
+//        ended: function(event) {
+////            $(this).jPlayer("play");
+//        }
+//    });
+
+
     /*
      #!/bin/bash
      #for file in *.mp3
@@ -308,21 +314,36 @@ function initAudio(args, main) {
 
     //*** AUDIO TRACE ************************************
     var audioArray = args.audio_for_images;
+    var toJPlayerList = [];
     for (var i = 0; i < audioArray.length; i++) {
-        var audio = document.createElement("audio");
-        $(audio).attr("class", "speech").attr("preload", "auto").attr("autobuffer", true);
-        if (audioArray[i].src_ogg != "" && audioArray[i].src_ogg != null
-                && audioArray[i].src_mp3 != "" && audioArray[i].src_mp3 != null) {
-            var source = document.createElement("source");
-            $(source).attr("src", audioArray[i].src_ogg).attr("type", "audio/ogg");
-            var source2 = document.createElement("source");
-            $(source2).attr("src", audioArray[i].src_mp3).attr("type", "audio/mpeg");
-            $(audio).append(source);
-            $(audio).append(source2);
-        }
-        $(main).append(audio);
+        toJPlayerList.push({
+            mp3: audioArray[i].src_mp3,
+        })
     }
     //****************************************************
+    var jplayerDiv = document.createElement("div");
+    $(jplayerDiv).attr("id", "jquery_jplayer_1").attr("class", "jp-jplayer");
+    var source = document.createElement("div");
+    $(source).attr("id", "jp_container_1").attr("class", "jp-audio");
+    $(source).html('<div class="jp-type-playlist"  style="display: none; height: 0px; width: 0px;"><div class="jp-playlist"><ol><li></li></ol></div></div>');
+    $(main).append(jplayerDiv);
+    $(main).append(source);
+
+    myplayList = new jPlayerPlaylist({
+        jPlayer: "#jquery_jplayer_1",
+        cssSelectorAncestor: "#jp_container_1"
+    }, toJPlayerList, {
+        swfPath: "js/",
+        supplied: "oga,mp3",
+        wmode: "window",
+        solution: "flash, html",
+        ready: function() {
+//            $(this).jPlayer("play");
+        },
+        ended: function(event) {
+//            $(this).jPlayer("play");
+        }
+    });
 }
 
 function startAnimation(args) {
@@ -341,7 +362,7 @@ function startAnimation(args) {
             }
             // Called after the effect is rendered
             // Draw anything you like on to of the canvas
-            return;
+//            return;
 
             context.save();
             //var gradient = context.createLinearGradient(0, 0, 0, 60);  
@@ -381,53 +402,35 @@ function startAnimation(args) {
     });
 }
 
-function pauseAudio() {
-    var children = $('.speech').length;
-    for (var i = 0; i < children; i++) {
-        $('.speech')[i].pause();
-    }
-}
-
 function playAudio(slideNumber) {
-    var audioAttuale = $('.speech')[slideNumber];
-    var children = $('.speech').length;
-    for (var i = 0; i < children; i++) {
-//        if (i != slideNumber) {
-        $('.speech')[i].pause();
-//        }
-    }
-
-    if (audioAttuale != null) {
-        fadeIn(audioAttuale);
-        audioOnAir = audioAttuale;
-    }
-
+    myplayList.play(slideNumber);
 }
 
-function fadeIn(audio) {
-    audio.volume = 1;
-    audio.play();
-
-    var isSeeking = audio.seeking;
-    var isSeekable = audio.seekable && audio.seekable.length > 0;
-    console.log("---");
-    console.log("Duration: " + audio.duration);
-    console.log("isSeeking: " + isSeeking);
-    console.log("isSeekable: " + isSeekable);
-    console.log("---");
-
-//    var vol = 0;
-//    var interval = 200;
-//    var intervalID = setInterval(function() {
-//        if (vol < 1) {
-//            vol += 0.1;
-//            if (vol >= 0 && vol <= 1)
-//                audio.volume = vol;
-//        } else {
-//            clearInterval(intervalID);
-//        }
-//    }, interval);
-}
+//
+//function fadeIn(audio) {
+//    audio.volume = 1;
+//    audio.play();
+//
+////    var isSeeking = audio.seeking;
+////    var isSeekable = audio.seekable && audio.seekable.length > 0;
+////    console.log("---");
+////    console.log("Duration: " + audio.duration);
+////    console.log("isSeeking: " + isSeeking);
+////    console.log("isSeekable: " + isSeekable);
+////    console.log("---");
+//
+////    var vol = 0;
+////    var interval = 200;
+////    var intervalID = setInterval(function() {
+////        if (vol < 1) {
+////            vol += 0.1;
+////            if (vol >= 0 && vol <= 1)
+////                audio.volume = vol;
+////        } else {
+////            clearInterval(intervalID);
+////        }
+////    }, interval);
+//}
 
 function fadeOut(audioPrecedente) {
     var vol = 0.1;
