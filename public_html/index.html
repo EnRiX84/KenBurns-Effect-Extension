@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="author" content="Enrico Maria Caruso"/>
 
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.8.3.min"></script>
 
         <script type="text/javascript" src="js/jqx-all.js"></script>
         <script type="text/javascript" src="js/jquery.bxslider.js"></script>
@@ -24,12 +24,12 @@
 
 
         <!--Necessari per l'upload di files-->
-        <script type="text/javascript" src="js/jqx-dragAndDrop.js"></script>
-        <script type="text/javascript" src="js/jquery.fileupload.js"></script>
-        <script type="text/javascript" src="js/kenburns_upload.js"></script>
-        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" id="theme">
-        <link rel="stylesheet" href="css/jquery.fileupload.css">
+        <!--        <script type="text/javascript" src="js/jqx-dragAndDrop.js"></script>
+                <script type="text/javascript" src="js/jquery.fileupload.js"></script>
+                <script type="text/javascript" src="js/kenburns_upload.js"></script>
+                <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+                <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" id="theme">
+                <link rel="stylesheet" href="css/jquery.fileupload.css">-->
 
         <title>Slider</title>
     </head>
@@ -43,7 +43,7 @@
         <script type="text/javascript">
             $(function() {
 
-                $('.uploadForm').kenburns_upload({});
+//                $('.uploadForm').kenburns_upload({});
                 $('.main').kenburns_extension({
                     width: 1000,
                     height: 400,
@@ -110,7 +110,7 @@
                         {src_mp3: './audio/Oman_Speech_23.mp3'},
                         {src_mp3: './audio/Oman_Speech_24.mp3'},
                         {src_mp3: './audio/desert-simple.mp3'}, // 25
-                        {src_mp3: './audio/eagle.mp3', src_ogg: './audio/eagle.ogg'},
+                        {src_mp3: './audio/eagle.mp3'},
                         {src_mp3: ''}// 27
                     ],
                     pan: [

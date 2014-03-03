@@ -142,6 +142,7 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             myplayList.play(0);
             $(".background")[0].currentTime = 0;
+            $(".background")[0].play();
             ken.setUpdateTime(0);
         });
 
@@ -151,29 +152,42 @@ $.fn.kenburns_extension = function() {
             myplayList.play(-1);
             var current_time = getRealTime(slidenumber);
             $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+            $(".background")[0].play();
             ken.setUpdateTime(current_time);
         });
 
+        var previousData = new Date().getTime();
         $(prevButton).click(function() {
-            $(pauseButton).parent().attr("class", "pause");
-            if (indexGeneral != 0)
-                indexGeneral = indexGeneral - 1;
-            else
-                indexGeneral = arrayTime.length - 1;
+            var actuallyData = new Date().getTime();
+            if ((actuallyData - previousData) > 1000) {
+                $(pauseButton).parent().attr("class", "pause");
+                if (indexGeneral != 0)
+                    indexGeneral = indexGeneral - 1;
+                else
+                    indexGeneral = arrayTime.length - 1;
 
-            myplayList.previous();
-            var current_time = getRealTime(indexGeneral);
-            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-            ken.setUpdateTime(current_time);
+                myplayList.previous();
+                var current_time = getRealTime(indexGeneral);
+                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                $(".background")[0].play();
+                ken.setUpdateTime(current_time);
+                previousData = new Date().getTime();
+            }
         });
+
 
         $(nextButton).click(function() {
-            $(pauseButton).parent().attr("class", "pause");
-            indexGeneral = (indexGeneral + 1) % arrayTime.length;
-            var current_time = getRealTime(indexGeneral);
-            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-            ken.setUpdateTime(current_time);
-            myplayList.next();
+            var actuallyData = new Date().getTime();
+            if ((actuallyData - previousData) > 1000) {
+                $(pauseButton).parent().attr("class", "pause");
+                indexGeneral = (indexGeneral + 1) % arrayTime.length;
+                var current_time = getRealTime(indexGeneral);
+                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                $(".background")[0].play();
+                ken.setUpdateTime(current_time);
+                myplayList.next();
+                previousData = new Date().getTime();
+            }
         });
         //*********************************
     }
@@ -244,14 +258,22 @@ function initSliders(args) {
 //        pause: 6000
     });
 }
-
+var previousDataSlide = new Date().getTime();
 function slideMove() {
-    $(pauseButton).parent().attr("class", "pause");
-    var time = parseInt($(sliderDiv).jqxSlider('value'));
-//    $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
-    ken.setUpdateTime(getStartTime(time));
-    slideDrag = false;
+    var actuallyDataSlide = new Date().getTime();
+    if ((actuallyDataSlide - previousDataSlide) > 1000) {
+
+        $(pauseButton).parent().attr("class", "pause");
+        var time = parseInt($(sliderDiv).jqxSlider('value'));
+        $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
+        $(".background")[0].play();
+        ken.setUpdateTime(getStartTime(time));
+        slideDrag = false;
+        previousDataSlide = new Date().getTime();
+    }
+    return false;
 }
+
 var myplayList;
 function initAudio(args, main) {
 
@@ -275,35 +297,29 @@ function initAudio(args, main) {
     }
     //****************************************************
 
+    //****AUDIO BACKGROUND********************************
+//    var audio_background_element = args.audio_background[0];
+//    if (audio_background_element != null && audio_background_element.src_mp3 != null) {
+//        var jplayerBackground = document.createElement("div");
+//        $(jplayerBackground).attr("id", "jquery_jplayer_background");
+//        $(main).append(jplayerBackground);
 //
-//    var jplayerBackground = document.createElement("div");
-//    $(jplayerBackground).attr("id", "jplayerBackground").attr("class", "jp-jplayer");
-//
-//    var jplayerDiv = document.createElement("div");
-//    $(jplayerDiv).attr("id", "jquery_jplayer_1").attr("class", "jp-jplayer");
-//    var source = document.createElement("div");
-//    $(source).attr("id", "jp_container_1").attr("class", "jp-audio");
-//    $(source).html('<div class="jp-type-playlist"  style="display: none; height: 0px; width: 0px;"><div class="jp-playlist"><ol><li></li></ol></div></div>');
-//    $(main).append(jplayerDiv);
-//    $(main).append(source);
-
-//
-//    myplayList = new jPlayerPlaylist({
-//        jPlayer: "#jquery_jplayer_1",
-//        cssSelectorAncestor: "#jp_container_1"
-//    }, toJPlayerList, {
-//        swfPath: "js/",
-//        supplied: "oga,mp3",
-//        wmode: "window",
-//        solution: "flash, html",
-//        ready: function() {
-////            $(this).jPlayer("play");
-//        },
-//        ended: function(event) {
-////            $(this).jPlayer("play");
-//        }
-//    });
-
+//        $("#jquery_jplayer_background").jPlayer({
+//            ready: function() {
+//                $(this).jPlayer("setMedia", {
+//                    m4a: audio_background_element.src_mp3,
+//                    oga: audio_background_element.src_ogg
+//                }).jPlayer("play");
+//            },
+//            ended: function(event) {
+//                $(this).jPlayer("play");
+//            },
+//            swfPath: "js/",
+//            supplied: "m4a, oga",
+//            volume: 0.2,
+//        });
+//    }
+    //****************************************************
 
     /*
      #!/bin/bash
@@ -337,13 +353,20 @@ function initAudio(args, main) {
         supplied: "oga,mp3",
         wmode: "window",
         solution: "flash, html",
+        playlistOptions: {
+            enableRemoveControls: true,
+            autoPlay: false
+        },
         ready: function() {
 //            $(this).jPlayer("play");
         },
         ended: function(event) {
-//            $(this).jPlayer("play");
+            $(this).jPlayer("stop");
+            return false;
         }
     });
+    $("#jquery_jplayer_1").unbind($.jPlayer.event.ended);
+
 }
 
 function startAnimation(args) {
@@ -393,11 +416,13 @@ function startAnimation(args) {
             context.restore();
         },
         post_display_image_callback: function(slide_number) {
-//            setTimeout(function() {
-            indexGeneral = slide_number;
             slider.goToSlide(slide_number);
-            playAudio(slide_number);
-//            }, 10);
+            console.log(slide_number);
+            indexGeneral = slide_number;
+            //it's usefull to set audio for more than one slide
+            if (myplayList.playlist[slide_number].mp3 != "" && myplayList.playlist[slide_number].mp3 != null) {
+                myplayList.play(slide_number);
+            }
         }
     });
 }
