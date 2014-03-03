@@ -258,6 +258,7 @@ function initSliders(args) {
 //        pause: 6000
     });
 }
+
 var previousDataSlide = new Date().getTime();
 function slideMove() {
     var actuallyDataSlide = new Date().getTime();
