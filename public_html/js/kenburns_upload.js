@@ -39,7 +39,7 @@ $.fn.kenburns_upload = function() {
                 </div>\n\
             </div>\n\
             <br/>\n\
-            <div id="status_bar" style="width: 850px;">\n\
+            <div id="status_bar" style="width: 1000px;">\n\
                 <h1 class="ui-widget-header">Status Bar</h1>\n\
                 <div class="ui-widget-content">\n\
                     <ul style="height: 200px; overflow: auto;">\n\
@@ -47,12 +47,7 @@ $.fn.kenburns_upload = function() {
                     </ul>\n\
                 </div>\n\
             </div>');
-
-
     $(this).append(html);
-
-
-
     $("#catalog").accordion({});
 //
 //    $("#catalog li").draggable({
@@ -69,39 +64,71 @@ $.fn.kenburns_upload = function() {
             dropped = dropped + 1;
             $(this).find(".placeholder").remove();
             var div = document.createElement("div");
-//            $(div).disableSelection();
+            $(div).attr("id", "status_bar_id_" + dropped);
             $(div).attr("class", "status_bar_element");
             $(div).html("<div><div align='center' style='height: 50px;'>" + ui.draggable.html() + "</div>\n\
-                        <span><b>Audio: </b></span><span id='audio" + dropped + "' style='width: 100px;'>...drag your audio here</span><br/>\n\
-                        <span><b>Text: </b></span><textarea id='text' rows='2' style='width: 170px;'></textarea><br/>\n\
-                        <span><b>Time: </b></span><span id='time'><input type='text' value='1' style='width: 30px;'/> seconds</span><br/>\n\
-                        <span><b>Zoom: </b></span><span id='zoom'><input type='text' value='1' style='width: 30px;'/> units</span><br/>\n\
-                        <span><b>Pan: </b></span><span id='text'>from <input id='panFrom' type='text' value='1' style='width: 30px;'/> to <input id='panTo'type='text' value='1' style='width: 30px;'/></span><br/>\n\</div>");
+                        <span><b>Audio: </b></span><span class='audio' name='' style='width: 100px;'>...drag your audio here</span><br/>\n\
+                        <span><b>Text: </b></span><textarea class='text' style='max-height: 50px; height: 15px; width: 130px; max-width: 170px;'></textarea><br/>\n\
+                        <span><b>Time: </b></span><span class='time'><input type='text' value='1000' style='width: 50px;'/> milliseconds</span><br/>\n\
+                        <span><b>Zoom: </b></span><span class='zoom'><input type='text' value='1' style='width: 30px;'/> units</span><br/>\n\
+                        <span><b>Pan: </b></span><span class='text'>from <input class='panFrom' type='text' value='1' style='width: 30px;'/> to <input id='panTo'type='text' value='1' style='width: 30px;'/></span>\n\
+                        <div id='delete" + dropped + "' align='center'><img style='cursor: pointer;' src='css/images/delete.png'/></div><br/></div>");
             $("<li></li>").html(div).appendTo(this);
+
+            $("#delete" + dropped).click(function() {
+                var r = confirm("Are you sure?");
+                if (r == true) {
+                    $(this).parent().parent().remove();
+                }
+                return false;
+            });
 
             $(div).droppable({
                 activeClass: "ui-state-default",
                 hoverClass: "ui-state-hover",
                 accept: ".jplayer",
                 drop: function(event, ui) {
-                    console.log(ui);
-                    console.log("DROPPED QUALCOSA FANCUBE");
+                    var jplayer = ui.draggable;
+                    var title = "";
+                    var duration = "";
+                    var src = "";
+                    var audio;
+                    $(this).find(".audio").each(function() {
+                        audio = this;
+                        return false;
+                    });
+                    $(jplayer).find(".jp-duration").each(function() {
+                        duration = $(this).text();
+                    });
+                    $(jplayer).find(".jp-title").each(function() {
+                        title = $(this).text();
+                    });
+                    $(jplayer).find("audio").each(function() {
+                        src = $(this).attr("src");
+                    });
+                    $(audio).attr("name", src).html(title + " - " + duration);
                 }
             });
-
-
-
-
         }
     }).sortable({
         items: "li:not(.placeholder)",
         sort: function() {
-            // gets added unintentionally by droppable interacting with sortable
-            // using connectWithSortable fixes this, but doesn't allow you to customize active/hoverClass options
+// gets added unintentionally by droppable interacting with sortable
+// using connectWithSortable fixes this, but doesn't allow you to customize active/hoverClass options
             $(this).removeClass("ui-state-default");
         }
     });
-
+    var span = document.createElement("span");
+    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
+    var img = document.createElement("img");
+    $(img).attr("src", "").attr("style", "max-height: 50px; max-width: 50px;");
+    $(span).append(img);
+    $(img).disableSelection();
+    $("#imageSection").append(span);
+    $(span).draggable({
+        appendTo: "body",
+        helper: "clone"
+    });
     $('#fileuploadImage').fileupload({
         dataType: 'json',
         done: function(e, data) {
@@ -122,7 +149,6 @@ $.fn.kenburns_upload = function() {
             });
         }
     });
-
     var i = 0;
     $('#fileuploadAudio').fileupload({
         dataType: 'json',
@@ -177,7 +203,6 @@ $.fn.kenburns_upload = function() {
                         keyEnabled: true,
                         cssSelectorAncestor: "#jp_container_" + i,
                     });
-
                     $(div).draggable({
                         appendTo: "body",
                         helper: "clone"
@@ -187,7 +212,6 @@ $.fn.kenburns_upload = function() {
         }
     });
 };
-
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
