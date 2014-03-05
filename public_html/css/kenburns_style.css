@@ -83,6 +83,38 @@ body {
     padding-bottom: 20px;
 }
 
+h1 { 
+    padding: .2em; 
+    margin: 0; 
+}
+
+#audio_video {
+    width: 500px; 
+    height: 400px; 
+    margin-right: 2em; 
+}
+/*#cart {margin-top: 50px; }*/
+/* style the list to maximize the droppable hitarea */
+#status_bar ul { 
+    margin: 0; 
+    padding: 1em 1em 1em 1em;
+}
+
+#status_bar ul li{
+    /*padding: 1em 0 1em 3em;*/        
+    width: 200px;
+    float: left;
+    list-style: none;
+}
+.status_bar_element{
+    background: #ffffff; 
+    height: 190px; 
+    border-radius: 5px; 
+    border: 1px solid #d2d2d2; 
+    margin: 0px 10px 10px 0px; 
+    padding: 5px;
+}
+
 .preview canvas{
     max-height: 16px;
 }
@@ -99,7 +131,7 @@ body {
     width:1000px; 
     margin-right: auto; 
     margin-left: auto; 
-    background: #000000;
+    /*background: #000000;*/
     padding: 20px;
 }
 
