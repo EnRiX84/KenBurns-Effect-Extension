@@ -70,10 +70,10 @@
                 loaded: false
             });
 
-            total_time += image_path.display_time;
+            total_time += parseInt(image_path.display_time);
             display_times.push(total_time);
 
-            zoom_level = 1 / image_path.zoom;
+            zoom_level = 1 / parseFloat(image_path.zoom);
             zoom_levels.push(zoom_level);
         });
 
@@ -332,7 +332,6 @@
                 autoplay = true;
             }
             intervalVar = setInterval(update, frame_time);
-
             return;
         };
         this.pause = function pause() {

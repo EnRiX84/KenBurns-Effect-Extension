@@ -44,7 +44,7 @@ $.fn.kenburns_upload = function() {
                 <div id="player" align="center"></div>\n\
             </div>\n\
             <div id="status_bar">\n\
-                <h1 class="ui-widget-header" style="width: 860px;">Slides</h1><button class="createVideo">Play Video</button>\n\
+                <h1 class="ui-widget-header" style="width: 480px;">Slides</h1><div class="audio_background" name="">...drag your <b>Audio background</b> here</div><button class="createVideo">Generate Video</button>\n\
                 <div class="ui-widget-content">\n\
                     <ul style="height: 200px; overflow: auto;">\n\
                         <li class="placeholder">Drag your images here</li>\n\
@@ -53,11 +53,30 @@ $.fn.kenburns_upload = function() {
             </div>');
     $(this).append(html);
     $("#catalog").accordion({});
-//
-//    $("#catalog li").draggable({
-//        appendTo: "body",
-//        helper: "clone"
-//    });
+
+    $(".audio_background").droppable({
+        activeClass: "ui-state-default",
+        hoverClass: "ui-state-hover",
+        accept: ".jplayer",
+        drop: function(event, ui) {
+            var jplayer = ui.draggable;
+            var title = "";
+            var duration = "";
+            var src = "";
+
+            $(jplayer).find(".jp-duration").each(function() {
+                duration = $(this).text();
+            });
+            $(jplayer).find(".jp-title").each(function() {
+                title = $(this).text();
+            });
+            $(jplayer).find("audio").each(function() {
+                src = $(this).attr("src");
+                src = src.replace(".ogg", ".mp3");
+            });
+            $(this).attr("name", src).html(title + " - " + duration);
+        }
+    });
 
     var dropped = 0;
     $("#status_bar ul").droppable({
@@ -70,19 +89,20 @@ $.fn.kenburns_upload = function() {
             var div = document.createElement("div");
             $(div).attr("id", "status_bar_id_" + dropped);
             $(div).attr("class", "status_bar_element");
-            $(div).html("<div><div align='center' style='height: 50px;'>" + ui.draggable.html() + "</div>\n\
+            $(div).html("<div>\n\
+                        <div align='center' style='height: 50px;'>" + ui.draggable.html() + "</div>\n\
                         <span><b>Audio: </b></span><span class='audio' name='' style='width: 100px;'>...drag your audio here</span><br/>\n\
                         <span><b>Text: </b></span><textarea class='text' style='max-height: 50px; height: 15px; width: 130px; max-width: 170px;'></textarea><br/>\n\
-                        <span><b>Time: </b></span><span class='time'><input type='text' value='1000' style='width: 50px;'/> milliseconds</span><br/>\n\
-                        <span><b>Zoom: </b></span><span class='zoom'><input type='text' value='1' style='width: 30px;'/> units</span><br/>\n\
-                        <span><b>Pan: </b></span><span class='text'>from <input class='panFrom' type='text' value='1' style='width: 30px;'/> to <input id='panTo'type='text' value='1' style='width: 30px;'/></span>\n\
+                        <span><b>Time: </b></span><span><input class='duration' type='text' value='5000' style='width: 50px;'/> milliseconds</span><br/>\n\
+                        <span><b>Zoom: </b></span><span><input class='zoom' type='text' value='1.1' style='width: 30px;'/> units</span><br/>\n\
+                        <span><b>Pan: </b></span><span>x: <input class='panFrom' type='text' value='1' style='width: 30px;'/> y: <input class='panTo'type='text' value='1' style='width: 30px;'/></span>\n\
                         <div id='delete" + dropped + "' align='center'><img style='cursor: pointer;' src='css/images/delete.png'/></div><br/></div>");
             $("<li></li>").html(div).appendTo(this);
 
             $("#delete" + dropped).click(function() {
                 var r = confirm("Are you sure?");
                 if (r == true) {
-                    $(this).parent().parent().remove();
+                    $(this).parent().parent().parent().remove();
                 }
                 return false;
             });
@@ -109,6 +129,7 @@ $.fn.kenburns_upload = function() {
                     });
                     $(jplayer).find("audio").each(function() {
                         src = $(this).attr("src");
+                        src = src.replace(".ogg", ".mp3");
                     });
                     $(audio).attr("name", src).html(title + " - " + duration);
                 }
@@ -154,6 +175,34 @@ $.fn.kenburns_upload = function() {
         helper: "clone"
     });
 
+    var span = document.createElement("span");
+    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
+    var img = document.createElement("img");
+    $(img).attr("src", "http://img2.fotoalbum.virgilio.it/v/www1-3/176/176513/304872/IMG_0880-vi.jpg").attr("style", "max-height: 50px; max-width: 50px;");
+    $(span).append(img);
+    $(img).disableSelection();
+    $("#imageSection").append(span);
+    $(span).draggable({
+        appendTo: "body",
+        helper: "clone"
+    });
+
+    var span = document.createElement("span");
+    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
+    var img = document.createElement("img");
+    $(img).attr("src", "http://4.bp.blogspot.com/_Z2V0ybeHVIc/TBfzwmqkgPI/AAAAAAAAEUc/mor4mV41vho/s1600/IMG_6883.JPG").attr("style", "max-height: 50px; max-width: 50px;");
+    $(span).append(img);
+    $(img).disableSelection();
+    $("#imageSection").append(span);
+    $(span).draggable({
+        appendTo: "body",
+        helper: "clone"
+    });
+
+    createAudioPlayer(30, "http://localhost/slider/audio/Arisa_Sanremo_2012.mp3");
+    createAudioPlayer(40, "http://localhost/slider/audio/Arisa_Sanremo_2014.mp3");
+    createAudioPlayer(50, "http://localhost/slider/audio/caparezza.mp3");
+
     createAudioPlayer(10, "http://localhost/slider/audio/Oman_Speech_07.mp3");
     createAudioPlayer(15, "http://localhost/slider/audio/Oman_Speech_08.mp3");
     createAudioPlayer(20, "http://localhost/slider/audio/Oman_Speech_09.mp3");
@@ -195,48 +244,55 @@ $.fn.kenburns_upload = function() {
 };
 var precedentPlay = new Date().getTime();
 function generateVideo() {
+    var elements = $("#status_bar ul").children();
+    var images = [];
+
+    var audio_for_images = [];
+    var pan = [];
+    var audio_background_src_mp3 = $("#status_bar").find(".audio_background").attr("name");
+    var audio_background_src_ogg = audio_background_src_mp3.replace(".mp3", ".ogg");
+    var audio_background = [{src_mp3: audio_background_src_mp3, src_ogg: audio_background_src_ogg, autoplay: true}];
+
+    for (var i = 0; i < elements.length; i++) {
+        var img_src = $(elements[i]).find("img")[0].src;
+        var img_display_time = $(elements[i]).find("input.duration").val();
+        var img_zoom_time = $(elements[i]).find("input.zoom").val();
+        var img_caption = $(elements[i]).find("textarea.text").val();
+
+        var pan_x = $(elements[i]).find("input.panFrom").val();
+        var pan_y = $(elements[i]).find("input.panTo").val();
+
+        var src_mp3 = $(elements[i]).find("span.audio").attr("name");
+
+        images.push({display_time: img_display_time, zoom: img_zoom_time, src: img_src, caption: img_caption});
+        audio_for_images.push({src_mp3: src_mp3});
+        pan.push({x: pan_x, y: pan_y});
+    }
+
     var actuallyDataSlide = new Date().getTime();
     if ((actuallyDataSlide - precedentPlay) > 2000) {
         var newPlayer = document.createElement("div");
-//        $("#player").children().remove();
-        $("#player").html("");
+        $("#player").html("Ready! press Play o <a href='#'>Scarica il video</a><br/><br/>");
         $("#player").append(newPlayer);
 
         $(newPlayer).kenburns_extension({
             width: 450,
             height: 300,
             status_bar: true, //set if you want see the status bar
+            autoplay: false, // set true if status_bar is false
             slide_controller: true, //set if you want see the slide controller
-            images: [//select path of your images
-                {display_time: 5000, zoom: 1, src: './img/title_majesty.png', caption: 'testo 1 '}, // 1
-                {display_time: 5000, zoom: 1, src: './img/title_university.png', caption: 'testo 2'}, // 2
-                {display_time: 5000, zoom: 1, src: './img/title_erc.png', caption: 'testo 3'}, // 3
-            ],
-            audio_background: [
-                {src_mp3: './audio/sultano.mp3', src_ogg: './audio/sultano.ogg', autoplay: true}
-            ],
-            audio_for_images: [
-                {src_mp3: './audio/Oman_Speech_08.mp3'},
-                {src_mp3: './audio/Oman_Speech_09.mp3'},
-                {src_mp3: './audio/Oman_Speech_10.mp3'}, // 10
-            ],
-            pan: [
-                {x: 0, y: 0}, // 2 marchi
-                {x: 0, y: 0}, // 3 marchi
-                {x: 0, y: 0}, // 4 marchi
-            ],
+            images: images,
+            audio_background: audio_background,
+            audio_for_images: audio_for_images,
+            pan: pan,
             debug: false, // true if you want to show debug info.
             frames_per_second: 25, // frames per second
             fade_time: 6000, // fade time
             background_color: '#000000', // background color
-            autoplay: false,
         });
 
         precedentPlay = new Date().getTime();
     }
-
-//    $("status_bar ul");
-
 }
 
 function createAudioPlayer(indexAudioPlayer, url) {
@@ -290,15 +346,6 @@ function createAudioPlayer(indexAudioPlayer, url) {
         helper: "clone"
     });
 }
-
-
-
-
-
-
-
-
-
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;

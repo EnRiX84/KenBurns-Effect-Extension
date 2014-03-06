@@ -26,7 +26,7 @@ $.fn.kenburns_extension = function() {
     var arrayTime = [];
     var images = args.images;
     for (var i = 0; i < images.length; i++) {
-        arrayTime.push(images[i].display_time);
+        arrayTime.push(parseInt(images[i].display_time));
     }
     var html = document.createElement("div");
 
@@ -139,12 +139,14 @@ $.fn.kenburns_extension = function() {
             if ($(this).parent().attr("class") == "pause") {
                 $(this).parent().attr("class", "play");
                 ken.pause();
-                $(".background")[0].pause();
+                if ($(".background")[0] != undefined)
+                    $(".background")[0].pause();
                 myplayList.pause();
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
-                $(".background")[0].play();
+                if ($(".background")[0] != undefined)
+                    $(".background")[0].play();
                 myplayList.play();
             }
         });
@@ -152,8 +154,10 @@ $.fn.kenburns_extension = function() {
         $(firstButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
             myplayList.play(0);
-            $(".background")[0].currentTime = 0;
-            $(".background")[0].play();
+            if ($(".background")[0] != undefined) {
+                $(".background")[0].currentTime = 0;
+                $(".background")[0].play();
+            }
             ken.setUpdateTime(0);
         });
 
@@ -162,8 +166,10 @@ $.fn.kenburns_extension = function() {
             var slidenumber = arrayTime.length - 1;
             myplayList.play(-1);
             var current_time = getRealTime(slidenumber, arrayTime);
-            $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-            $(".background")[0].play();
+            if ($(".background")[0] != undefined) {
+                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                $(".background")[0].play();
+            }
             ken.setUpdateTime(current_time);
         });
 
@@ -179,8 +185,10 @@ $.fn.kenburns_extension = function() {
                     indexGeneral = arrayTime.length - 1;
                 myplayList.previous();
                 var current_time = getRealTime(indexGeneral, arrayTime);
-                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-                $(".background")[0].play();
+                if ($(".background")[0] != undefined) {
+                    $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                    $(".background")[0].play();
+                }
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
             }
@@ -192,8 +200,10 @@ $.fn.kenburns_extension = function() {
                 $(pauseButton).parent().attr("class", "pause");
                 var indexGeneral = (ken.getSlideNumber() + 1) % arrayTime.length;
                 var current_time = getRealTime(indexGeneral, arrayTime);
-                $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
-                $(".background")[0].play();
+                if ($(".background")[0] != undefined) {
+                    $(".background")[0].currentTime = (current_time / 1000) % $(".background")[0].duration;
+                    $(".background")[0].play();
+                }
                 ken.setUpdateTime(current_time);
                 myplayList.next();
                 previousData = new Date().getTime();
@@ -210,7 +220,7 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
     for (var i = 0; i < arrayTime.length; i++) {
         maxTime += arrayTime[i];
     }
-
+    console.log(maxTime);
     if (args.status_bar == true) {
         $(sliderDiv).jqxSlider({
             width: args.width,
@@ -262,8 +272,10 @@ function slideMove(sliderDiv, pauseButton, ken, arrayTime) {
     if ((actuallyDataSlide - previousDataSlide) > 1000) {
         $(pauseButton).parent().attr("class", "pause");
         var time = parseInt($(sliderDiv).jqxSlider('value'));
-        $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
-        $(".background")[0].play();
+        if ($(".background")[0] != undefined) {
+            $(".background")[0].currentTime = (time / 1000) % $(".background")[0].duration;
+            $(".background")[0].play();
+        }
         ken.setUpdateTime(getStartTime(time, arrayTime), arrayTime);
         slideDrag = false;
         previousDataSlide = new Date().getTime();
@@ -275,13 +287,16 @@ function initAudio(args, main) {
 
     //****AUDIO BACKGROUND********************************
     var audio_background_element = args.audio_background[0];
-    if (audio_background_element != null && audio_background_element.src_ogg != null
-            && audio_background_element.src_mp3 != null) {
+    if (audio_background_element != null
+            && audio_background_element.src_ogg != null && audio_background_element.src_ogg != ""
+            && audio_background_element.src_mp3 != null && audio_background_element.src_mp3 != "") {
         var audio_background = document.createElement("audio");
         $(audio_background).attr("preload", "auto").attr("autobuffer", true).attr("class", "background");
+
         if (audio_background_element.autoplay != null && audio_background_element.autoplay == true) {
-            $(audio_background).attr("autoplay", args.autoplay).attr("loop", true);
+            $(audio_background).attr("autoplay", args.autoplay);
         }
+
         var source_background = document.createElement("source");
         $(source_background).attr("src", audio_background_element.src_ogg).attr("type", "audio/ogg");
         var source_background2 = document.createElement("source");
@@ -292,6 +307,9 @@ function initAudio(args, main) {
         audio_background.volume = 0.2;
     }
     //****************************************************
+
+
+
 
     //****AUDIO BACKGROUND********************************
 //    var audio_background_element = args.audio_background[0];
