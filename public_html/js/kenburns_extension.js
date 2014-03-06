@@ -233,7 +233,6 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
         mode: 'fade'
 //        pause: 6000
     });
-
     return slider;
 }
 

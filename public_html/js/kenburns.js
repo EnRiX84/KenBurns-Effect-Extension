@@ -327,7 +327,12 @@
         });
 
         this.play = function play() {
+            if (!autoplay) {
+                start_time = (new Date()).getTime();
+                autoplay = true;
+            }
             intervalVar = setInterval(update, frame_time);
+
             return;
         };
         this.pause = function pause() {
