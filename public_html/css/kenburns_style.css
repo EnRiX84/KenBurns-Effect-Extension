@@ -89,12 +89,32 @@ h1 {
 }
 
 #audio_video {
-    width: 500px; 
+    width: 490px; 
     height: 400px; 
-    margin-right: 2em; 
+    float: left;
+}
+
+#player{
+    width: 498px;
+    height: 400px; 
+    float: right;
+    border: 1px solid #d2d2d2; 
+    border-radius: 5px;
+    margin-left: 10px;
+}
+.createVideo{
+    height: 25px;
+    margin-left: 887px;
+    margin-top: -28px;
+    position: absolute;
 }
 /*#cart {margin-top: 50px; }*/
 /* style the list to maximize the droppable hitarea */
+#status_bar { 
+    width: 1000px;
+    border-radius: 5px;
+}
+
 #status_bar ul { 
     margin: 0; 
     padding: 1em 1em 1em 1em;
@@ -102,10 +122,11 @@ h1 {
 
 #status_bar ul li{
     /*padding: 1em 0 1em 3em;*/        
-    width: 200px;
+    width: 230px;
     float: left;
     list-style: none;
 }
+
 .status_bar_element{
     background: #ffffff; 
     height: 190px; 
@@ -354,12 +375,17 @@ a:visited {
 }
 
 .slider-wrapper {
+
+    /*padding-top: 20px;*/
+    /*color: #ffffff;*/
+}
+
+.slide{
+    padding-top: 20px;
     text-align: center;
     font-size: 16px;
     font-weight: lighter;
     height: 50px;
-    padding-top: 20px;
-    color: #ffffff;
 }
 
 .jqx-slider-slider{

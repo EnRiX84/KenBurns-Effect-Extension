@@ -24,6 +24,7 @@
 (function($) {
     $.fn.kenburns = function(options) {
         var intervalVar;
+        var top_frame_global = 0;
 
         var $canvas = $(this);
         var ctx = this[0].getContext('2d');
@@ -32,6 +33,7 @@
         var height = $canvas.height();
         var debug = options.debug;
         var image_paths = options.images;
+        var autoplay = options.autoplay;
         var display_time = options.display_time || 7000;
         var fade_time = Math.min(display_time / 2, options.fade_time || 1000);
         //var solid_time = display_time - (fade_time * 2);
@@ -280,6 +282,7 @@
             if (top_frame != last_frame) {
                 if (options.post_display_image_callback) {
 //                    console.debug('DEBUG: image=' + top_frame + ' update_time=' + update_time);
+                    top_frame_global = top_frame;
                     options.post_display_image_callback(top_frame);
                 }
                 last_frame = top_frame;
@@ -317,7 +320,9 @@
         get_image_info(0, function() {
             get_image_info(1, function() {
                 start_time = (new Date()).getTime(); //get_time();
-                intervalVar = setInterval(update, frame_time);
+                if (autoplay) {
+                    intervalVar = setInterval(update, frame_time);
+                }
             })
         });
 
@@ -349,6 +354,10 @@
             clearInterval(intervalVar);
             intervalVar = setInterval(update, frame_time);
         };
+
+        this.getSlideNumber = function getSlideNumber() {
+            return top_frame_global;
+        }
 
         return this;
     };
