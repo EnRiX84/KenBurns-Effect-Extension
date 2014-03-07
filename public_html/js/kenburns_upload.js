@@ -20,6 +20,10 @@
 
 
 $.fn.kenburns_upload = function() {
+    var msg_drag_background = "...drag your <b>Audio background</b> here";
+    var msg_drag_audio = "...drag your trace here";
+    var msg_drag_images = "...drag your images here";
+
     var indexAudioPlayer = 0;
     var args = arguments[0] || {};
     var html = document.createElement("div");
@@ -44,15 +48,23 @@ $.fn.kenburns_upload = function() {
                 <div id="player" align="center"></div>\n\
             </div>\n\
             <div id="status_bar">\n\
-                <h1 class="ui-widget-header" style="width: 480px;">Slides</h1><div class="audio_background" name="">...drag your <b>Audio background</b> here</div><button class="createVideo">Generate Video</button>\n\
+                <h1 class="ui-widget-header" style="width: 480px;">Slides</h1>\n\
+                <div class="audio_background" name="">' + msg_drag_background + '</div> \n\
+                <img id="clearAudioBackground" title="Remove background trace" style="cursor: pointer;" src="css/images/clear.png"/><button class="createVideo">Generate Video</button>\n\
                 <div class="ui-widget-content">\n\
                     <ul style="height: 200px; overflow: auto;">\n\
-                        <li class="placeholder">Drag your images here</li>\n\
+                        <li class="placeholder">' + msg_drag_images + '</li>\n\
                     </ul>\n\
                 </div>\n\
             </div>');
     $(this).append(html);
     $("#catalog").accordion({});
+
+    $("#clearAudioBackground").click(function() {
+        $(".audio_background").html(msg_drag_background);
+        $(".audio_background").attr("name", "");
+        return false;
+    });
 
     $(".audio_background").droppable({
         activeClass: "ui-state-default",
@@ -91,7 +103,7 @@ $.fn.kenburns_upload = function() {
             $(div).attr("class", "status_bar_element");
             $(div).html("<div>\n\
                         <div align='center' style='height: 50px;'>" + ui.draggable.html() + "</div>\n\
-                        <span><b>Audio: </b></span><span class='audio' name='' style='width: 100px;'>...drag your audio here</span><br/>\n\
+                        <span><b>Audio: </b></span><span id='audio" + dropped + "' class='audio' name='' style='width: 100px;'>" + msg_drag_audio + "</span> <img id='clearAudio" + dropped + "' style='cursor: pointer;' src='css/images/clear.png'/><br/>\n\
                         <span><b>Text: </b></span><textarea class='text' style='max-height: 50px; height: 15px; width: 130px; max-width: 170px;'></textarea><br/>\n\
                         <span><b>Time: </b></span><span><input class='duration' type='text' value='5000' style='width: 50px;'/> milliseconds</span><br/>\n\
                         <span><b>Zoom: </b></span><span><input class='zoom' type='text' value='1.1' style='width: 30px;'/> units</span><br/>\n\
@@ -104,6 +116,12 @@ $.fn.kenburns_upload = function() {
                 if (r == true) {
                     $(this).parent().parent().parent().remove();
                 }
+                return false;
+            });
+
+            $("#clearAudio" + dropped).click(function() {
+                $("#audio" + dropped).html(msg_drag_audio);
+                $("#audio" + dropped).attr("name", "");
                 return false;
             });
 
@@ -208,6 +226,7 @@ $.fn.kenburns_upload = function() {
     createAudioPlayer(20, "http://localhost/slider/audio/Oman_Speech_09.mp3");
     //*********************************************************************************
 
+
     $('#fileuploadImage').fileupload({
         dataType: 'json',
         done: function(e, data) {
@@ -242,6 +261,7 @@ $.fn.kenburns_upload = function() {
         }
     });
 };
+
 var precedentPlay = new Date().getTime();
 function generateVideo() {
     var elements = $("#status_bar ul").children();
