@@ -185,10 +185,8 @@ $.fn.kenburns_extension = function() {
                     indexGeneral = arrayTime.length - 1;
 
                 var current_time = getRealTime(indexGeneral, arrayTime);
-
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
-
                 //**** BACKGROUND**************
                 changePositionBackground(current_time, playListBackground, background_duration);
                 //*****************************
@@ -201,15 +199,11 @@ $.fn.kenburns_extension = function() {
                 $(pauseButton).parent().attr("class", "pause");
                 var indexGeneral = (ken.getSlideNumber() + 1) % arrayTime.length;
                 var current_time = getRealTime(indexGeneral, arrayTime);
-
                 //**** BACKGROUND**************
                 changePositionBackground(current_time, playListBackground, background_duration);
                 //*****************************
-
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
-
-//              myplayList.play(indexGeneral);
             }
         });
         //*********************************
@@ -436,19 +430,10 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             }
 
             var ret = getPosition(ken.getUpdateTime(), background_duration);
-            var position = ret[0];
-            var offsetForNextOrPrev = ret[1];
-
-            console.log("background_duration: " + background_duration);
-            console.log("ken.getUpdateTime(): " + ken.getUpdateTime());
-            console.log("position: " + position);
-            console.log("background_track: " + background_track);
-            console.log("----------------");
-
-            if (position != background_track) {
-                background_track = position;
-                playListBackground.play(position);
-                $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(offsetForNextOrPrev) / 1000);
+            if (ret[0] != background_track) {
+                background_track = ret[0];
+                playListBackground.play(ret[0]);
+                $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
             }
 
             // Called after the effect is rendered
@@ -492,7 +477,7 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             //it's usefull to set audio for more than one slide
             if (myplayList.playlist[slide_number].mp3 != "" && myplayList.playlist[slide_number].mp3 != null) {
                 myplayList.play(slide_number);
-                console.log("Play: " + slide_number);
+//                console.log("-- Play: " + slide_number);
             }
         }
     });
