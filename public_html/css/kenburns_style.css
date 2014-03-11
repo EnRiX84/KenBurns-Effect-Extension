@@ -103,7 +103,7 @@ h1 {
     margin-left: 10px;
 }
 
-.audio_background{
+/*.audio_background{
     height: 25px;
     margin-left: 500px;
     margin-top: -28px;
@@ -111,7 +111,7 @@ h1 {
     border: 1px solid #d2d2d2; 
     border-radius: 5px;
     width: 340px;
-}
+}*/
 
 #clearAudioBackground{
     position: absolute; 
@@ -119,22 +119,41 @@ h1 {
     margin-left: 845px;
 }
 
-.jp-audio{
+/*.jp-audio{
     cursor: pointer;
     width: 150px;
-}
+}*/
 
 .createVideo{
     height: 25px;
-    margin-left: 870px;
-    margin-top: -28px;
-    position: absolute;
+    width: 150px;
+    margin-left: 850px;
+    position: relative;
 }
 /*#cart {margin-top: 50px; }*/
 /* style the list to maximize the droppable hitarea */
+
+
+#audio_bar{
+    width: 255px;
+    display: inline-block;
+}
+
+#audio_bar ul { 
+    margin: 0; 
+    padding: 1em 1em 1em 1em;
+}
+
+#audio_bar ul li{
+    /*padding: 1em 0 1em 3em;*/        
+    width: 240px;
+    float: left;
+    list-style: none;
+}
+
 #status_bar { 
-    width: 1000px;
-    border-radius: 5px;
+    width: 740px;
+    display: inline-block;
 }
 
 #status_bar ul { 

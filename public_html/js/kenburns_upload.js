@@ -17,8 +17,6 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 $.fn.kenburns_upload = function() {
     var msg_drag_background = "...drag your <b>Audio background</b> here";
     var msg_drag_audio = "...drag your trace here";
@@ -47,34 +45,51 @@ $.fn.kenburns_upload = function() {
                 </div>\n\
                 <div id="player" align="center"></div>\n\
             </div>\n\
-            <div id="status_bar">\n\
-                <h1 class="ui-widget-header" style="width: 480px;">Slides</h1>\n\
-                <div class="audio_background" name="">' + msg_drag_background + '</div> \n\
-                <img id="clearAudioBackground" title="Remove background trace" style="cursor: pointer;" src="css/images/clear.png"/><button class="createVideo">Generate Video</button>\n\
-                <div class="ui-widget-content">\n\
-                    <ul style="height: 200px; overflow: auto;">\n\
-                        <li class="placeholder">' + msg_drag_images + '</li>\n\
-                    </ul>\n\
+            <div style="display: inline-block; width: 1000px;">\n\
+                <div id="status_bar">\n\
+                    <h1 class="ui-widget-header" style="width: 480px;">Slides</h1>\n\
+                    <div class="ui-widget-content">\n\
+                        <ul style="height: 200px; overflow: auto;">\n\
+                            <li class="placeholder">' + msg_drag_images + '</li>\n\
+                        </ul>\n\
+                    </div>\n\
                 </div>\n\
+                <div id="audio_bar">\n\
+                    <h1 class="ui-widget-header" style="width: 150px;">Audio</h1>\n\
+                    <div class="ui-widget-content">\n\
+                        <ul style="height: 200px; overflow: auto;">\n\
+                            <li class="placeholder">' + msg_drag_background + '</li>\n\
+                        </ul>\n\
+                    </div>\n\
+                </div>\n\
+                <button class="createVideo">Generate Video</button>\n\
             </div>');
+    /*
+     <div class="audio_background" name="">' + msg_drag_background + '</div> \n\
+     
+     */
     $(this).append(html);
     $("#catalog").accordion({});
 
-    $("#clearAudioBackground").click(function() {
-        $(".audio_background").html(msg_drag_background);
-        $(".audio_background").attr("name", "");
-        return false;
-    });
+//    $("#clearAudioBackground").click(function() {
+//        $(".audio_background").html(msg_drag_background);
+//        $(".audio_background").attr("name", "");
+//        return false;
+//    });
 
-    $(".audio_background").droppable({
+    var audioindex = 0;
+    $("#audio_bar ul").droppable({
         activeClass: "ui-state-default",
         hoverClass: "ui-state-hover",
         accept: ".jplayer",
         drop: function(event, ui) {
+            audioindex = audioindex + 1;
+            $(this).find(".placeholder").remove();
             var jplayer = ui.draggable;
             var title = "";
             var duration = "";
             var src = "";
+            var div = document.createElement("div");
 
             $(jplayer).find(".jp-duration").each(function() {
                 duration = $(this).text();
@@ -86,7 +101,21 @@ $.fn.kenburns_upload = function() {
                 src = $(this).attr("src");
                 src = src.replace(".ogg", ".mp3");
             });
-            $(this).attr("name", src).html(title + " - " + duration);
+            $(div).attr("name", src).html(title + " - " + duration + "<img id='clearAudioBack" + audioindex + "' style='cursor: pointer;' src='css/images/clear.png'/>");
+
+            var li = document.createElement("li");
+            $(li).attr("id", "backindex" + audioindex);
+            $(li).html(div).appendTo(this);
+            $("#clearAudioBack" + audioindex).click(function() {
+                $(this).parent().parent().remove();
+                return false;
+            });
+        }
+    }).sortable({
+        items: "li:not(.placeholder)",
+        sort: function() {
+            $(this).removeClass("ui-state-default");
+            $("#status_bar ul").removeClass("ui-state-default");
         }
     });
 
@@ -110,7 +139,6 @@ $.fn.kenburns_upload = function() {
                         <span><b>Pan: </b></span><span>x: <input class='panFrom' type='text' value='1' style='width: 30px;'/> y: <input class='panTo'type='text' value='1' style='width: 30px;'/></span>\n\
                         <div id='delete" + dropped + "' align='center'><img style='cursor: pointer;' src='css/images/delete.png'/></div><br/></div>");
             $("<li></li>").html(div).appendTo(this);
-
             $("#delete" + dropped).click(function() {
                 var r = confirm("Are you sure?");
                 if (r == true) {
@@ -264,14 +292,20 @@ $.fn.kenburns_upload = function() {
 
 var precedentPlay = new Date().getTime();
 function generateVideo() {
+
+    //******************* AUDIO ****************
+    var audio_background = [];
+    var audio_background_element = $("#audio_bar ul").children();
+    for (var i = 0; i < audio_background_element.length; i++) {
+        var mp3 = $(audio_background_element[i]).find("div").attr("name");
+        audio_background.push({src_mp3: mp3});
+    }
+    //******************************************
     var elements = $("#status_bar ul").children();
     var images = [];
 
     var audio_for_images = [];
     var pan = [];
-    var audio_background_src_mp3 = $("#status_bar").find(".audio_background").attr("name");
-    var audio_background_src_ogg = audio_background_src_mp3.replace(".mp3", ".ogg");
-    var audio_background = [{src_mp3: audio_background_src_mp3, src_ogg: audio_background_src_ogg, autoplay: true}];
 
     for (var i = 0; i < elements.length; i++) {
         var img_src = $(elements[i]).find("img")[0].src;
