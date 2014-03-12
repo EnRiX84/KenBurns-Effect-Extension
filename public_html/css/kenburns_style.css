@@ -127,9 +127,22 @@ h1 {
 .createVideo{
     height: 25px;
     width: 150px;
-    margin-left: 850px;
+    float: right;
     position: relative;
 }
+
+.exportVideo{
+    height: 25px;
+    width: 180px;
+    float: right;
+    position: relative;
+}
+
+.colorPicker {
+    margin-left: 5px; 
+    display: inline-table;
+}
+
 /*#cart {margin-top: 50px; }*/
 /* style the list to maximize the droppable hitarea */
 

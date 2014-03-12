@@ -62,20 +62,23 @@ $.fn.kenburns_upload = function() {
                         </ul>\n\
                     </div>\n\
                 </div>\n\
-                <button class="createVideo">Generate Video</button>\n\
+                <div><span><b>width: </b><input class="width" type="text" value="800" style="width: 35px;"/>px; &nbsp;<b>height: </b><input class="height" type="text" value="600" style="width: 35px;"/>px; &nbsp;<b>frame per seconds: </b><input class="frame_per_seconds" type="text" value="25" style="width: 35px;"/></span>\n\
+                <br/><span><b>background color: </b><div class="colorPicker" id="dropDownButton">\n\
+                    <div style="padding: 3px;"><div id="colorPicker"></div></div>\n\
+                </div></span></div>\n\
+                <button class="createVideo">Generate Video</button> <button class="exportVideo">Import/Export Video</button>\n\
             </div>');
-    /*
-     <div class="audio_background" name="">' + msg_drag_background + '</div> \n\
-     
-     */
     $(this).append(html);
+
     $("#catalog").accordion({});
 
-//    $("#clearAudioBackground").click(function() {
-//        $(".audio_background").html(msg_drag_background);
-//        $(".audio_background").attr("name", "");
-//        return false;
-//    });
+    $("#colorPicker").on('colorchange', function(event) {
+        $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(event.args.color));
+    });
+
+    $("#colorPicker").jqxColorPicker({color: "000000", colorMode: 'hue', width: 220, height: 200});    //001CF7 BLU
+    $("#dropDownButton").jqxDropDownButton({width: 120, height: 22});
+    $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(new $.jqx.color({hex: "000000"})));
 
     var audioindex = 0;
     $("#audio_bar ul").droppable({
@@ -101,7 +104,7 @@ $.fn.kenburns_upload = function() {
                 src = $(this).attr("src");
                 src = src.replace(".ogg", ".mp3");
             });
-            $(div).attr("name", src).html(title + " - " + duration + "<img id='clearAudioBack" + audioindex + "' style='cursor: pointer;' src='css/images/clear.png'/>");
+            $(div).attr("name", src).attr("duration", duration).html(title + " - " + duration + "<img id='clearAudioBack" + audioindex + "' style='cursor: pointer;' src='css/images/clear.png'/>");
 
             var li = document.createElement("li");
             $(li).attr("id", "backindex" + audioindex);
@@ -196,11 +199,18 @@ $.fn.kenburns_upload = function() {
         return false;
     });
 
+    $(".exportVideo").button().click(function(event) {
+        event.preventDefault();
+        generateVideo(true);
+        return false;
+    });
+
+
     //******************************** IMMAGINI DI TEST ********************************
     var span = document.createElement("span");
     $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
     var img = document.createElement("img");
-    $(img).attr("src", "http://www.online-image-editor.com/styles/2013/images/example_image.png").attr("style", "max-height: 50px; max-width: 50px;");
+    $(img).attr("src", "http://www.letiziabernardi.it/images/immagini_di_natale_5.jpg").attr("style", "max-height: 50px; max-width: 50px;");
     $(span).append(img);
     $(img).disableSelection();
     $("#imageSection").append(span);
@@ -276,7 +286,6 @@ $.fn.kenburns_upload = function() {
         }
     });
 
-
     $('#fileuploadAudio').fileupload({
         dataType: 'json',
         done: function(e, data) {
@@ -290,22 +299,62 @@ $.fn.kenburns_upload = function() {
     });
 };
 
+function getTextElementByColor(color) {
+    if (color == 'transparent' || color.hex == "") {
+        return $("<div style='text-shadow: none; position: relative; padding-bottom: 2px; margin-top: 2px;'>transparent</div>");
+    }
+    var element = $("<div style='text-shadow: none; position: relative; padding-bottom: 2px; margin-top: 2px;'>#" + color.hex + "</div>");
+    var nThreshold = 105;
+    var bgDelta = (color.r * 0.299) + (color.g * 0.587) + (color.b * 0.114);
+    var foreColor = (255 - bgDelta < nThreshold) ? 'Black' : 'White';
+    element.css('color', foreColor);
+    element.css('background', "#" + color.hex);
+    element.addClass('jqx-rc-all');
+    return element;
+}
+
 var precedentPlay = new Date().getTime();
-function generateVideo() {
+function generateVideo(exportVideo) {
+
+    $("audio").remove();
+    console.log($("audio"));
+    $("body").find("audio").each(function() {
+        console.log("TROVATO");
+    });
+
+    console.log();
+    var width = $($(".width")[0]).val();
+    var height = $($(".height")[0]).val();
+    var frame_per_seconds = $($(".frame_per_seconds")[0]).val();
+    var background_color = $("#dropDownButton").jqxDropDownButton('getContent');
+
 
     //******************* AUDIO ****************
+    var audio_background_text = "[";
     var audio_background = [];
     var audio_background_element = $("#audio_bar ul").children();
     for (var i = 0; i < audio_background_element.length; i++) {
         var mp3 = $(audio_background_element[i]).find("div").attr("name");
-        audio_background.push({src_mp3: mp3});
+        var duration = $(audio_background_element[i]).find("div").attr("duration");
+        if (mp3 != undefined && duration != undefined) {
+            audio_background.push({mp3: mp3, duration: duration});
+            audio_background_text += "\n                          {mp3: '" + mp3 + "', duration: '" + duration + "'},";
+        }
     }
+    audio_background_text += "],";
+
     //******************************************
     var elements = $("#status_bar ul").children();
     var images = [];
-
+    var images_text = "[";
     var audio_for_images = [];
+    var audio_for_images_text = "[";
     var pan = [];
+    var pan_text = "[";
+
+    if (elements.length == 0 || $(elements[0]).attr("class") == "placeholder") {
+        alert("You must drag at least one image");
+    }
 
     for (var i = 0; i < elements.length; i++) {
         var img_src = $(elements[i]).find("img")[0].src;
@@ -316,38 +365,72 @@ function generateVideo() {
         var pan_x = $(elements[i]).find("input.panFrom").val();
         var pan_y = $(elements[i]).find("input.panTo").val();
 
-        var src_mp3 = $(elements[i]).find("span.audio").attr("name");
+        var mp3 = $(elements[i]).find("span.audio").attr("name");
 
         images.push({display_time: img_display_time, zoom: img_zoom_time, src: img_src, caption: img_caption});
-        audio_for_images.push({src_mp3: src_mp3});
+        images_text += "\n                          {display_time: '" + img_display_time + "', zoom: '" + img_zoom_time + "', src: '" + img_src + "', caption: '" + img_caption + "'},";
+        audio_for_images.push({mp3: mp3});
+        audio_for_images_text += "\n                          {mp3: '" + mp3 + "'},";
         pan.push({x: pan_x, y: pan_y});
+        pan_text += "\n                          {x: '" + pan_x + "', y: '" + pan_y + "'},";
     }
+
+    images_text += "],";
+    audio_for_images_text += "],";
+    pan_text += "],";
 
     var actuallyDataSlide = new Date().getTime();
     if ((actuallyDataSlide - precedentPlay) > 2000) {
         var newPlayer = document.createElement("div");
-        $("#player").html("Ready! press Play o <a href='#'>Scarica il video</a><br/><br/>");
+        $("#player").html("Ready! press Play or <a href='#'>Download video</a><br/><br/>");
         $("#player").append(newPlayer);
 
         $(newPlayer).kenburns_extension({
-            width: 450,
+            width: 400,
             height: 300,
             status_bar: true, //set if you want see the status bar
             autoplay: false, // set true if status_bar is false
             slide_controller: true, //set if you want see the slide controller
+            debug: false, // true if you want to show debug info.
             images: images,
             audio_background: audio_background,
             audio_for_images: audio_for_images,
             pan: pan,
-            debug: false, // true if you want to show debug info.
-            frames_per_second: 25, // frames per second
+            frames_per_second: frame_per_seconds, // frames per second
             fade_time: 6000, // fade time
-            background_color: '#000000', // background color
+            background_color: $(background_color).text(), // background color
         });
 
+        if (exportVideo) {
+            var string = "\
+                <!--Include \n\
+                   <div class='kenburns_effect'></div> \n\
+                   in your BODY element. \n\
+                   After this include this script: --> \n\
+                <script type='text/javascript'>\n\
+                    $(function() {\n\
+                            $('.kenburns_effect').kenburns_extension({\n\
+                               width: " + width + " , \n\
+                               height: " + height + ",\n\
+                               status_bar: true,\n\
+                               autoplay: false,\n\
+                               slide_controller: true,\n\
+                               images: " + images_text + "\n\
+                               audio_background: " + audio_background_text + "\n\
+                               audio_for_images: " + audio_for_images_text + "\n\
+                               pan: " + pan_text + "\n\
+                               debug: false,\n\
+                               frames_per_second: " + frame_per_seconds + ",\n\
+                               background_color: '" + $(background_color).text() + "' \n\
+                            });\n\
+                    });\n\
+                </script>";
+            alert(string);
+        }
         precedentPlay = new Date().getTime();
     }
 }
+
 
 function createAudioPlayer(indexAudioPlayer, url) {
     var div = document.createElement("div");

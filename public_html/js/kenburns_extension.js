@@ -22,6 +22,10 @@ var slideDrag = false;
 
 $.fn.kenburns_extension = function() {
 
+    for (var i = 0; i < 9999; i++) {
+        clearInterval(i);
+    }
+
     var args = arguments[0] || {};
     var arrayTime = [];
     var images = args.images;
@@ -414,6 +418,7 @@ function initAudio(args, main) {
 
 function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBackground, background_duration) {
     var background_track = 0;
+
     var ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
@@ -475,7 +480,7 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             }
 //            indexGeneral = slide_number;
             //it's usefull to set audio for more than one slide
-            if (myplayList.playlist[slide_number].mp3 != "" && myplayList.playlist[slide_number].mp3 != null) {
+            if (myplayList.playlist[slide_number].mp3 !== "" && myplayList.playlist[slide_number].mp3 !== null) {
                 myplayList.play(slide_number);
 //                console.log("-- Play: " + slide_number);
             }
