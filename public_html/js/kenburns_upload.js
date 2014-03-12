@@ -359,7 +359,7 @@ function generateVideo(exportVideo, xml) {
     var pan = [];
     var pan_text = "[";
 
-    if (elements.length == 0 || $(elements[0]).attr("class") == PLACEHOLDER) {
+    if (!xml && (elements.length == 0 || $(elements[0]).attr("class") == PLACEHOLDER)) {
         alert("You must drag at least one image");
     }
 
@@ -367,7 +367,8 @@ function generateVideo(exportVideo, xml) {
     for (var i = 0; i < elements.length; i++) {
         var xml_slide = "<slide>";
 
-        var img_src = $(elements[i]).find("img")[0].src;
+        var image = $(elements[i]).find("img");
+        var img_src = (image != null && image.length > 0) ? image[0].src : "";
         var img_display_time = $(elements[i]).find("input.duration").val();
         var img_zoom_time = $(elements[i]).find("input.zoom").val();
         var img_caption = $(elements[i]).find("textarea.text").val();
@@ -405,27 +406,27 @@ function generateVideo(exportVideo, xml) {
 
     var actuallyDataSlide = new Date().getTime();
     if ((actuallyDataSlide - precedentPlay) > 2000) {
-        var newPlayer = document.createElement("div");
-        $("#player").html("Ready! press Play or <a href='#'>Download video</a><br/><br/>");
-        $("#player").append(newPlayer);
+        if (exportVideo == null && xml == null) {
+            var newPlayer = document.createElement("div");
+            $("#player").html("Ready! press Play or <a href='#'>Download video</a><br/><br/>");
+            $("#player").append(newPlayer);
 
-        $(newPlayer).kenburns_extension({
-            width: 400,
-            height: 300,
-            status_bar: true, //set if you want see the status bar
-            autoplay: false, // set true if status_bar is false
-            slide_controller: true, //set if you want see the slide controller
-            debug: false, // true if you want to show debug info.
-            images: images,
-            audio_background: audio_background,
-            audio_for_images: audio_for_images,
-            pan: pan,
-            frames_per_second: frame_per_seconds, // frames per second
-            fade_time: 6000, // fade time
-            background_color: $(background_color).text(), // background color
-        });
-
-        if (exportVideo) {
+            $(newPlayer).kenburns_extension({
+                width: 400,
+                height: 300,
+                status_bar: true, //set if you want see the status bar
+                autoplay: false, // set true if status_bar is false
+                slide_controller: true, //set if you want see the slide controller
+                debug: false, // true if you want to show debug info.
+                images: images,
+                audio_background: audio_background,
+                audio_for_images: audio_for_images,
+                pan: pan,
+                frames_per_second: frame_per_seconds, // frames per second
+                fade_time: 6000, // fade time
+                background_color: $(background_color).text(), // background color
+            });
+        } else if (exportVideo) {
             var string = "\
                 <!--Include \n\
                    <div class='kenburns_effect'></div> \n\
@@ -450,9 +451,8 @@ function generateVideo(exportVideo, xml) {
                     });\n\
                 </script>";
             alert(string);
-        }
 
-        if (xml) {
+        } else if (xml) {
             var xml_image_upload = ""
             var images = $("#imageSection").find("img");
             for (var i = 0; i < images.length; i++) {
