@@ -16,11 +16,13 @@
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+var PLACEHOLDER = "placeholder";
 
 $.fn.kenburns_upload = function() {
     var msg_drag_background = "...drag your <b>Audio background</b> here";
     var msg_drag_audio = "...drag your trace here";
     var msg_drag_images = "...drag your images here";
+
 
     var indexAudioPlayer = 0;
     var args = arguments[0] || {};
@@ -29,14 +31,14 @@ $.fn.kenburns_upload = function() {
             <div style="display: inline-block;">\n\
                 <div id="audio_video">\n\
                     <div id="catalog">\n\
-                        <h2><a href="#">Upload Images</a></h2>\n\
-                        <div>\n\
+                        <div><h2>Upload Images</h2></div>\n\
+                        <div style="padding: 10px;">\n\
                             <input id="fileuploadImage" type="file" name="files[]" data-url="server/php/" multiple><br/><br/>\n\
                             <div id="imageSection" style="height: 265px; overflow: auto;">\n\
                             </div>\n\
                         </div>\n\
-                        <h2><a href="#">Upload Audio</a></h2>\n\
-                        <div >\n\
+                        <div><h2>Upload Audio</h2></div>\n\
+                        <div style="padding: 10px;">\n\
                             <input id="fileuploadAudio" type="file" name="files[]" data-url="server/php/" multiple>\n\
                             <div id="audioSection" style="height: 265px; width: 450px; overflow: auto;">\n\
                             </div>\n\
@@ -50,7 +52,7 @@ $.fn.kenburns_upload = function() {
                     <h1 class="ui-widget-header" style="width: 480px;">Slides</h1>\n\
                     <div class="ui-widget-content">\n\
                         <ul style="height: 200px; overflow: auto;">\n\
-                            <li class="placeholder">' + msg_drag_images + '</li>\n\
+                            <li class="' + PLACEHOLDER + '">' + msg_drag_images + '</li>\n\
                         </ul>\n\
                     </div>\n\
                 </div>\n\
@@ -58,7 +60,7 @@ $.fn.kenburns_upload = function() {
                     <h1 class="ui-widget-header" style="width: 150px;">Audio</h1>\n\
                     <div class="ui-widget-content">\n\
                         <ul style="height: 200px; overflow: auto;">\n\
-                            <li class="placeholder">' + msg_drag_background + '</li>\n\
+                            <li class="' + PLACEHOLDER + '">' + msg_drag_background + '</li>\n\
                         </ul>\n\
                     </div>\n\
                 </div>\n\
@@ -66,11 +68,14 @@ $.fn.kenburns_upload = function() {
                 <br/><span><b>background color: </b><div class="colorPicker" id="dropDownButton">\n\
                     <div style="padding: 3px;"><div id="colorPicker"></div></div>\n\
                 </div></span></div>\n\
-                <button class="createVideo">Generate Video</button> <button class="exportVideo">Import/Export Video</button>\n\
+                <button style="cursor: pointer;" class="createVideo">Generate Video</button> <button style="cursor: pointer; margin-right: 10px;" class="exportVideo">JavaScript video</button> <button style="cursor: pointer; margin-right: 10px;" class="saveXML">Save XML</button>\n\
             </div>');
     $(this).append(html);
 
-    $("#catalog").accordion({});
+    $("#catalog").jqxNavigationBar({
+        width: 490,
+        height: 400
+    });
 
     $("#colorPicker").on('colorchange', function(event) {
         $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(event.args.color));
@@ -87,7 +92,7 @@ $.fn.kenburns_upload = function() {
         accept: ".jplayer",
         drop: function(event, ui) {
             audioindex = audioindex + 1;
-            $(this).find(".placeholder").remove();
+            $(this).find("." + PLACEHOLDER).remove();
             var jplayer = ui.draggable;
             var title = "";
             var duration = "";
@@ -115,7 +120,7 @@ $.fn.kenburns_upload = function() {
             });
         }
     }).sortable({
-        items: "li:not(.placeholder)",
+        items: "li:not(." + PLACEHOLDER + ")",
         sort: function() {
             $(this).removeClass("ui-state-default");
             $("#status_bar ul").removeClass("ui-state-default");
@@ -129,7 +134,7 @@ $.fn.kenburns_upload = function() {
         accept: ":not(.ui-sortable-helper, .jplayer)",
         drop: function(event, ui) {
             dropped = dropped + 1;
-            $(this).find(".placeholder").remove();
+            $(this).find("." + PLACEHOLDER).remove();
             var div = document.createElement("div");
             $(div).attr("id", "status_bar_id_" + dropped);
             $(div).attr("class", "status_bar_element");
@@ -180,12 +185,12 @@ $.fn.kenburns_upload = function() {
                         src = $(this).attr("src");
                         src = src.replace(".ogg", ".mp3");
                     });
-                    $(audio).attr("name", src).html(title + " - " + duration);
+                    $(audio).attr("name", src).attr("duration", duration).html(title + " - " + duration);
                 }
             });
         }
     }).sortable({
-        items: "li:not(.placeholder)",
+        items: "li:not(." + PLACEHOLDER + ")",
         sort: function() {
             // gets added unintentionally by droppable interacting with sortable
             // using connectWithSortable fixes this, but doesn't allow you to customize active/hoverClass options
@@ -193,18 +198,24 @@ $.fn.kenburns_upload = function() {
         }
     });
 
-    $(".createVideo").button().click(function(event) {
+    $(".createVideo").jqxButton().click(function(event) {
         event.preventDefault();
         generateVideo();
         return false;
     });
 
-    $(".exportVideo").button().click(function(event) {
+    $(".exportVideo").jqxButton().click(function(event) {
         event.preventDefault();
         generateVideo(true);
         return false;
     });
 
+    $(".saveXML").jqxButton().click(function(event) { //{ width: '150'}
+        event.preventDefault();
+
+        generateVideo(false, true);
+        return false;
+    });
 
     //******************************** IMMAGINI DI TEST ********************************
     var span = document.createElement("span");
@@ -314,36 +325,32 @@ function getTextElementByColor(color) {
 }
 
 var precedentPlay = new Date().getTime();
-function generateVideo(exportVideo) {
-
-    $("audio").remove();
-    console.log($("audio"));
-    $("body").find("audio").each(function() {
-        console.log("TROVATO");
-    });
-
-    console.log();
+function generateVideo(exportVideo, xml) {
     var width = $($(".width")[0]).val();
     var height = $($(".height")[0]).val();
     var frame_per_seconds = $($(".frame_per_seconds")[0]).val();
     var background_color = $("#dropDownButton").jqxDropDownButton('getContent');
 
-
     //******************* AUDIO ****************
+    var xml_audio_background = "<audio_background>";
     var audio_background_text = "[";
     var audio_background = [];
     var audio_background_element = $("#audio_bar ul").children();
     for (var i = 0; i < audio_background_element.length; i++) {
+        var xml_audio = "<audio>";
         var mp3 = $(audio_background_element[i]).find("div").attr("name");
         var duration = $(audio_background_element[i]).find("div").attr("duration");
         if (mp3 != undefined && duration != undefined) {
+            xml_audio += "<mp3>" + mp3 + "</mp3><ogg></ogg><duration>" + duration + "</duration>";
             audio_background.push({mp3: mp3, duration: duration});
             audio_background_text += "\n                          {mp3: '" + mp3 + "', duration: '" + duration + "'},";
         }
+        xml_audio += "</audio>";
     }
     audio_background_text += "],";
-
+    xml_audio_background += xml_audio + "</audio_background>";
     //******************************************
+
     var elements = $("#status_bar ul").children();
     var images = [];
     var images_text = "[";
@@ -352,11 +359,14 @@ function generateVideo(exportVideo) {
     var pan = [];
     var pan_text = "[";
 
-    if (elements.length == 0 || $(elements[0]).attr("class") == "placeholder") {
+    if (elements.length == 0 || $(elements[0]).attr("class") == PLACEHOLDER) {
         alert("You must drag at least one image");
     }
 
+    var xml_slides = "<slides>";
     for (var i = 0; i < elements.length; i++) {
+        var xml_slide = "<slide>";
+
         var img_src = $(elements[i]).find("img")[0].src;
         var img_display_time = $(elements[i]).find("input.duration").val();
         var img_zoom_time = $(elements[i]).find("input.zoom").val();
@@ -366,6 +376,7 @@ function generateVideo(exportVideo) {
         var pan_y = $(elements[i]).find("input.panTo").val();
 
         var mp3 = $(elements[i]).find("span.audio").attr("name");
+        var duration = $(elements[i]).find("span.audio").attr("duration");
 
         images.push({display_time: img_display_time, zoom: img_zoom_time, src: img_src, caption: img_caption});
         images_text += "\n                          {display_time: '" + img_display_time + "', zoom: '" + img_zoom_time + "', src: '" + img_src + "', caption: '" + img_caption + "'},";
@@ -373,7 +384,20 @@ function generateVideo(exportVideo) {
         audio_for_images_text += "\n                          {mp3: '" + mp3 + "'},";
         pan.push({x: pan_x, y: pan_y});
         pan_text += "\n                          {x: '" + pan_x + "', y: '" + pan_y + "'},";
+
+        var src_ogg = (mp3.indexOf(".mp3") != -1) ? mp3.replace(".mp3", ".ogg") : mp3;
+
+        xml_slide += "<img>" + img_src + "</img>";
+        xml_slide += "<display_time>" + img_display_time + "</display_time>";
+        xml_slide += "<zoom_time>" + img_zoom_time + "</zoom_time>";
+        xml_slide += "<caption>" + img_caption + "</caption>";
+        xml_slide += "<pan><x>" + pan_x + "</x><y>" + pan_y + "</y></pan>";
+        xml_slide += "<audio><mp3>" + mp3 + "</mp3><ogg>" + src_ogg + "</ogg><duration>" + duration + "</duration></audio>";
+        xml_slide += "<img>" + img_src + "</img>";
+        xml_slide += "</slide>";
+        xml_slides += xml_slide;
     }
+    xml_slides += "</slides>";
 
     images_text += "],";
     audio_for_images_text += "],";
@@ -427,10 +451,61 @@ function generateVideo(exportVideo) {
                 </script>";
             alert(string);
         }
+
+        if (xml) {
+            var xml_image_upload = ""
+            var images = $("#imageSection").find("img");
+            for (var i = 0; i < images.length; i++) {
+                xml_image_upload += "<img>" + $(images[i]).attr("src") + "</img>";
+            }
+
+            var xml_audio_upload = ""
+            var audio = $("#audioSection").find("audio");
+            for (var i = 0; i < audio.length; i++) {
+                var src = $(audio[i]).attr("src");
+                var src_mp3 = (src.indexOf(".ogg") != -1) ? src.replace(".ogg", ".mp3") : src;
+                var src_ogg = (src.indexOf(".mp3") != -1) ? src.replace(".mp3", ".ogg") : src;
+                xml_audio_upload += "<audio><mp3>" + src_mp3 + "</mp3><ogg>" + src_ogg + "</ogg></audio>";
+            }
+
+            var xml_frame_per_seconds = "<frame_per_seconds>" + frame_per_seconds + "</frame_per_seconds>";
+            var xml_background_color = "<background_color>" + $(background_color).text() + "</background_color>";
+            var xml_debug = "<debug>false</debug>";
+            var xml_slide_controller = "<slide_controller>true</slide_controller>";
+            var xml_autoplay = "<autoplay>false</autoplay>";
+            var xml_status_bar = "<status_bar>true</status_bar>";
+            var xml_width = "<width>" + width + "</width>";
+            var xml_height = "<height>" + height + "</height>";
+
+            var xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            xml += "<kenburns_xml>";
+            xml += xml_slides;
+            xml += xml_audio_background
+            xml += "<image_upload>" + xml_image_upload + "</image_upload>";
+            xml += "<audio_upload>" + xml_audio_upload + "</audio_upload>";
+            xml += "<meta_video_info>" + xml_width + xml_height + xml_frame_per_seconds + xml_background_color + xml_debug + xml_slide_controller + xml_autoplay + xml_status_bar + "</meta_video_info>";
+            xml += "</kenburns_xml>";
+            var xml_print = vkbeautify.xml(xml);
+            var blob = new Blob([xml_print], {type: "text/plain;charset=utf-8"});
+            saveAs(blob, "xml_kenburns_" + getData() + ".xml");
+        }
         precedentPlay = new Date().getTime();
     }
 }
 
+function getData() {
+    var date = new Date();
+    var y = date.getFullYear();
+    var m = date.getMonth() + 1;
+    var d = date.getDate();
+
+    if (m.toString().length == 1)
+        m = '0' + m;
+    if (d.toString().length == 1)
+        d = '0' + d;
+
+    return y + '-' + m + '-' + d;
+}
 
 function createAudioPlayer(indexAudioPlayer, url) {
     var div = document.createElement("div");
