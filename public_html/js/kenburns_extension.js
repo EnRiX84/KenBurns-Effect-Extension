@@ -39,7 +39,7 @@ $.fn.kenburns_extension = function() {
     $(canvas).append("<p>Your browser does not support canvas!</p>");
 
     //Status bar
-    if (args.status_bar == true) {
+    if (args.status_bar === true) {
         var sliderDiv = document.createElement("div");
         $(sliderDiv).attr("class", "sliderDiv");
     }
@@ -97,7 +97,7 @@ $.fn.kenburns_extension = function() {
         slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, background_duration);
     });
 
-    if (args.slide_controller == true) {
+    if (args.slide_controller === true) {
         // SLIDE SHOW CONTROLLER
         var divForSlide = document.createElement("div");
         var slideShowController = document.createElement("div");
@@ -123,11 +123,6 @@ $.fn.kenburns_extension = function() {
         $(li1).append(prevButton);
 
         var li2 = document.createElement("li");
-        if (args.autoplay) {
-            $(li2).attr("class", "pause");
-        } else {
-            $(li2).attr("class", "play");
-        }
         $(ul).append(li2);
         $(li2).append(pauseButton);
 
@@ -144,7 +139,7 @@ $.fn.kenburns_extension = function() {
         $(li4).append(lastButton);
 
         $(pauseButton).click(function() {
-            if ($(this).parent().attr("class") == "pause") {
+            if ($(this).parent().attr("class") === "pause") {
                 $(this).parent().attr("class", "play");
                 ken.pause();
                 playListBackground.pause();
@@ -183,7 +178,7 @@ $.fn.kenburns_extension = function() {
             if ((actuallyData - previousData) > 1000) {
                 $(pauseButton).parent().attr("class", "pause");
                 var indexGeneral = ken.getSlideNumber();
-                if (indexGeneral != 0)
+                if (indexGeneral !== 0)
                     indexGeneral = indexGeneral - 1;
                 else
                     indexGeneral = arrayTime.length - 1;
@@ -213,6 +208,16 @@ $.fn.kenburns_extension = function() {
         //*********************************
     }
     $(loaderDiv).hide();
+
+    if (args.autoplay) {
+        $(li2).attr("class", "pause");
+        setTimeout(function() {
+            playListBackground.play();
+        }, 300);
+    } else {
+        $(li2).attr("class", "play");
+        playListBackground.pause();
+    }
 };
 
 function changePositionBackground(current_time, playListBackground, background_duration) {
@@ -249,7 +254,7 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
         maxTime += arrayTime[i];
     }
 
-    if (args.status_bar == true) {
+    if (args.status_bar === true) {
         $(sliderDiv).jqxSlider({
             width: args.width,
             min: 0,
@@ -257,7 +262,7 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
             value: 0,
             step: 1000,
             showTicks: false,
-            showButtons: false,
+            showButtons: false
         });
     }
 
@@ -325,8 +330,10 @@ function initAudio(args, main) {
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
     for (var i = 0; i < audioArray_background.length; i++) {
+        var ogg = audioArray_background[i].mp3.replace(".mp3", ".ogg");
         toJPlayerList_background.push({
-            mp3: audioArray_background[i].mp3, ogg: audioArray_background[i].ogg
+            mp3: audioArray_background[i].mp3,
+            oga: ogg
         });
 
         var duration = audioArray_background[i].duration;
@@ -336,7 +343,7 @@ function initAudio(args, main) {
 
     //****************************************************
     var jplayerDiv_background = document.createElement("div");
-    $(jplayerDiv_background).attr("id", "jquery_jplayer_background_playlist").attr("class", "jp-jplayer")
+    $(jplayerDiv_background).attr("id", "jquery_jplayer_background_playlist").attr("class", "jp-jplayer");
     var source_background = document.createElement("div");
     $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
     $(source_background).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
@@ -348,18 +355,17 @@ function initAudio(args, main) {
                                </div>');
     $(main).append(jplayerDiv_background);
     $(main).append(source_background);
-
     var myplayList_background = new jPlayerPlaylist({
         jPlayer: "#jquery_jplayer_background_playlist",
         cssSelectorAncestor: "#jp_container_background_playlist"
     }, toJPlayerList_background, {
         wmode: "window",
         solution: "flash, html",
-        supplied: "mp3,ogg",
+        supplied: "mp3,oga",
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
-        volume: 0.2,
+        volume: 0.2
     });
     $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
     //****************************************************
@@ -375,13 +381,15 @@ function initAudio(args, main) {
     var audioArray = args.audio_for_images;
     var toJPlayerList = [];
     for (var i = 0; i < audioArray.length; i++) {
+        var ogg = audioArray[i].mp3.replace(".mp3", ".ogg");
         toJPlayerList.push({
-            mp3: audioArray[i].mp3, ogg: audioArray[i].ogg
-        })
+            mp3: audioArray[i].mp3,
+            oga: ogg
+        });
     }
     //****************************************************
     var jplayerDiv = document.createElement("div");
-    $(jplayerDiv).attr("id", "jquery_jplayer_playlist").attr("class", "jp-jplayer")
+    $(jplayerDiv).attr("id", "jquery_jplayer_playlist").attr("class", "jp-jplayer");
     var source = document.createElement("div");
     $(source).attr("id", "jp_container_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
     $(source).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
@@ -400,7 +408,7 @@ function initAudio(args, main) {
     }, toJPlayerList, {
         wmode: "window",
         solution: "flash, html",
-        supplied: "mp3,ogg",
+        supplied: "mp3, oga",
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
@@ -430,12 +438,12 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         pan: args.pan,
         autoplay: args.autoplay,
         post_render_callback: function($canvas, context) {
-            if (args.status_bar == true && slideDrag == false) {
+            if (args.status_bar === true && slideDrag === false) {
                 $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
             }
 
             var ret = getPosition(ken.getUpdateTime(), background_duration);
-            if (ret[0] != background_track) {
+            if (ret[0] !== background_track) {
                 background_track = ret[0];
                 playListBackground.play(ret[0]);
                 $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
@@ -475,7 +483,7 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         },
         post_display_image_callback: function(slide_number) {
             slider.goToSlide(slide_number);
-            if (slide_number == 0) {
+            if (slide_number === 0) {
                 playListBackground.play(0);
             }
 //            indexGeneral = slide_number;

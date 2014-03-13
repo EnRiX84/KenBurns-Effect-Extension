@@ -44,9 +44,13 @@
                 $('.main').kenburns_extension({
                     width: 1000,
                     height: 400,
+                    frames_per_second: 25, // frames per second
+                    fade_time: 6000, // fade time
+                    background_color: '#000000', // background color
                     status_bar: true, //set if you want see the status bar
                     autoplay: true, // set true if status_bar is false
                     slide_controller: true, //set if you want see the slide controller
+                    debug: false, // true if you want to show debug info.
                     images: [//select path of your images
                         {display_time: 1000, zoom: 1, src: './img/title_majesty.png', caption: ''}, // 1
                         {display_time: 5000, zoom: 1, src: './img/title_university.png', caption: ''}, // 2
@@ -80,36 +84,36 @@
                         {display_time: 11000, zoom: 1, src: './img/txt-end.png', caption: ''}, //27
                     ],
                     audio_background: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
-                        {mp3: './audio/Arisa_Sanremo_2014.mp3', ogg: './audio/Arisa_Sanremo_2014.mp3', duration: '3:30'}, // mm:ss        
-                        {mp3: './audio/Arisa_Sanremo_2012.mp3', ogg: './audio/Arisa_Sanremo_2012.mp3', duration: '1:00'}, // mm:ss
+                        {mp3: './audio/Arisa_Sanremo_2014.mp3', duration: '3:30'}, // mm:ss        
+                        {mp3: './audio/Arisa_Sanremo_2012.mp3', duration: '1:00'}, // mm:ss
                     ],
                     audio_for_images: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
-                        {mp3: '', ogg: ''},
-                        {mp3: '', ogg: ''},
-                        {mp3: '', ogg: ''},
-                        {mp3: '', ogg: ''},
-                        {mp3: '', ogg: ''}, // 5
-                        {mp3: './audio/Oman_Speech_06.mp3', ogg: './audio/Oman_Speech_06.mp3'},
-                        {mp3: './audio/Oman_Speech_07.mp3', ogg: './audio/Oman_Speech_07.mp3'},
-                        {mp3: './audio/Oman_Speech_08.mp3', ogg: './audio/Oman_Speech_08.mp3'},
-                        {mp3: './audio/Oman_Speech_09.mp3', ogg: './audio/Oman_Speech_09.mp3'},
-                        {mp3: './audio/Oman_Speech_10.mp3', ogg: './audio/Oman_Speech_10.mp3'}, // 10
-                        {mp3: './audio/Oman_Speech_11.mp3', ogg: './audio/Oman_Speech_11.mp3'},
-                        {mp3: './audio/Oman_Speech_12.mp3', ogg: './audio/Oman_Speech_12.mp3'},
-                        {mp3: './audio/Oman_Speech_13.mp3', ogg: './audio/Oman_Speech_13.mp3'},
-                        {mp3: './audio/Oman_Speech_14.mp3', ogg: './audio/Oman_Speech_14.mp3'},
-                        {mp3: './audio/Oman_Speech_15.mp3', ogg: './audio/Oman_Speech_15.mp3'}, // 15
-                        {mp3: './audio/Oman_Speech_16.mp3', ogg: './audio/Oman_Speech_16.mp3'},
-                        {mp3: './audio/Oman_Speech_17.mp3', ogg: './audio/Oman_Speech_17.mp3'},
-                        {mp3: './audio/Oman_Speech_18.mp3', ogg: './audio/Oman_Speech_18.mp3'},
-                        {mp3: './audio/Oman_Speech_19.mp3', ogg: './audio/Oman_Speech_19.mp3'},
-                        {mp3: './audio/Oman_Speech_20.mp3', ogg: './audio/Oman_Speech_20.mp3'}, // 20
-                        {mp3: './audio/Oman_Speech_21.mp3', ogg: './audio/Oman_Speech_21.mp3'},
-                        {mp3: './audio/Oman_Speech_22.mp3', ogg: './audio/Oman_Speech_22.mp3'},
-                        {mp3: './audio/Oman_Speech_23.mp3', ogg: './audio/Oman_Speech_23.mp3'},
-                        {mp3: './audio/Oman_Speech_24.mp3', ogg: './audio/Oman_Speech_24.mp3'},
-                        {mp3: './audio/desert-simple.mp3', ogg: './audio/desert-simple.mp3'}, // 25
-                        {mp3: './audio/eagle.mp3', ogg: './audio/eagle.mp3'},
+                        {mp3: ''},
+                        {mp3: ''},
+                        {mp3: ''},
+                        {mp3: ''},
+                        {mp3: ''}, // 5
+                        {mp3: './audio/Oman_Speech_06.mp3'},
+                        {mp3: './audio/Oman_Speech_07.mp3'},
+                        {mp3: './audio/Oman_Speech_08.mp3'},
+                        {mp3: './audio/Oman_Speech_09.mp3'},
+                        {mp3: './audio/Oman_Speech_10.mp3'}, // 10
+                        {mp3: './audio/Oman_Speech_11.mp3'},
+                        {mp3: './audio/Oman_Speech_12.mp3'},
+                        {mp3: './audio/Oman_Speech_13.mp3'},
+                        {mp3: './audio/Oman_Speech_14.mp3'},
+                        {mp3: './audio/Oman_Speech_15.mp3'}, // 15
+                        {mp3: './audio/Oman_Speech_16.mp3'},
+                        {mp3: './audio/Oman_Speech_17.mp3'},
+                        {mp3: './audio/Oman_Speech_18.mp3'},
+                        {mp3: './audio/Oman_Speech_19.mp3'},
+                        {mp3: './audio/Oman_Speech_20.mp3'}, // 20
+                        {mp3: './audio/Oman_Speech_21.mp3'},
+                        {mp3: './audio/Oman_Speech_22.mp3'},
+                        {mp3: './audio/Oman_Speech_23.mp3'},
+                        {mp3: './audio/Oman_Speech_24.mp3'},
+                        {mp3: './audio/desert-simple.mp3'}, // 25
+                        {mp3: './audio/eagle.mp3'},
                         {mp3: ''}// 27
                     ],
                     pan: [
@@ -143,11 +147,7 @@
                         {x: 0, y: 0}, // 25 ex 23 desert
                         {x: 2, y: 1}, // 26 ex 24 eagle
                         {x: 1, y: 1}, // 28 scritta txt end
-                    ],
-                    debug: false, // true if you want to show debug info.
-                    frames_per_second: 25, // frames per second
-                    fade_time: 6000, // fade time
-                    background_color: '#000000', // background color
+                    ]
                 });
             });
         </script>
