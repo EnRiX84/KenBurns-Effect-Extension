@@ -30,7 +30,8 @@ $.fn.kenburns_extension = function() {
     var arrayTime = [];
     var images = args.images;
     for (var i = 0; i < images.length; i++) {
-        arrayTime.push(parseInt(images[i]["display_time"]));
+        if (images[i] != null)
+            arrayTime.push(parseInt(images[i]["display_time"]));
     }
     var html = document.createElement("div");
 
@@ -51,7 +52,8 @@ $.fn.kenburns_extension = function() {
     $(caption).attr("class", "slider-wrapper");
     var slides = "";
     for (var i = 0; i < args.images.length; i++) {
-        slides += '<div class="slide">' + args.images[i]["caption"] + '</div>';
+        if (images[i] != null)
+            slides += '<div class="slide">' + args.images[i]["caption"] + '</div>';
     }
     $(caption).html(slides);
     //**************************************************************
@@ -242,11 +244,13 @@ function getPosition(current_time, background_duration) {
     var subTotal = 0;
     var offset = 0;
     for (var i = 0; i < background_duration.length; i++) {
-        offset += (i !== 0) ? background_duration[i - 1] : "";
-        subTotal += background_duration[i];
-        if (current_time <= subTotal) {
-            positionBackground = i;
-            break;
+        if (background_duration[i] != null) {
+            offset += (i !== 0) ? background_duration[i - 1] : "";
+            subTotal += background_duration[i];
+            if (current_time <= subTotal) {
+                positionBackground = i;
+                break;
+            }
         }
     }
     var offset = current_time - offset;
@@ -257,7 +261,9 @@ function getPosition(current_time, background_duration) {
 function initSliders(args, caption, sliderDiv, arrayTime) {
     var maxTime = 0;
     for (var i = 0; i < arrayTime.length; i++) {
+        if (arrayTime[i] != null) {
         maxTime += arrayTime[i];
+        }
     }
 
     if (args.status_bar === true) {
@@ -289,11 +295,13 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
 function getStartTime(realtime, arrayTime) {
     var value = 0;
     for (var i = 0; i < arrayTime.length; i++) {
+         if (arrayTime[i] != null) {
         value += arrayTime[i];
         if (value >= realtime) {
             return value - arrayTime[i];
             break;
         }
+         }
     }
     return false;
 }
@@ -336,15 +344,17 @@ function initAudio(args, main) {
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
     for (var i = 0; i < audioArray_background.length; i++) {
-        var ogg = audioArray_background[i]["mp3"].replace(".mp3", ".ogg");
-        toJPlayerList_background.push({
-            mp3: audioArray_background[i]["mp3"],
-            oga: ogg
-        });
+        if (audioArray_background[i] != null) {
+            var ogg = audioArray_background[i]["mp3"].replace(".mp3", ".ogg");
+            toJPlayerList_background.push({
+                mp3: audioArray_background[i]["mp3"],
+                oga: ogg
+            });
 
-        var duration = audioArray_background[i]["duration"];
-        duration = ((parseInt(duration.split(":")[0]) * 60) + parseInt(duration.split(":")[1])) * 1000;
-        background_duration.push(duration);
+            var duration = audioArray_background[i]["duration"];
+            duration = ((parseInt(duration.split(":")[0]) * 60) + parseInt(duration.split(":")[1])) * 1000;
+            background_duration.push(duration);
+        }
     }
 
     //****************************************************
@@ -388,11 +398,13 @@ function initAudio(args, main) {
     var audioArray = args.audio_for_images;
     var toJPlayerList = [];
     for (var i = 0; i < audioArray.length; i++) {
-        var ogg = audioArray[i]["mp3"].replace(".mp3", ".ogg");
-        toJPlayerList.push({
-            mp3: audioArray[i]["mp3"],
-            oga: ogg
-        });
+        if (audioArray[i] != null) {
+            var ogg = audioArray[i]["mp3"].replace(".mp3", ".ogg");
+            toJPlayerList.push({
+                mp3: audioArray[i]["mp3"],
+                oga: ogg
+            });
+        }
     }
     //****************************************************
     var jplayerDiv = document.createElement("div");
