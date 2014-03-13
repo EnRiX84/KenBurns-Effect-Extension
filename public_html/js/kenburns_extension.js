@@ -151,7 +151,6 @@ $.fn.kenburns_extension = function() {
                 ken.pause();
                 playListBackground.pause();
                 myplayList.pause();
-
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
@@ -221,8 +220,6 @@ $.fn.kenburns_extension = function() {
         //*********************************
     }
     $(loaderDiv).hide();
-
-
 };
 
 function changePositionBackground(current_time, playListBackground, background_duration) {
@@ -467,9 +464,9 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
 
             // Called after the effect is rendered
             // Draw anything you like on to of the canvas
-//            return;
+            return;
 
-            context.save();
+//            context.save();
             //var gradient = context.createLinearGradient(0, 0, 0, 60);  
             //gradient.addColorStop(0.0, '#000');
             //gradient.addColorStop(1.0, 'rgba(0,0,0,0)');
@@ -480,22 +477,22 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             //drawing.src = "img/shadow.png";
             //context.drawImage(drawing,0,0);
 //
-            context.fillStyle = '#000';
-            context.font = 'bold 20px serif';
-            var width = $canvas.width();
-            var height = $canvas.height();
-            var text = "";
-            var metric = context.measureText(text);
-
-            context.fillStyle = '#fff';
-
-            context.shadowOffsetX = 3;
-            context.shadowOffsetY = 3;
-            context.shadowBlur = 4;
-            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
-
-            context.fillText(text, width - metric.width - 8, height - 8);
-            context.restore();
+//            context.fillStyle = '#000';
+//            context.font = 'bold 20px serif';
+//            var width = $canvas.width();
+//            var height = $canvas.height();
+//            var text = "";
+//            var metric = context.measureText(text);
+//
+//            context.fillStyle = '#fff';
+//
+//            context.shadowOffsetX = 3;
+//            context.shadowOffsetY = 3;
+//            context.shadowBlur = 4;
+//            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+//
+//            context.fillText(text, width - metric.width - 8, height - 8);
+//            context.restore();
         },
         post_display_image_callback: function(slide_number) {
             slider.goToSlide(slide_number);
