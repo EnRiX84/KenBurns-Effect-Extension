@@ -30,7 +30,7 @@ $.fn.kenburns_extension = function() {
     var arrayTime = [];
     var images = args.images;
     for (var i = 0; i < images.length; i++) {
-        arrayTime.push(parseInt(images[i].display_time));
+        arrayTime.push(parseInt(images[i]["display_time"]));
     }
     var html = document.createElement("div");
 
@@ -51,7 +51,7 @@ $.fn.kenburns_extension = function() {
     $(caption).attr("class", "slider-wrapper");
     var slides = "";
     for (var i = 0; i < args.images.length; i++) {
-        slides += '<div class="slide">' + args.images[i].caption + '</div>';
+        slides += '<div class="slide">' + args.images[i]["caption"] + '</div>';
     }
     $(caption).html(slides);
     //**************************************************************
@@ -144,12 +144,14 @@ $.fn.kenburns_extension = function() {
                 ken.pause();
                 playListBackground.pause();
                 myplayList.pause();
+
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
                 playListBackground.play();
                 myplayList.play();
             }
+            return false;
         });
 
         $(firstButton).click(function() {
@@ -157,6 +159,7 @@ $.fn.kenburns_extension = function() {
             playListBackground.play(0);
             ken.setUpdateTime(0);
             myplayList.play(0);
+            return false;
         });
 
         $(lastButton).click(function() {
@@ -170,6 +173,7 @@ $.fn.kenburns_extension = function() {
 
             myplayList.play(-1);
             ken.setUpdateTime(current_time);
+            return false;
         });
 
         var previousData = new Date().getTime();
@@ -190,6 +194,7 @@ $.fn.kenburns_extension = function() {
                 changePositionBackground(current_time, playListBackground, background_duration);
                 //*****************************
             }
+            return false;
         });
 
         $(nextButton).click(function() {
@@ -204,6 +209,7 @@ $.fn.kenburns_extension = function() {
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
             }
+            return false;
         });
         //*********************************
     }
@@ -213,7 +219,7 @@ $.fn.kenburns_extension = function() {
         $(li2).attr("class", "pause");
         setTimeout(function() {
             playListBackground.play();
-        }, 300);
+        }, 1000);
     } else {
         $(li2).attr("class", "play");
         playListBackground.pause();
@@ -330,13 +336,13 @@ function initAudio(args, main) {
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
     for (var i = 0; i < audioArray_background.length; i++) {
-        var ogg = audioArray_background[i].mp3.replace(".mp3", ".ogg");
+        var ogg = audioArray_background[i]["mp3"].replace(".mp3", ".ogg");
         toJPlayerList_background.push({
-            mp3: audioArray_background[i].mp3,
+            mp3: audioArray_background[i]["mp3"],
             oga: ogg
         });
 
-        var duration = audioArray_background[i].duration;
+        var duration = audioArray_background[i]["duration"];
         duration = ((parseInt(duration.split(":")[0]) * 60) + parseInt(duration.split(":")[1])) * 1000;
         background_duration.push(duration);
     }
@@ -365,6 +371,7 @@ function initAudio(args, main) {
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
+//        preload: "auto",
         volume: 0.2
     });
     $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
@@ -381,9 +388,9 @@ function initAudio(args, main) {
     var audioArray = args.audio_for_images;
     var toJPlayerList = [];
     for (var i = 0; i < audioArray.length; i++) {
-        var ogg = audioArray[i].mp3.replace(".mp3", ".ogg");
+        var ogg = audioArray[i]["mp3"].replace(".mp3", ".ogg");
         toJPlayerList.push({
-            mp3: audioArray[i].mp3,
+            mp3: audioArray[i]["mp3"],
             oga: ogg
         });
     }
@@ -488,7 +495,7 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             }
 //            indexGeneral = slide_number;
             //it's usefull to set audio for more than one slide
-            if (myplayList.playlist[slide_number].mp3 !== "" && myplayList.playlist[slide_number].mp3 !== null) {
+            if (myplayList.playlist[slide_number]["mp3"] !== "" && myplayList.playlist[slide_number]["mp3"] !== null) {
                 myplayList.play(slide_number);
 //                console.log("-- Play: " + slide_number);
             }
