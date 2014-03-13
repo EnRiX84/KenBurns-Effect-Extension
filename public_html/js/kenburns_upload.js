@@ -607,7 +607,7 @@ function generateVideo(exportVideo, xml) {
                 pan: pan,
                 frames_per_second: frame_per_seconds, // frames per second
                 fade_time: 6000, // fade time
-                background_color: $(background_color).text(), // background color
+                background_color: $(background_color).text() // background color
             });
         } else if (exportVideo) {
             var string = "\

@@ -126,6 +126,11 @@ $.fn.kenburns_extension = function() {
 
         var li2 = document.createElement("li");
         $(ul).append(li2);
+        if (args.autoplay) {
+            $(li2).attr("class", "pause");
+        } else {
+            $(li2).attr("class", "play");
+        }
         $(li2).append(pauseButton);
 
         var li3 = document.createElement("li");
@@ -217,15 +222,7 @@ $.fn.kenburns_extension = function() {
     }
     $(loaderDiv).hide();
 
-    if (args.autoplay) {
-        $(li2).attr("class", "pause");
-        setTimeout(function() {
-            playListBackground.play();
-        }, 1000);
-    } else {
-        $(li2).attr("class", "play");
-        playListBackground.pause();
-    }
+
 };
 
 function changePositionBackground(current_time, playListBackground, background_duration) {
@@ -262,7 +259,7 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
     var maxTime = 0;
     for (var i = 0; i < arrayTime.length; i++) {
         if (arrayTime[i] != null) {
-        maxTime += arrayTime[i];
+            maxTime += arrayTime[i];
         }
     }
 
@@ -295,13 +292,13 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
 function getStartTime(realtime, arrayTime) {
     var value = 0;
     for (var i = 0; i < arrayTime.length; i++) {
-         if (arrayTime[i] != null) {
-        value += arrayTime[i];
-        if (value >= realtime) {
-            return value - arrayTime[i];
-            break;
+        if (arrayTime[i] != null) {
+            value += arrayTime[i];
+            if (value >= realtime) {
+                return value - arrayTime[i];
+                break;
+            }
         }
-         }
     }
     return false;
 }
@@ -470,9 +467,9 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
 
             // Called after the effect is rendered
             // Draw anything you like on to of the canvas
-            return;
+//            return;
 
-//            context.save();
+            context.save();
             //var gradient = context.createLinearGradient(0, 0, 0, 60);  
             //gradient.addColorStop(0.0, '#000');
             //gradient.addColorStop(1.0, 'rgba(0,0,0,0)');
@@ -483,27 +480,30 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             //drawing.src = "img/shadow.png";
             //context.drawImage(drawing,0,0);
 //
-//            context.fillStyle = '#000';
-//            context.font = 'bold 20px serif';
-//            var width = $canvas.width();
-//            var height = $canvas.height();
-//            var text = "";
-//            var metric = context.measureText(text);
-//
-//            context.fillStyle = '#fff';
-//
-//            context.shadowOffsetX = 3;
-//            context.shadowOffsetY = 3;
-//            context.shadowBlur = 4;
-//            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
-//
-//            context.fillText(text, width - metric.width - 8, height - 8);
-//            context.restore();
+            context.fillStyle = '#000';
+            context.font = 'bold 20px serif';
+            var width = $canvas.width();
+            var height = $canvas.height();
+            var text = "";
+            var metric = context.measureText(text);
+
+            context.fillStyle = '#fff';
+
+            context.shadowOffsetX = 3;
+            context.shadowOffsetY = 3;
+            context.shadowBlur = 4;
+            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+
+            context.fillText(text, width - metric.width - 8, height - 8);
+            context.restore();
         },
         post_display_image_callback: function(slide_number) {
             slider.goToSlide(slide_number);
             if (slide_number === 0) {
-                playListBackground.play(0);
+                console.log("PASSA");
+                setTimeout(function() {
+                    playListBackground.play(0);
+                }, 100);
             }
 //            indexGeneral = slide_number;
             //it's usefull to set audio for more than one slide
