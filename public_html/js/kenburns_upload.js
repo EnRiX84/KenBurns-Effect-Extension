@@ -17,12 +17,11 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 var PLACEHOLDER = "placeholder";
+var msg_drag_background = "...drag your <b>Audio background</b> here";
+var msg_drag_audio = "...drag your trace here";
+var msg_drag_images = "...drag your images here";
 
 $.fn.kenburns_upload = function() {
-    var msg_drag_background = "...drag your <b>Audio background</b> here";
-    var msg_drag_audio = "...drag your trace here";
-    var msg_drag_images = "...drag your images here";
-
 
     var indexAudioPlayer = 0;
     var args = arguments[0] || {};
@@ -45,7 +44,7 @@ $.fn.kenburns_upload = function() {
                         </div>\n\
                         <div><h3>Import XML</h3></div>\n\
                         <div style="padding: 10px;">\n\
-                            <input id="fileuploadXML" type="file" name="files[]" data-url="server/php/">\n\
+                            <input id="fileuploadXML" type="file" name="files[]" data-url="server/php/" multiple>\n\
                             <div id="xmlSection" style="height: 260px; width: 450px; overflow: auto; padding-top: 10px;">\n\
                             </div>\n\
                         </div>\n\
@@ -98,32 +97,7 @@ $.fn.kenburns_upload = function() {
         accept: ".jplayer",
         drop: function(event, ui) {
             audioindex = audioindex + 1;
-            $(this).find("." + PLACEHOLDER).remove();
-            var jplayer = ui.draggable;
-            var title = "";
-            var duration = "";
-            var src = "";
-            var div = document.createElement("div");
-
-            $(jplayer).find(".jp-duration").each(function() {
-                duration = $(this).text();
-            });
-            $(jplayer).find(".jp-title").each(function() {
-                title = $(this).text();
-            });
-            $(jplayer).find("audio").each(function() {
-                src = $(this).attr("src");
-                src = src.replace(".ogg", ".mp3");
-            });
-            $(div).attr("style", "cursor: pointer;").attr("name", src).attr("duration", duration).html(title + " - " + duration + "<img id='clearAudioBack" + audioindex + "' style='cursor: pointer;' src='css/images/clear.png'/>");
-
-            var li = document.createElement("li");
-            $(li).attr("id", "backindex" + audioindex);
-            $(li).html(div).appendTo(this);
-            $("#clearAudioBack" + audioindex).click(function() {
-                $(this).parent().parent().remove();
-                return false;
-            });
+            createBackgroundAudio(this, audioindex, ui, "", "", "", "");
         }
     }).sortable({
         items: "li:not(." + PLACEHOLDER + ")",
@@ -140,60 +114,7 @@ $.fn.kenburns_upload = function() {
         accept: ":not(.ui-sortable-helper, .jplayer)",
         drop: function(event, ui) {
             dropped = dropped + 1;
-            $(this).find("." + PLACEHOLDER).remove();
-            var div = document.createElement("div");
-            $(div).attr("id", "status_bar_id_" + dropped);
-            $(div).attr("class", "status_bar_element");
-            $(div).html("<div>\n\
-                        <div align='center' style='height: 50px;'>" + ui.draggable.html() + "</div>\n\
-                        <span><b>Audio: </b></span><span id='audio" + dropped + "' class='audio' name='' style='width: 100px;'>" + msg_drag_audio + "</span> <img id='clearAudio" + dropped + "' style='cursor: pointer;' src='css/images/clear.png'/><br/>\n\
-                        <span><b>Text: </b></span><textarea class='text' style='max-height: 50px; height: 15px; width: 130px; max-width: 170px;'></textarea><br/>\n\
-                        <span><b>Time: </b></span><span><input class='duration' type='text' value='5000' style='width: 50px;'/> milliseconds</span><br/>\n\
-                        <span><b>Zoom: </b></span><span><input class='zoom' type='text' value='1.1' style='width: 30px;'/> units</span><br/>\n\
-                        <span><b>Pan: </b></span><span>x: <input class='panFrom' type='text' value='1' style='width: 30px;'/> y: <input class='panTo'type='text' value='1' style='width: 30px;'/></span>\n\
-                        <div id='delete" + dropped + "' align='center'><img style='cursor: pointer;' src='css/images/delete.png'/></div><br/></div>");
-            $("<li></li>").html(div).appendTo(this);
-            $("#delete" + dropped).click(function() {
-                var r = confirm("Are you sure?");
-                if (r == true) {
-                    $(this).parent().parent().parent().remove();
-                }
-                return false;
-            });
-
-            $("#clearAudio" + dropped).click(function() {
-                $("#audio" + dropped).html(msg_drag_audio);
-                $("#audio" + dropped).attr("name", "");
-                return false;
-            });
-
-            $(div).droppable({
-                activeClass: "ui-state-default",
-                hoverClass: "ui-state-hover",
-                accept: ".jplayer",
-                drop: function(event, ui) {
-                    var jplayer = ui.draggable;
-                    var title = "";
-                    var duration = "";
-                    var src = "";
-                    var audio;
-                    $(this).find(".audio").each(function() {
-                        audio = this;
-                        return false;
-                    });
-                    $(jplayer).find(".jp-duration").each(function() {
-                        duration = $(this).text();
-                    });
-                    $(jplayer).find(".jp-title").each(function() {
-                        title = $(this).text();
-                    });
-                    $(jplayer).find("audio").each(function() {
-                        src = $(this).attr("src");
-                        src = src.replace(".ogg", ".mp3");
-                    });
-                    $(audio).attr("name", src).attr("duration", duration).html(title + " - " + duration);
-                }
-            });
+            createSlide(this, dropped, ui, "", "", "", "", "", "", "", "", "", "");
         }
     }).sortable({
         items: "li:not(." + PLACEHOLDER + ")",
@@ -218,86 +139,31 @@ $.fn.kenburns_upload = function() {
 
     $(".saveXML").jqxButton().click(function(event) { //{ width: '150'}
         event.preventDefault();
-
         generateVideo(false, true);
         return false;
     });
 
-    //******************************** IMMAGINI DI TEST ********************************
-    var span = document.createElement("span");
-    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
-    var img = document.createElement("img");
-    $(img).attr("src", "http://www.letiziabernardi.it/images/immagini_di_natale_5.jpg").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
-    $(span).append(img);
-    $(img).disableSelection();
-    $("#imageSection").append(span);
-    $(span).draggable({
-        appendTo: "body",
-        helper: "clone"
-    });
 
-    var span = document.createElement("span");
-    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
-    var img = document.createElement("img");
-    $(img).attr("src", "http://www.esa.int/var/esa/storage/images/esa_multimedia/images/2012/11/solar_eclipse_corona/12092636-3-eng-GB/Solar_eclipse_corona_node_full_image.jpg").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
-    $(span).append(img);
-    $(img).disableSelection();
-    $("#imageSection").append(span);
-    $(span).draggable({
-        appendTo: "body",
-        helper: "clone"
-    });
-
-    var span = document.createElement("span");
-    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
-    var img = document.createElement("img");
-    $(img).attr("src", "http://img2.fotoalbum.virgilio.it/v/www1-3/176/176513/304872/IMG_0880-vi.jpg").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
-    $(span).append(img);
-    $(img).disableSelection();
-    $("#imageSection").append(span);
-    $(span).draggable({
-        appendTo: "body",
-        helper: "clone"
-    });
-
-    var span = document.createElement("span");
-    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
-    var img = document.createElement("img");
-    $(img).attr("src", "http://4.bp.blogspot.com/_Z2V0ybeHVIc/TBfzwmqkgPI/AAAAAAAAEUc/mor4mV41vho/s1600/IMG_6883.JPG").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
-    $(span).append(img);
-    $(img).disableSelection();
-    $("#imageSection").append(span);
-    $(span).draggable({
-        appendTo: "body",
-        helper: "clone"
-    });
-
-    createAudioPlayer(30, "http://localhost/slider/audio/Arisa_Sanremo_2012.mp3");
-    createAudioPlayer(40, "http://localhost/slider/audio/Arisa_Sanremo_2014.mp3");
-    createAudioPlayer(50, "http://localhost/slider/audio/caparezza.mp3");
-
-    createAudioPlayer(10, "http://localhost/slider/audio/Oman_Speech_07.mp3");
-    createAudioPlayer(15, "http://localhost/slider/audio/Oman_Speech_08.mp3");
-    createAudioPlayer(20, "http://localhost/slider/audio/Oman_Speech_09.mp3");
-    //*********************************************************************************
-
+//    //******************************** IMMAGINI DI TEST ********************************
+//    createImagePreview("http://www.letiziabernardi.it/images/immagini_di_natale_5.jpg");
+//    createImagePreview("http://www.esa.int/var/esa/storage/images/esa_multimedia/images/2012/11/solar_eclipse_corona/12092636-3-eng-GB/Solar_eclipse_corona_node_full_image.jpg");
+//    createImagePreview("http://img2.fotoalbum.virgilio.it/v/www1-3/176/176513/304872/IMG_0880-vi.jpg");
+//    createImagePreview("http://4.bp.blogspot.com/_Z2V0ybeHVIc/TBfzwmqkgPI/AAAAAAAAEUc/mor4mV41vho/s1600/IMG_6883.JPG");
+//
+//    createAudioPlayer(10, "http://localhost/slider/audio/Arisa_Sanremo_2012.mp3");
+//    createAudioPlayer(20, "http://localhost/slider/audio/Arisa_Sanremo_2014.mp3");
+//    createAudioPlayer(30, "http://localhost/slider/audio/caparezza.mp3");
+//    createAudioPlayer(40, "http://localhost/slider/audio/Oman_Speech_07.mp3");
+//    createAudioPlayer(50, "http://localhost/slider/audio/Oman_Speech_08.mp3");
+//    createAudioPlayer(60, "http://localhost/slider/audio/Oman_Speech_09.mp3");
+//    //*********************************************************************************
 
     $('#fileuploadImage').fileupload({
         dataType: 'json',
         done: function(e, data) {
             $.each(data.result.files, function(index, file) {
                 if (endsWith(file.url, ".jpg") || endsWith(file.url, ".png") || endsWith(file.url, ".gif")) {
-                    var span = document.createElement("span");
-                    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
-                    var img = document.createElement("img");
-                    $(img).attr("src", file.url).attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
-                    $(span).append(img);
-                    $(img).disableSelection();
-                    $("#imageSection").append(span);
-                    $(span).draggable({
-                        appendTo: "body",
-                        helper: "clone"
-                    });
+                    createImagePreview(file.url);
                 }
             });
         }
@@ -342,11 +208,7 @@ $.fn.kenburns_upload = function() {
         done: function(e, data) {
             $.each(data.result.files, function(index, file) {
                 if (endsWith(file.url, ".xml")) {
-//                    indexAudioPlayer = indexAudioPlayer + 1;
-//                    createAudioPlayer(indexAudioPlayer, file.url);
-                    console.log(file.url);
                     createXMLloader(file);
-
                 }
             });
         }
@@ -363,6 +225,149 @@ $.fn.kenburns_upload = function() {
         $(this).fileupload('option', 'done').call(this, null, {result: result});
     });
 };
+
+function createBackgroundAudio(position, audioindex, ui, audio_mp3, audio_ogg, audio_duration, audio_text) {
+    $(position).find("." + PLACEHOLDER).remove();
+
+    var text = "";
+    var duration = "";
+    var src = "";
+    if (ui != null) {
+        var title = "";
+        var jplayer = ui.draggable;
+        $(jplayer).find(".jp-duration").each(function() {
+            duration = $(this).text();
+        });
+        $(jplayer).find(".jp-title").each(function() {
+            title = $(this).text();
+        });
+        $(jplayer).find("audio").each(function() {
+            src = $(this).attr("src");
+            src = src.replace(".ogg", ".mp3");
+        });
+        text = title + " - " + duration;
+    } else {
+        duration = audio_duration;
+        src = audio_mp3;
+        text = audio_text;
+    }
+
+    var div = document.createElement("div");
+    $(div).attr("style", "cursor: pointer;").attr("name", src).attr("duration", duration).html(text + "<img id='clearAudioBack" + audioindex + "' style='cursor: pointer;' src='css/images/clear.png'/>");
+
+    var li = document.createElement("li");
+    $(li).attr("id", "backindex" + audioindex);
+    $(li).html(div).appendTo(position);
+    $("#clearAudioBack" + audioindex).click(function() {
+        $(this).parent().parent().remove();
+        return false;
+    });
+}
+
+
+function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, duration, audio_text, text, time, zoom, pan_x, pan_y) {
+    dropped = dropped + 1;
+    $(element).find("." + PLACEHOLDER).remove();
+
+    var image_element = '<img style="cursor: pointer; max-height: 50px; max-width: 50px;" src="' + image_uri + '">';
+    if (ui != null) {
+        image_element = ui.draggable.html();
+    }
+    var audio_textV = msg_drag_audio;
+    if (audio_mp3 != "" || audio_ogg != "" || duration != "" || audio_text != "") {
+        audio_textV = audio_text;
+    }
+
+    var timeV = time;
+    if (timeV == "") {
+        timeV = 5000;
+    }
+
+    var zoomV = zoom;
+    if (zoomV == "") {
+        zoomV = "1.1";
+    }
+
+    var panXV = pan_x;
+    if (panXV == "") {
+        panXV = "1";
+    }
+    var panYV = pan_y;
+    if (panYV == "") {
+        panYV = "1";
+    }
+
+    var div = document.createElement("div");
+    $(div).attr("id", "status_bar_id_" + dropped);
+    $(div).attr("class", "status_bar_element");
+    $(div).html("<div>\n\
+        <div align='center' style='height: 50px;'>" + image_element + "</div>\n\
+        <span><b>Audio: </b></span><span id='audio" + dropped + "' class='audio' name='" + audio_mp3 + "' duration='" + duration + "' style='width: 100px;'>" + audio_textV + "</span> <img id='clearAudio" + dropped + "' style='cursor: pointer;' src='css/images/clear.png'/><br/>\n\
+        <span><b>Text: </b></span><textarea class='text' style='max-height: 50px; height: 15px; width: 130px; max-width: 170px;'>" + text + "</textarea><br/>\n\
+        <span><b>Time: </b></span><span><input class='duration' type='text' value='" + timeV + "' style='width: 50px;'/> milliseconds</span><br/>\n\
+        <span><b>Zoom: </b></span><span><input class='zoom' type='text' value='" + zoomV + "' style='width: 30px;'/> units</span><br/>\n\
+        <span><b>Pan: </b></span><span>x: <input class='panFrom' type='text' value='" + panXV + "' style='width: 30px;'/> y: <input class='panTo'type='text' value='" + panYV + "' style='width: 30px;'/></span>\n\
+        <div id='delete" + dropped + "' align='center'><img style='cursor: pointer;' src='css/images/delete.png'/></div><br/></div>");
+    $("<li></li>").html(div).appendTo(element);
+
+    $("#delete" + dropped).click(function() {
+        var r = confirm("Are you sure?");
+        if (r == true) {
+            $(this).parent().parent().parent().remove();
+        }
+        return false;
+    });
+
+    $("#clearAudio" + dropped).click(function() {
+        $("#audio" + dropped).html(msg_drag_audio);
+        $("#audio" + dropped).attr("name", "");
+        return false;
+    });
+
+    $(div).droppable({
+        activeClass: "ui-state-default",
+        hoverClass: "ui-state-hover",
+        accept: ".jplayer",
+        drop: function(event, ui) {
+            var jplayer = ui.draggable;
+            var title = "";
+            var duration = "";
+            var src = "";
+            var audio;
+            $(this).find(".audio").each(function() {
+                audio = this;
+                return false;
+            });
+            $(jplayer).find(".jp-duration").each(function() {
+                duration = $(this).text();
+            });
+            $(jplayer).find(".jp-title").each(function() {
+                title = $(this).text();
+            });
+            $(jplayer).find("audio").each(function() {
+                src = $(this).attr("src");
+                src = src.replace(".ogg", ".mp3");
+            });
+            $(audio).attr("name", src).attr("duration", duration).html(title + " - " + duration);
+        }
+    });
+}
+
+function createImagePreview(URL) {
+    var span = document.createElement("span");
+    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
+    var img = document.createElement("img");
+    $(img).attr("src", URL).attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
+    $(span).append(img);
+    $(img).disableSelection();
+    $("#imageSection").append(span);
+    $(span).draggable({
+        appendTo: "body",
+        helper: "clone"
+    });
+}
+
+
 var fileLoaded = [];
 function createXMLloader(file) {
     fileLoaded.push(file);
@@ -386,8 +391,13 @@ function createXMLloader(file) {
     $("#xmlSection").append(div);
 
     $(img_import).click(function() {
-
         $.get($(this).attr("name"), function(data) {
+
+            $("#imageSection").html("");
+            $("#audioSection").html("");
+            $("#status_bar ul").html("");
+            $("#audio_bar ul").html("");
+
             var fileXml = $(data);
 
             var array_slides = fileXml.find('kenburns_xml > slides > slide');
@@ -399,10 +409,16 @@ function createXMLloader(file) {
             var height = fileXml.find('kenburns_xml > meta_video_info > height').text();
             var frame_per_seconds = fileXml.find('kenburns_xml > meta_video_info > frame_per_seconds').text();
             var background_color = fileXml.find('kenburns_xml > meta_video_info > background_color').text();
+
             var debug = fileXml.find('kenburns_xml > meta_video_info > debug').text();
             var slide_controller = fileXml.find('kenburns_xml > meta_video_info > slide_controller').text();
             var autoplay = fileXml.find('kenburns_xml > meta_video_info > autoplay').text();
             var status_bar = fileXml.find('kenburns_xml > meta_video_info > status_bar').text();
+
+            $($(".width")[0]).val(width);
+            $($(".height")[0]).val(height);
+            $($(".frame_per_seconds")[0]).val(frame_per_seconds);
+            $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(new $.jqx.color({hex: background_color.replace("#", "")})));
 
             for (var i = 0; i < array_slides.length; i++) {
                 var img = $(array_slides[i]).find("img").text();
@@ -413,45 +429,31 @@ function createXMLloader(file) {
                 var pan_x = $(array_slides[i]).find("pan > x").text();
                 var pan_y = $(array_slides[i]).find("pan > y").text();
 
-                var audio_mp3 = $(array_slides[i]).find("audio > mp3").text();
+                var audio_mp = $(array_slides[i]).find("audio > mp3").text();
                 var audio_ogg = $(array_slides[i]).find("audio > ogg").text();
                 var audio_duration = $(array_slides[i]).find("audio > duration").text();
+                var audio_text = $(array_slides[i]).find("audio > text").text();
+                createSlide($("#status_bar ul"), i, null, img, audio_mp, audio_ogg, audio_duration, audio_text, caption, display_time, zoom_time, pan_x, pan_y);
             }
 
             for (var i = 0; i < array_audios_background.length; i++) {
                 var mp3 = $(array_audios_background[i]).find("mp3").text();
                 var ogg = $(array_audios_background[i]).find("ogg").text();
                 var duration = $(array_audios_background[i]).find("duration").text();
+                var text = $(array_audios_background[i]).find("text").text();
+                createBackgroundAudio($("#audio_bar ul"), i, null, mp3, ogg, duration, text);
             }
 
             for (var i = 0; i < array_images_upload.length; i++) {
-                var img_upload_url = $(array_images_upload[i]).text();
+                var img_upload_image_url = $(array_images_upload[i]).text();
+                createImagePreview(img_upload_image_url);
             }
 
             for (var i = 0; i < array_audio_upload.length; i++) {
                 var audio_mp3 = $(array_audio_upload[i]).find("mp3").text();
                 var audio_ogg = $(array_audio_upload[i]).find("ogg").text();
+                createAudioPlayer(i, audio_mp3);
             }
-
-
-            /*
-             <slide>
-             <img>http://www.esa.int/var/esa/storage/images/esa_multimedia/images/2012/11/solar_eclipse_corona/12092636-3-eng-GB/Solar_eclipse_corona_node_full_image.jpg</img>
-             <display_time>5000</display_time>
-             <zoom_time>1.1</zoom_time>
-             <caption></caption>
-             <pan>
-             <x>1</x>
-             <y>1</y>
-             </pan>
-             <audio>
-             <mp3></mp3>
-             <ogg></ogg>
-             <duration>undefined</duration>
-             </audio>
-             <img>http://www.esa.int/var/esa/storage/images/esa_multimedia/images/2012/11/solar_eclipse_corona/12092636-3-eng-GB/Solar_eclipse_corona_node_full_image.jpg</img>
-             </slide>
-             */
 
         });
     });
@@ -516,16 +518,20 @@ function generateVideo(exportVideo, xml) {
     for (var i = 0; i < audio_background_element.length; i++) {
         var xml_audio = "<audio>";
         var mp3 = $(audio_background_element[i]).find("div").attr("name");
+        var ogg = (mp3 != undefined && mp3.indexOf(".mp3") != -1) ? mp3.replace(".mp3", ".ogg") : mp3;
+        var mp3_text = $(audio_background_element[i]).find("div").text();
         var duration = $(audio_background_element[i]).find("div").attr("duration");
+
         if (mp3 != undefined && duration != undefined) {
-            xml_audio += "<mp3>" + mp3 + "</mp3><ogg></ogg><duration>" + duration + "</duration>";
+            xml_audio += "<mp3>" + mp3 + "</mp3><ogg>" + ogg + "</ogg><duration>" + duration + "</duration><text>" + mp3_text + "</text>";
             audio_background.push({mp3: mp3, duration: duration});
             audio_background_text += "\n                          {mp3: '" + mp3 + "', duration: '" + duration + "'},";
         }
         xml_audio += "</audio>";
+        xml_audio_background += xml_audio;
     }
     audio_background_text += "],";
-    xml_audio_background += xml_audio + "</audio_background>";
+    xml_audio_background += "</audio_background>";
     //******************************************
 
     var elements = $("#status_bar ul").children();
@@ -554,6 +560,7 @@ function generateVideo(exportVideo, xml) {
             var pan_y = $(elements[i]).find("input.panTo").val();
 
             var mp3 = $(elements[i]).find("span.audio").attr("name");
+            var mp3_text = $(elements[i]).find("span.audio").text();
             var duration = $(elements[i]).find("span.audio").attr("duration");
 
             images.push({display_time: img_display_time, zoom: img_zoom_time, src: img_src, caption: img_caption});
@@ -570,7 +577,7 @@ function generateVideo(exportVideo, xml) {
             xml_slide += "<zoom_time>" + img_zoom_time + "</zoom_time>";
             xml_slide += "<caption>" + img_caption + "</caption>";
             xml_slide += "<pan><x>" + pan_x + "</x><y>" + pan_y + "</y></pan>";
-            xml_slide += "<audio><mp3>" + mp3 + "</mp3><ogg>" + src_ogg + "</ogg><duration>" + duration + "</duration></audio>";
+            xml_slide += "<audio><mp3>" + mp3 + "</mp3><ogg>" + src_ogg + "</ogg><duration>" + duration + "</duration><text>" + mp3_text + "</text></audio>";
             xml_slide += "</slide>";
             xml_slides += xml_slide;
         }
