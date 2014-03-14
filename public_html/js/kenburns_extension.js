@@ -441,7 +441,7 @@ function initAudio(args, main) {
 
 function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBackground, background_duration) {
     var background_track = 0;
-
+    var started = 0;
     var ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
@@ -453,6 +453,7 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         pan: args.pan,
         autoplay: args.autoplay,
         post_render_callback: function($canvas, context) {
+
             if (args.status_bar === true && slideDrag === false) {
                 $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
             }
@@ -462,6 +463,11 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
                 background_track = ret[0];
                 playListBackground.play(ret[0]);
                 $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
+            }
+
+            if (ken.getUpdateTime() > 5) {
+                playListBackground.play();
+                started = 1;
             }
 
             // Called after the effect is rendered
@@ -499,9 +505,11 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         post_display_image_callback: function(slide_number) {
             slider.goToSlide(slide_number);
             if (slide_number === 0) {
-                setTimeout(function() {
-                    playListBackground.play(0);
-                }, 100);
+//                setTimeout(function() {
+
+                console.log("Parti");
+                playListBackground.play();
+//                }, 100);
             }
 //            indexGeneral = slide_number;
             //it's usefull to set audio for more than one slide
