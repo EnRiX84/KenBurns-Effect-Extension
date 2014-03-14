@@ -249,7 +249,6 @@ function createBackgroundAudio(position, audioindex, ui, audio_mp3, audio_ogg, a
     });
 }
 
-
 function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, duration, audio_text, text, time, zoom, pan_x, pan_y) {
     dropped = dropped + 1;
     $(element).find("." + PLACEHOLDER).remove();
@@ -293,7 +292,7 @@ function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, dura
         <span><b>Time: </b></span><span><input class='duration' type='text' value='" + timeV + "' style='width: 50px;'/> milliseconds</span><br/>\n\
         <span><b>Zoom: </b></span><span><input class='zoom' type='text' value='" + zoomV + "' style='width: 30px;'/> units</span><br/>\n\
         <span><b>Pan: </b></span><span>x: <input class='panFrom' type='text' value='" + panXV + "' style='width: 30px;'/> y: <input class='panTo'type='text' value='" + panYV + "' style='width: 30px;'/></span>\n\
-        <div id='delete" + dropped + "' align='center'><img style='cursor: pointer;' src='css/images/delete.png'/></div><br/></div>");
+        <div id='delete" + dropped + "' align='center'><img style='cursor: pointer;' src='css/images/delete.png' title='Remove'/></div><br/></div>");
     $("<li></li>").html(div).appendTo(element);
 
     $("#delete" + dropped).click(function() {
@@ -360,7 +359,10 @@ function createImagePreview(URL) {
     var divImage2 = document.createElement("div");
     $(divImage2).attr("align", "center").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
     var imgRemove = document.createElement("img");
-    $(imgRemove).attr("src", "css/images/delete.png").attr("style", "cursor: pointer; max-height: 16px; max-width: 16px;");
+    $(imgRemove)
+            .attr("src", "css/images/delete.png")
+            .attr("style", "cursor: pointer; max-height: 16px; max-width: 16px;")
+            .attr("title", "Remove image");
     $(divImage2).append(imgRemove);
     $(divInsideTD).append(divImage2);
 
@@ -410,6 +412,19 @@ function createXMLloader(file) {
     var img_import = document.createElement("img");
     $(img_import).attr("name", file.url).attr("src", "css/images/import.png").attr("style", "cursor: pointer;").attr("title", "Import XML");
     $(div).append(img_import);
+
+    var imgRemove = document.createElement("img");
+    $(imgRemove).attr("name", file.url).attr("src", "css/images/delete.png").attr("style", "cursor: pointer;").attr("title", "Remove XML");
+    $(div).append(imgRemove);
+
+    $(imgRemove).click(function() {
+        var r = confirm("Are you sure?");
+        if (r == true) {
+            var url = $(this).attr("name");
+            removeFileFromServer(url);
+            $(div).remove();
+        }
+    });
 
     $(div).append(document.createElement("br"));
 
@@ -512,7 +527,6 @@ function handleFileSelect(evt) {
         reader.readAsDataURL(f);
     }
 }
-
 
 function getTextElementByColor(color) {
     if (color == 'transparent' || color.hex == "") {
@@ -718,9 +732,11 @@ function getData() {
 }
 
 function createAudioPlayer(indexAudioPlayer, url) {
+
+    var container = document.createElement("div");
+
     var div = document.createElement("div");
-    $(div).attr("class", "jplayer").attr("style", "cursor: pointer;");
-    $(div).append(document.createElement("br"));
+    $(div).attr("class", "jplayer").attr("style", "cursor: pointer; margin-top: 10px; display: inline-block;");
     var jplayerBackground = document.createElement("div");
     $(jplayerBackground).attr("id", "jquery_jplayer_" + indexAudioPlayer);
     var jp_container = document.createElement("div");
@@ -748,7 +764,27 @@ function createAudioPlayer(indexAudioPlayer, url) {
         <div class="jp-no-solution"><span>Update Required!</span> To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.</div></div>');
     $(div).append(jplayerBackground);
     $(div).append(jp_container);
-    $("#audioSection").append(div);
+
+    var imgRemove = document.createElement("img");
+    $(imgRemove).attr("name", decodeURI(url))
+            .attr("src", "css/images/delete.png")
+            .attr("style", "cursor: pointer; display: inline-block;")
+            .attr("title", "Remove Audio");
+
+    $(imgRemove).click(function() {
+        var r = confirm("Are you sure?");
+        if (r == true) {
+            var url = $(this).attr("name");
+            removeFileFromServer(url);
+            removeFileFromServer(url.replace(".mp3", ".ogg"));
+            $(container).remove();
+        }
+    });
+
+    $(container).append(div);
+    $(container).append(imgRemove);
+
+    $("#audioSection").append(container);
     $("#jquery_jplayer_" + indexAudioPlayer).jPlayer({
         ready: function(event) {
             $(this).jPlayer("setMedia", {
@@ -761,7 +797,7 @@ function createAudioPlayer(indexAudioPlayer, url) {
         wmode: "window",
         smoothPlayBar: true,
         keyEnabled: true,
-        cssSelectorAncestor: "#jp_container_" + indexAudioPlayer,
+        cssSelectorAncestor: "#jp_container_" + indexAudioPlayer
     });
     $(div).draggable({
         appendTo: "body",
