@@ -506,8 +506,6 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             slider.goToSlide(slide_number);
             if (slide_number === 0) {
 //                setTimeout(function() {
-
-                console.log("Parti");
                 playListBackground.play();
 //                }, 100);
             }
@@ -523,7 +521,6 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
     return ken;
 }
 
-//
 //function fadeIn(audio) {
 //    audio.volume = 1;
 //    audio.play();
