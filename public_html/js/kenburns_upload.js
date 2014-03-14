@@ -21,6 +21,7 @@ var msg_drag_background = "...drag your <b>Audio background</b> here";
 var msg_drag_audio = "...drag your trace here";
 var msg_drag_images = "...drag your images here";
 var title_remove_image = "Remove image";
+var title_remove_xml = "Remove XML";
 var indexAudioPlayer = 0;
 
 $.fn.kenburns_upload = function() {
@@ -143,23 +144,46 @@ $.fn.kenburns_upload = function() {
 
     $("#removeAllImages").jqxButton().click(function(event) {
         var r = confirm("Are you sure?");
-        if (r == true) {
+        if (r === true) {
+            $("#imageSection").find("img").each(function() {
+                var imgRemove = $(this).attr("name");
+                if (imgRemove != null && imgRemove != "") {
+                    var img_name = $(this).attr("name");
+                    removeFileFromServer(imgRemove);
+                    removeFileFromServer(img_name);
+                }
+            });
             $("#imageSection").html("");
+
         }
         event.preventDefault();
         return false;
     });
     $("#removeAllAudios").jqxButton().click(function(event) {
         var r = confirm("Are you sure?");
-        if (r == true) {
+        if (r === true) {
+            $("#audioSection").find("audio").each(function() {
+                var src = $(this).attr("src");
+                var src1 = src.replace(".ogg", ".mp3");
+                removeFileFromServer(src);
+                removeFileFromServer(src1);
+            });
             $("#audioSection").html("");
         }
         event.preventDefault();
         return false;
     });
+
     $("#removeAllXML").jqxButton().click(function(event) {
         var r = confirm("Are you sure?");
-        if (r == true) {
+        if (r === true) {
+            $("#xmlSection").find("img").each(function() {
+                var imgRemove = $(this).attr("name");
+                var title = $(this).attr("title");
+                if (imgRemove != null && imgRemove != "" && title != title_remove_xml) {
+                    removeFileFromServer(imgRemove);
+                }
+            });
             $("#xmlSection").html("");
         }
         event.preventDefault();
@@ -459,7 +483,7 @@ function createXMLloader(file) {
     $(div).append(img_import);
 
     var imgRemove = document.createElement("img");
-    $(imgRemove).attr("name", file.url).attr("src", "css/images/delete.png").attr("style", "cursor: pointer;").attr("title", "Remove XML");
+    $(imgRemove).attr("name", file.url).attr("src", "css/images/delete.png").attr("style", "cursor: pointer;").attr("title", title_remove_xml);
     $(div).append(imgRemove);
 
     $(imgRemove).click(function() {

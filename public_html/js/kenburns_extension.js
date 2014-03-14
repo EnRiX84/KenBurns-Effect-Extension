@@ -376,7 +376,7 @@ function initAudio(args, main) {
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
-//        preload: "auto",
+        preload: "auto",
         volume: 0.2
     });
     $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
@@ -426,6 +426,7 @@ function initAudio(args, main) {
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
+        preload: "auto",
         volume: 1,
         ended: function(event) {
             $(this).jPlayer("stop");
@@ -498,7 +499,6 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         post_display_image_callback: function(slide_number) {
             slider.goToSlide(slide_number);
             if (slide_number === 0) {
-                console.log("PASSA");
                 setTimeout(function() {
                     playListBackground.play(0);
                 }, 100);
