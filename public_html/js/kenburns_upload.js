@@ -143,21 +143,6 @@ $.fn.kenburns_upload = function() {
         return false;
     });
 
-
-//    //******************************** IMMAGINI DI TEST ********************************
-//    createImagePreview("http://www.letiziabernardi.it/images/immagini_di_natale_5.jpg");
-//    createImagePreview("http://www.esa.int/var/esa/storage/images/esa_multimedia/images/2012/11/solar_eclipse_corona/12092636-3-eng-GB/Solar_eclipse_corona_node_full_image.jpg");
-//    createImagePreview("http://img2.fotoalbum.virgilio.it/v/www1-3/176/176513/304872/IMG_0880-vi.jpg");
-//    createImagePreview("http://4.bp.blogspot.com/_Z2V0ybeHVIc/TBfzwmqkgPI/AAAAAAAAEUc/mor4mV41vho/s1600/IMG_6883.JPG");
-//
-//    createAudioPlayer(10, "http://localhost/slider/audio/Arisa_Sanremo_2012.mp3");
-//    createAudioPlayer(20, "http://localhost/slider/audio/Arisa_Sanremo_2014.mp3");
-//    createAudioPlayer(30, "http://localhost/slider/audio/caparezza.mp3");
-//    createAudioPlayer(40, "http://localhost/slider/audio/Oman_Speech_07.mp3");
-//    createAudioPlayer(50, "http://localhost/slider/audio/Oman_Speech_08.mp3");
-//    createAudioPlayer(60, "http://localhost/slider/audio/Oman_Speech_09.mp3");
-//    //*********************************************************************************
-
     $('#fileuploadImage').fileupload({
         dataType: 'json',
         done: function(e, data) {
@@ -269,10 +254,11 @@ function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, dura
     dropped = dropped + 1;
     $(element).find("." + PLACEHOLDER).remove();
 
-    var image_element = '<img style="cursor: pointer; max-height: 50px; max-width: 50px;" src="' + image_uri + '">';
+    var image_element = image_uri;
     if (ui != null) {
-        image_element = ui.draggable.html();
+        image_element = $(ui.draggable.find("img")[0]).attr("src");
     }
+    image_element = '<img style="cursor: pointer; max-height: 50px; max-width: 50px;" src="' + image_element + '">';
     var audio_textV = msg_drag_audio;
     if (audio_mp3 != "" || audio_ogg != "" || duration != "" || audio_text != "") {
         audio_textV = audio_text;
@@ -354,19 +340,58 @@ function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, dura
 }
 
 function createImagePreview(URL) {
-    var span = document.createElement("span");
-    $(span).attr("style", " padding: 5px; max-height: 50px; max-width: 50px;")
+    var div = document.createElement("div");
+    $(div).attr("class", "pla_grid_manage");
+
+    var td = document.createElement("td");
+    $(div).append(td);
+
+    var divInsideTD = document.createElement("div");
+    $(td).append(divInsideTD);
+
+    var divImage1 = document.createElement("div");
+    $(divImage1).attr("align", "center").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
     var img = document.createElement("img");
     $(img).attr("src", URL).attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
-    $(span).append(img);
+    $(divImage1).append(img);
+    $(divInsideTD).append(divImage1);
     $(img).disableSelection();
-    $("#imageSection").append(span);
-    $(span).draggable({
+
+    var divImage2 = document.createElement("div");
+    $(divImage2).attr("align", "center").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
+    var imgRemove = document.createElement("img");
+    $(imgRemove).attr("src", "css/images/delete.png").attr("style", "cursor: pointer; max-height: 16px; max-width: 16px;");
+    $(divImage2).append(imgRemove);
+    $(divInsideTD).append(divImage2);
+
+    $("#imageSection").append(div);
+    $(div).draggable({
         appendTo: "body",
         helper: "clone"
     });
+
+    $(divImage2).click(function() {
+        var r = confirm("Are you sure?");
+        if (r == true) {
+            $(this).parent().parent().parent().remove();
+            removeFileFromServer($(img).attr("src"));
+        }
+    });
 }
 
+function removeFileFromServer(url) {
+    if (url != "") {
+        $.ajax({
+            url: "server/php/index.php?file=" + url,
+            type: 'DELETE',
+            success: function(data) {
+            },
+            error: function() {
+                alertError(i18n.msg_error, i18n.msg_netError);
+            }
+        });
+    }
+}
 
 var fileLoaded = [];
 function createXMLloader(file) {
@@ -516,19 +541,21 @@ function generateVideo(exportVideo, xml) {
     var audio_background = [];
     var audio_background_element = $("#audio_bar ul").children();
     for (var i = 0; i < audio_background_element.length; i++) {
-        var xml_audio = "<audio>";
-        var mp3 = $(audio_background_element[i]).find("div").attr("name");
-        var ogg = (mp3 != undefined && mp3.indexOf(".mp3") != -1) ? mp3.replace(".mp3", ".ogg") : mp3;
-        var mp3_text = $(audio_background_element[i]).find("div").text();
-        var duration = $(audio_background_element[i]).find("div").attr("duration");
+        if ($(audio_background_element[i]).attr("class") != PLACEHOLDER) {
+            var xml_audio = "<audio>";
+            var mp3 = $(audio_background_element[i]).find("div").attr("name");
+            var ogg = (mp3 != undefined && mp3.indexOf(".mp3") != -1) ? mp3.replace(".mp3", ".ogg") : mp3;
+            var mp3_text = $(audio_background_element[i]).find("div").text();
+            var duration = $(audio_background_element[i]).find("div").attr("duration");
 
-        if (mp3 != undefined && duration != undefined) {
-            xml_audio += "<mp3>" + mp3 + "</mp3><ogg>" + ogg + "</ogg><duration>" + duration + "</duration><text>" + mp3_text + "</text>";
-            audio_background.push({mp3: mp3, duration: duration});
-            audio_background_text += "\n                          {mp3: '" + mp3 + "', duration: '" + duration + "'},";
+            if (mp3 != undefined && duration != undefined) {
+                xml_audio += "<mp3>" + mp3 + "</mp3><ogg>" + ogg + "</ogg><duration>" + duration + "</duration><text>" + mp3_text + "</text>";
+                audio_background.push({mp3: mp3, duration: duration});
+                audio_background_text += "\n                          {mp3: '" + mp3 + "', duration: '" + duration + "'},";
+            }
+            xml_audio += "</audio>";
+            xml_audio_background += xml_audio;
         }
-        xml_audio += "</audio>";
-        xml_audio_background += xml_audio;
     }
     audio_background_text += "],";
     xml_audio_background += "</audio_background>";

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kenburns_xml>
+    <slides></slides>
+    <audio_background>
+        <audio></audio>
+    </audio_background>
+    <image_upload></image_upload>
+    <audio_upload>
+        <audio>
+            <mp3>http://localhost/slider/server/php/files/Arisa_Sanremo_2012.mp3</mp3>
+            <ogg>http://localhost/slider/server/php/files/Arisa_Sanremo_2012.ogg</ogg>
+        </audio>
+        <audio>
+            <mp3>http://localhost/slider/server/php/files/Arisa_Sanremo_2014.mp3</mp3>
+            <ogg>http://localhost/slider/server/php/files/Arisa_Sanremo_2014.ogg</ogg>
+        </audio>
+        <audio>
+            <mp3>http://localhost/slider/server/php/files/caparezza.mp3</mp3>
+            <ogg>http://localhost/slider/server/php/files/caparezza.ogg</ogg>
+        </audio>
+    </audio_upload>
+    <meta_video_info>
+        <width>800</width>
+        <height>600</height>
+        <frame_per_seconds>25</frame_per_seconds>
+        <background_color>#000000</background_color>
+        <debug>false</debug>
+        <slide_controller>true</slide_controller>
+        <autoplay>false</autoplay>
+        <status_bar>true</status_bar>
+    </meta_video_info>
+</kenburns_xml>
