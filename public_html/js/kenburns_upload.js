@@ -20,10 +20,10 @@ var PLACEHOLDER = "placeholder";
 var msg_drag_background = "...drag your <b>Audio background</b> here";
 var msg_drag_audio = "...drag your trace here";
 var msg_drag_images = "...drag your images here";
+var title_remove_image = "Remove image";
+var indexAudioPlayer = 0;
 
 $.fn.kenburns_upload = function() {
-
-    var indexAudioPlayer = 0;
     var args = arguments[0] || {};
     var html = document.createElement("div");
     $(html).html('\
@@ -32,26 +32,30 @@ $.fn.kenburns_upload = function() {
                     <div id="catalog">\n\
                         <div><h3>Upload Images</h3></div>\n\
                         <div style="padding: 10px;">\n\
-                            <input id="fileuploadImage" type="file" name="files[]" data-url="server/php/" multiple><br/><br/>\n\
-                            <div id="imageSection" style="height: 260px; overflow: auto;">\n\
+                            <div class="upload"> Upload <input class="fileUpload" id="fileuploadImage" type="file" name="files[]" data-url="server/php/" multiple></div>\n\
+                            <button class="upload_button" id="removeAllImages">Rimuovi tutto</button>\n\
+                            <div id="imageSection" class="inside_accordion">\n\
                             </div>\n\
                         </div>\n\
                         <div><h3>Upload Audio</h3></div>\n\
                         <div style="padding: 10px;">\n\
-                            <input id="fileuploadAudio" type="file" name="files[]" data-url="server/php/" multiple>\n\
-                            <div id="audioSection" style="height: 270px; width: 480px; overflow: auto;">\n\
+                            <div class="upload"> Upload <input class="fileUpload" id="fileuploadAudio" type="file" name="files[]" data-url="server/php/" multiple></div>\n\
+                            <button class="upload_button" id="removeAllAudios">Rimuovi tutto</button>\n\
+                            <div id="audioSection" class="inside_accordion">\n\
                             </div>\n\
                         </div>\n\
                         <div><h3>Import XML</h3></div>\n\
                         <div style="padding: 10px;">\n\
-                            <input id="fileuploadXML" type="file" name="files[]" data-url="server/php/" multiple>\n\
-                            <div id="xmlSection" style="height: 260px; width: 450px; overflow: auto; padding-top: 10px;">\n\
+                            <div class="upload"> Upload <input class="fileUpload" id="fileuploadXML" type="file" name="files[]" data-url="server/php/" multiple></div>\n\
+                            <button class="upload_button" id="removeAllXML">Rimuovi tutto</button>\n\
+                            <div id="xmlSection" class="inside_accordion">\n\
                             </div>\n\
                         </div>\n\
                     </div>\n\
                 </div>\n\
                 <div id="player" align="center"></div>\n\
             </div>\n\
+            <div class="colorPicker" id="dropDownBackground"><div style="padding: 3px;"><div id="colorPicker2"></div></div></div>\n\
             <div style="display: inline-block; width: 1000px;">\n\
                 <div id="status_bar">\n\
                     <h1 class="ui-widget-header" style="width: 480px;">Slides</h1>\n\
@@ -77,9 +81,19 @@ $.fn.kenburns_upload = function() {
             </div>');
     $(this).append(html);
 
+    $("#colorPicker2").on('colorchange', function(event) {
+        $("#dropDownBackground").jqxDropDownButton('setContent', getTextElementByColor(event.args.color));
+        $("#player").css("background-color", "#" + event.args.color.hex);
+    });
+
+    $("#colorPicker2").jqxColorPicker({color: "000000", colorMode: 'hue', width: 220, height: 200});    //001CF7 BLU
+    $("#dropDownBackground").jqxDropDownButton({width: 120, height: 22});
+    $("#dropDownBackground").jqxDropDownButton('setContent', getTextElementByColor(new $.jqx.color({hex: "FFFFFF"})));
+
+
     $("#catalog").jqxNavigationBar({
         width: 490,
-        height: 400
+        height: 404
     });
 
     $("#colorPicker").on('colorchange', function(event) {
@@ -114,7 +128,7 @@ $.fn.kenburns_upload = function() {
         accept: ":not(.ui-sortable-helper, .jplayer)",
         drop: function(event, ui) {
             dropped = dropped + 1;
-            createSlide(this, dropped, ui, "", "", "", "", "", "", "", "", "", "");
+            createSlide(this, dropped, ui, "", "", "", "", "", "", "", "", "", "", "");
         }
     }).sortable({
         items: "li:not(." + PLACEHOLDER + ")",
@@ -124,6 +138,34 @@ $.fn.kenburns_upload = function() {
             $(this).removeClass("ui-state-default");
         }
     });
+
+    $(".upload").jqxButton({width: '150', height: "16"});
+
+    $("#removeAllImages").jqxButton().click(function(event) {
+        var r = confirm("Are you sure?");
+        if (r == true) {
+            $("#imageSection").html("");
+        }
+        event.preventDefault();
+        return false;
+    });
+    $("#removeAllAudios").jqxButton().click(function(event) {
+        var r = confirm("Are you sure?");
+        if (r == true) {
+            $("#audioSection").html("");
+        }
+        event.preventDefault();
+        return false;
+    });
+    $("#removeAllXML").jqxButton().click(function(event) {
+        var r = confirm("Are you sure?");
+        if (r == true) {
+            $("#xmlSection").html("");
+        }
+        event.preventDefault();
+        return false;
+    });
+
 
     $(".createVideo").jqxButton().click(function(event) {
         event.preventDefault();
@@ -148,7 +190,7 @@ $.fn.kenburns_upload = function() {
         done: function(e, data) {
             $.each(data.result.files, function(index, file) {
                 if (endsWith(file.url, ".jpg") || endsWith(file.url, ".png") || endsWith(file.url, ".gif")) {
-                    createImagePreview(file.url);
+                    createImagePreview(file.thumbnailUrl, file.url);
                 }
             });
         }
@@ -170,8 +212,8 @@ $.fn.kenburns_upload = function() {
         done: function(e, data) {
             $.each(data.result.files, function(index, file) {
                 if (endsWith(file.url, ".mp3")) {
-                    indexAudioPlayer = indexAudioPlayer + 1;
-                    createAudioPlayer(indexAudioPlayer, file.url);
+
+                    createAudioPlayer(file.url);
                 }
             });
         }
@@ -249,15 +291,15 @@ function createBackgroundAudio(position, audioindex, ui, audio_mp3, audio_ogg, a
     });
 }
 
-function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, duration, audio_text, text, time, zoom, pan_x, pan_y) {
+function createSlide(element, dropped, ui, image_thumb, image_src, audio_mp3, audio_ogg, duration, audio_text, text, time, zoom, pan_x, pan_y) {
     dropped = dropped + 1;
     $(element).find("." + PLACEHOLDER).remove();
 
-    var image_element = image_uri;
     if (ui != null) {
-        image_element = $(ui.draggable.find("img")[0]).attr("src");
+        image_thumb = $(ui.draggable.find("img")[0]).attr("src");
+        image_src = $(ui.draggable.find("img")[0]).attr("name");
     }
-    image_element = '<img style="cursor: pointer; max-height: 50px; max-width: 50px;" src="' + image_element + '">';
+    var image_element = '<img style="cursor: pointer; max-height: 50px; max-width: 50px;" name="' + image_src + '" src="' + image_thumb + '">';
     var audio_textV = msg_drag_audio;
     if (audio_mp3 != "" || audio_ogg != "" || duration != "" || audio_text != "") {
         audio_textV = audio_text;
@@ -287,7 +329,9 @@ function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, dura
     $(div).attr("class", "status_bar_element");
     $(div).html("<div>\n\
         <div align='center' style='height: 50px;'>" + image_element + "</div>\n\
-        <span><b>Audio: </b></span><span id='audio" + dropped + "' class='audio' name='" + audio_mp3 + "' duration='" + duration + "' style='width: 100px;'>" + audio_textV + "</span> <img id='clearAudio" + dropped + "' style='cursor: pointer;' src='css/images/clear.png'/><br/>\n\
+        <span><b>Audio: </b></span>\n\
+            <span id='audio" + dropped + "' class='audio' name='" + audio_mp3 + "' duration='" + duration + "' style='width: 100px;'>" + audio_textV + "</span> \n\
+            <img id='clearAudio" + dropped + "' style='cursor: pointer;' src='css/images/clear.png'/><br/>\n\
         <span><b>Text: </b></span><textarea class='text' style='max-height: 50px; height: 15px; width: 130px; max-width: 170px;'>" + text + "</textarea><br/>\n\
         <span><b>Time: </b></span><span><input class='duration' type='text' value='" + timeV + "' style='width: 50px;'/> milliseconds</span><br/>\n\
         <span><b>Zoom: </b></span><span><input class='zoom' type='text' value='" + zoomV + "' style='width: 30px;'/> units</span><br/>\n\
@@ -338,7 +382,7 @@ function createSlide(element, dropped, ui, image_uri, audio_mp3, audio_ogg, dura
     });
 }
 
-function createImagePreview(URL) {
+function createImagePreview(thumbnailURL, URL) {
     var div = document.createElement("div");
     $(div).attr("class", "pla_grid_manage");
 
@@ -351,7 +395,7 @@ function createImagePreview(URL) {
     var divImage1 = document.createElement("div");
     $(divImage1).attr("align", "center").attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
     var img = document.createElement("img");
-    $(img).attr("src", URL).attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
+    $(img).attr("name", URL).attr("src", thumbnailURL).attr("style", "cursor: pointer; max-height: 50px; max-width: 50px;");
     $(divImage1).append(img);
     $(divInsideTD).append(divImage1);
     $(img).disableSelection();
@@ -362,7 +406,7 @@ function createImagePreview(URL) {
     $(imgRemove)
             .attr("src", "css/images/delete.png")
             .attr("style", "cursor: pointer; max-height: 16px; max-width: 16px;")
-            .attr("title", "Remove image");
+            .attr("title", title_remove_image);
     $(divImage2).append(imgRemove);
     $(divInsideTD).append(divImage2);
 
@@ -375,8 +419,9 @@ function createImagePreview(URL) {
     $(divImage2).click(function() {
         var r = confirm("Are you sure?");
         if (r == true) {
-            $(this).parent().parent().parent().remove();
             removeFileFromServer($(img).attr("src"));
+            removeFileFromServer($(img).attr("name"));
+            $(this).parent().parent().parent().remove();
         }
     });
 }
@@ -461,7 +506,9 @@ function createXMLloader(file) {
             $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(new $.jqx.color({hex: background_color.replace("#", "")})));
 
             for (var i = 0; i < array_slides.length; i++) {
-                var img = $(array_slides[i]).find("img").text();
+                var image_thumb = $(array_slides[i]).find("img > thumbnail").text();
+                var image_src = $(array_slides[i]).find("img > src").text();
+
                 var display_time = $(array_slides[i]).find("display_time").text();
                 var zoom_time = $(array_slides[i]).find("zoom_time").text();
                 var caption = $(array_slides[i]).find("caption").text();
@@ -473,7 +520,7 @@ function createXMLloader(file) {
                 var audio_ogg = $(array_slides[i]).find("audio > ogg").text();
                 var audio_duration = $(array_slides[i]).find("audio > duration").text();
                 var audio_text = $(array_slides[i]).find("audio > text").text();
-                createSlide($("#status_bar ul"), i, null, img, audio_mp, audio_ogg, audio_duration, audio_text, caption, display_time, zoom_time, pan_x, pan_y);
+                createSlide($("#status_bar ul"), i, null, image_thumb, image_src, audio_mp, audio_ogg, audio_duration, audio_text, caption, display_time, zoom_time, pan_x, pan_y);
             }
 
             for (var i = 0; i < array_audios_background.length; i++) {
@@ -485,14 +532,15 @@ function createXMLloader(file) {
             }
 
             for (var i = 0; i < array_images_upload.length; i++) {
-                var img_upload_image_url = $(array_images_upload[i]).text();
-                createImagePreview(img_upload_image_url);
+                var img_upload_image_thumbURL = $(array_images_upload[i]).find("thumbnail").text();
+                var img_upload_image_url = $(array_images_upload[i]).find("src").text();
+                createImagePreview(img_upload_image_thumbURL, img_upload_image_url);
             }
 
             for (var i = 0; i < array_audio_upload.length; i++) {
                 var audio_mp3 = $(array_audio_upload[i]).find("mp3").text();
                 var audio_ogg = $(array_audio_upload[i]).find("ogg").text();
-                createAudioPlayer(i, audio_mp3);
+                createAudioPlayer(audio_mp3);
             }
 
         });
@@ -592,7 +640,8 @@ function generateVideo(exportVideo, xml) {
             var xml_slide = "<slide>";
 
             var image = $(elements[i]).find("img");
-            var img_src = (image != null && image.length > 0) ? image[0].src : "";
+            var img_thumb = (image != null && image.length > 0) ? image[0].src : "";
+            var img_src = (image != null && image.length > 0) ? image[0].name : "";
             var img_display_time = $(elements[i]).find("input.duration").val();
             var img_zoom_time = $(elements[i]).find("input.zoom").val();
             var img_caption = $(elements[i]).find("textarea.text").val();
@@ -613,7 +662,7 @@ function generateVideo(exportVideo, xml) {
 
             var src_ogg = (mp3 != undefined && mp3.indexOf(".mp3") != -1) ? mp3.replace(".mp3", ".ogg") : mp3;
 
-            xml_slide += "<img>" + img_src + "</img>";
+            xml_slide += "<img><thumbnail>" + img_thumb + "</thumbnail><src>" + img_src + "</src></img>";
             xml_slide += "<display_time>" + img_display_time + "</display_time>";
             xml_slide += "<zoom_time>" + img_zoom_time + "</zoom_time>";
             xml_slide += "<caption>" + img_caption + "</caption>";
@@ -632,7 +681,7 @@ function generateVideo(exportVideo, xml) {
     if ((actuallyDataSlide - precedentPlay) > 2000) {
         if (exportVideo == null && xml == null) {
             var newPlayer = document.createElement("div");
-            $("#player").html("Ready! press Play or <a href='#'>Download video</a><br/><br/>");
+            $("#player").html("Ready! press Play or <a href='#'>Download video</a><br/>");
             $("#player").append(newPlayer);
 
             $(newPlayer).kenburns_extension({
@@ -680,7 +729,11 @@ function generateVideo(exportVideo, xml) {
             var xml_image_upload = ""
             var images = $("#imageSection").find("img");
             for (var i = 0; i < images.length; i++) {
-                xml_image_upload += "<img>" + $(images[i]).attr("src") + "</img>";
+                if ($(images[i]).attr("title") != title_remove_image) {
+                    var img_thumb = $(images[i]).attr("src");
+                    var img_src = $(images[i]).attr("name");
+                    xml_image_upload += "<img><thumbnail>" + img_thumb + "</thumbnail><src>" + img_src + "</src></img>";
+                }
             }
 
             var xml_audio_upload = ""
@@ -712,6 +765,7 @@ function generateVideo(exportVideo, xml) {
             var xml_print = vkbeautify.xml(xml);
             var blob = new Blob([xml_print], {type: "text/plain;charset=utf-8"});
             saveAs(blob, "xml_kenburns_" + getData() + ".xml");
+
         }
         precedentPlay = new Date().getTime();
     }
@@ -731,8 +785,8 @@ function getData() {
     return y + '-' + m + '-' + d;
 }
 
-function createAudioPlayer(indexAudioPlayer, url) {
-
+function createAudioPlayer(url) {
+    indexAudioPlayer = indexAudioPlayer + 1;
     var container = document.createElement("div");
 
     var div = document.createElement("div");

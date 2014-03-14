@@ -52,8 +52,9 @@ $.fn.kenburns_extension = function() {
     $(caption).attr("class", "slider-wrapper");
     var slides = "";
     for (var i = 0; i < args.images.length; i++) {
-        if (images[i] != null)
+        if (args.images[i] !== null) {
             slides += '<div class="slide">' + args.images[i]["caption"] + '</div>';
+        }
     }
     $(caption).html(slides);
     //**************************************************************
