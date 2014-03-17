@@ -228,7 +228,7 @@
                 var d = new Date();
                 current_time = d.getTime();
             } else {
-                current_time += 50;
+                current_time += frame_time;
             }
 
             var elapsed_time = current_time - start_time;
@@ -335,19 +335,20 @@
             return;
         };
         this.pause = function pause() {
+            stopped_time = true;
             for (var i = 0; i < 9999; i++) {
                 clearInterval(i);
             }
-            stopped_time = true;
-            clearInterval(intervalVar);
-            return false;
+            return;
         };
 
         this.stop = function stop() {
             start_time = (new Date()).getTime();
             update_time = 0;
             stopped_time = false;
-            clearInterval(intervalVar);
+            for (var i = 0; i < 9999; i++) {
+                clearInterval(i);
+            }
             return;
         };
 
@@ -358,7 +359,9 @@
         this.setUpdateTime = function setUpdateTime(newTime) {
             current_time = current_time - update_time + newTime;
             stopped_time = true;
-            clearInterval(intervalVar);
+            for (var i = 0; i < 9999; i++) {
+                clearInterval(i);
+            }
             intervalVar = setInterval(update, frame_time);
         };
 

@@ -20,6 +20,7 @@
 var previousDataSlide = new Date().getTime();
 var slideDrag = false;
 var background_duration = [];
+var current_slide = 0;
 
 $.fn.kenburns_extension = function() {
     for (var i = 0; i < 9999; i++) {
@@ -145,14 +146,15 @@ $.fn.kenburns_extension = function() {
         $(pauseButton).click(function() {
             if ($(this).parent().attr("class") === "pause") {
                 $(this).parent().attr("class", "play");
-                ken.pause();
                 $f("idplayer").pause();
                 $f("idplayertrace").pause();
+                ken.pause();
             } else {
                 $(this).parent().attr("class", "pause");
-                ken.play();
                 $f("idplayer").play();
-                $f("idplayertrace").play();
+                if ($f("idplayertrace").getClip().index == ken.getSlideNumber())
+                    $f("idplayertrace").play();
+                ken.play();
             }
             return false;
         });
@@ -185,13 +187,12 @@ $.fn.kenburns_extension = function() {
                     indexGeneral = indexGeneral - 1;
                 else
                     indexGeneral = arrayTime.length - 1;
-
                 var current_time = getRealTime(indexGeneral, arrayTime);
-                ken.setUpdateTime(current_time);
-                previousData = new Date().getTime();
                 //**** BACKGROUND**************
                 changePositionBackground(current_time);
                 //*****************************
+                ken.setUpdateTime(current_time);
+                previousData = new Date().getTime();
             }
             return false;
         });
@@ -303,7 +304,6 @@ function slideMove(statusBar, pauseButton, ken, arrayTime) {
     if ((actuallyDataSlide - previousDataSlide) > 1000) {
         $(pauseButton).parent().attr("class", "pause");
         var currentTime = parseInt($(statusBar).jqxSlider('value'));
-
         //**** BACKGROUND**************
         changePositionBackground(currentTime);
         //*****************************
@@ -325,18 +325,14 @@ function addFlowPlayer(panel, toJPlayerList_background, ken, args) {
         $f(pl_namePlayer, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
             playlist: toJPlayerList_background,
             onLoad: function() { // called when player has finished loading
-                this.setVolume(30); // set volume property
-//                console.log("Caricato Background");
-//                if (args.autoplay){
-                    ken.play();
-//                    console.log("ken - started");
-//                }
+                this.setVolume(20); // set volume property
             },
             clip: {
-                autoPlay: true,
+                autoPlay: false,
                 autoBuffering: true,
-                loop: true,
-                provider: "audio"
+                provider: "audio",
+                onStart: function() { // called when player has finished loading
+                }
             },
             plugins: {//controls:null
                 controls: {
@@ -365,12 +361,24 @@ function addFlowPlayerTrace(panel, toJPlayerList, ken, args) {
             playlist: toJPlayerList,
             onLoad: function() { // called when player has finished loading
                 this.setVolume(100); // set volume property
-//                console.log("Caricato Tracce");
+                if (args.autoplay) {
+                    if ($f("idplayer").isLoaded()) {
+                        ken.play();
+                        $f("idplayer").play(0);
+                    } else {
+                        setTimeout(function() {
+                            ken.play();
+                            $f("idplayer").play(0);
+                        }, 1000);
+                    }
+                }
             },
             clip: {
-                autoPlay: true,
+                autoPlay: false,
                 autoBuffering: true,
                 provider: "audio",
+                onStart: function() { // called when player has finished loading
+                }
             },
             plugins: {
                 controls: {
@@ -396,7 +404,9 @@ function initAudio(args, main, ken) {
         if (audioArray_background[i] !== null) {
             toJPlayerList_background.push({
                 url: audioArray_background[i]["mp3"],
-                duration: audioArray_background[i]["duration"]
+                duration: audioArray_background[i]["duration"],
+                position: i,
+                autoPlay: (i != 0) ? true : false
             });
             var duration = parseInt(audioArray_background[i]["duration"]) * 1000;
             background_duration.push(duration);
@@ -417,7 +427,8 @@ function initAudio(args, main, ken) {
     for (var i = 0; i < audioArray.length; i++) {
         if (audioArray[i] !== null) {
             toJPlayerList.push({
-                url: audioArray[i]["mp3"]
+                url: audioArray[i]["mp3"],
+                position: i
             });
         }
     }
@@ -425,8 +436,6 @@ function initAudio(args, main, ken) {
 }
 
 function startAnimation(args, statusBar, canvas, slider) {
-    var background_track = 0;
-
     var ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
@@ -444,7 +453,7 @@ function startAnimation(args, statusBar, canvas, slider) {
             return;
         },
         post_display_image_callback: function(slide_number) {
-
+            console.log("GO TO SLIDE");
             slider.goToSlide(slide_number);
 
             if (slide_number === 0) {
