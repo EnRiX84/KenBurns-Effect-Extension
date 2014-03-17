@@ -25,6 +25,9 @@
     $.fn.kenburns = function(options) {
         var intervalVar;
         var top_frame_global = 0;
+        var gap_time;
+        var pause_time;
+
 
         var $canvas = $(this);
         var ctx = this[0].getContext('2d');
@@ -223,12 +226,10 @@
 
         function update() {
             // Render the next frame	
-
             if (stopped_time == false) {
-                var d = new Date();
-                current_time = d.getTime();
+                current_time = new Date().getTime();
             } else {
-                current_time += frame_time;
+                current_time = new Date().getTime() - gap_time;
             }
 
             var elapsed_time = current_time - start_time;
@@ -327,8 +328,9 @@
         });
 
         this.play = function play() {
+            gap_time = new Date().getTime() - pause_time;
             if (!autoplay) {
-                start_time = (new Date()).getTime();
+                start_time = new Date().getTime();
                 autoplay = true;
             }
             intervalVar = setInterval(update, frame_time);
@@ -336,6 +338,7 @@
         };
         this.pause = function pause() {
             stopped_time = true;
+            pause_time = current_time;
             for (var i = 0; i < 9999; i++) {
                 clearInterval(i);
             }
@@ -369,8 +372,13 @@
             return top_frame_global;
         }
 
+
+
         return this;
     };
+
+
+
 })(jQuery);
 
 
