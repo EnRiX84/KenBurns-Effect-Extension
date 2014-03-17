@@ -84,9 +84,6 @@ $.fn.kenburns_extension = function() {
 
     var pauseButton = document.createElement("a");
 
-    console.log("Max Time: " + maxTime);
-    console.log(arrayTime);
-
     var slider = initSliders(args, caption, statusBar, maxTime);
     var ken = startAnimation(args, statusBar, canvas, slider);
     initAudio(args, this, ken);
@@ -329,10 +326,10 @@ function addFlowPlayer(panel, toJPlayerList_background, ken, args) {
             playlist: toJPlayerList_background,
             onLoad: function() { // called when player has finished loading
                 this.setVolume(30); // set volume property
-                console.log("Caricato Background");
+//                console.log("Caricato Background");
 //                if (args.autoplay){
                     ken.play();
-                    console.log("ken - started");
+//                    console.log("ken - started");
 //                }
             },
             clip: {
@@ -368,7 +365,7 @@ function addFlowPlayerTrace(panel, toJPlayerList, ken, args) {
             playlist: toJPlayerList,
             onLoad: function() { // called when player has finished loading
                 this.setVolume(100); // set volume property
-                console.log("Caricato Tracce");
+//                console.log("Caricato Tracce");
             },
             clip: {
                 autoPlay: true,
