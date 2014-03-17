@@ -276,7 +276,7 @@
             render_image(wrap_index(top_frame), (time_passed) / display_time, fade_in);
 
             if (options.post_render_callback) {
-                options.post_render_callback($canvas, ctx);
+                options.post_render_callback($canvas, ctx, update_time);
             }
 
             if (top_frame != last_frame) {
@@ -335,9 +335,12 @@
             return;
         };
         this.pause = function pause() {
+            for (var i = 0; i < 9999; i++) {
+                clearInterval(i);
+            }
             stopped_time = true;
             clearInterval(intervalVar);
-            return;
+            return false;
         };
 
         this.stop = function stop() {

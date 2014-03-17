@@ -213,7 +213,7 @@ h1 {
 #dropDownBackground{
     position: absolute;
     margin-left: 500px;
-    
+
 }
 
 #audio_bar{
@@ -517,12 +517,14 @@ a:visited {
     background: #202020; 
 }
 
-.sliderDiv{
-    margin-top: -32px;
+.statusBar{
+    margin-top: -30px;
     background: url(images/slider.png) repeat-x; 
     overflow: hidden; 
     position: relative; 
+    z-index: 50;
 }
+
 .slideshow-controller {
     background: url(images/controller.png) no-repeat; 
     height: 48px; 

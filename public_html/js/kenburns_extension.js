@@ -19,20 +19,15 @@
 
 var previousDataSlide = new Date().getTime();
 var slideDrag = false;
+var background_duration = [];
 
 $.fn.kenburns_extension = function() {
-
     for (var i = 0; i < 9999; i++) {
         clearInterval(i);
     }
 
     var args = arguments[0] || {};
-    var arrayTime = [];
-    var images = args.images;
-    for (var i = 0; i < images.length; i++) {
-        if (images[i] != null)
-            arrayTime.push(parseInt(images[i]["display_time"]));
-    }
+
     var html = document.createElement("div");
 
     var canvas = document.createElement("canvas");
@@ -41,23 +36,28 @@ $.fn.kenburns_extension = function() {
 
     //Status bar
     if (args.status_bar === true) {
-        var sliderDiv = document.createElement("div");
-        $(sliderDiv).attr("class", "sliderDiv");
+        var statusBar = document.createElement("div");
+        $(statusBar).attr("class", "statusBar");
     }
 
-    //**************************************************************
     var loaderDiv = document.createElement("div");
     $(loaderDiv).html("Your browser do not support HTML 5 standard");
     var caption = document.createElement("div");
     $(caption).attr("class", "slider-wrapper");
+
     var slides = "";
-    for (var i = 0; i < args.images.length; i++) {
-        if (args.images[i] !== null) {
+    var maxTime = 0;
+    var arrayTime = [];
+    var images = args.images;
+    for (var i = 0; i < images.length; i++) {
+        if (images[i] !== null) {
+            maxTime += parseInt(images[i]["display_time"]);
+            arrayTime.push(parseInt(images[i]["display_time"]));
             slides += '<div class="slide">' + args.images[i]["caption"] + '</div>';
         }
     }
     $(caption).html(slides);
-    //**************************************************************
+
 
     var containerForCanvasLoaderSlider = document.createElement("div");
     $(containerForCanvasLoaderSlider).append(canvas);
@@ -67,12 +67,12 @@ $.fn.kenburns_extension = function() {
 
     //apply events to containerForCanvasLoaderSlider
     $(containerForCanvasLoaderSlider).mouseenter(function() {
-        $(sliderPosition).append(sliderDiv);
+        $(sliderPosition).append(statusBar);
         $(sliderPosition).append(divForSlide);
-        $(sliderDiv).fadeIn("slow");
+        $(statusBar).fadeIn("slow");
         $(slideShowController).fadeIn("slow");
     }).mouseleave(function() {
-        $(sliderDiv).fadeOut("slow");
+        $(statusBar).fadeOut("slow");
         $(slideShowController).fadeOut("slow");
     });
 
@@ -83,21 +83,20 @@ $.fn.kenburns_extension = function() {
     $(this).append(html);
 
     var pauseButton = document.createElement("a");
-    var list = initAudio(args, this);
 
-    var myplayList = list[0];
-    var playListBackground = list[1];
-    var background_duration = list[2];
+    console.log("Max Time: " + maxTime);
+    console.log(arrayTime);
 
-    var slider = initSliders(args, caption, sliderDiv, arrayTime);
-    var ken = startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBackground, background_duration);
+    var slider = initSliders(args, caption, statusBar, maxTime);
+    var ken = startAnimation(args, statusBar, canvas, slider);
+    initAudio(args, this, ken);
 
-    $(sliderDiv).on('slideEnd', function(event) { //slideEnd
-        slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, background_duration);
+    $(statusBar).on('slideEnd', function(event) { //slideEnd
+        slideMove(statusBar, pauseButton, ken, arrayTime);
     }).on('slideStart', function(event) {
         slideDrag = true;
     }).on('mousedown', function(event) {
-        slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, background_duration);
+        slideMove(statusBar, pauseButton, ken, arrayTime);
     });
 
     if (args.slide_controller === true) {
@@ -150,22 +149,20 @@ $.fn.kenburns_extension = function() {
             if ($(this).parent().attr("class") === "pause") {
                 $(this).parent().attr("class", "play");
                 ken.pause();
-                playListBackground.pause();
-                myplayList.pause();
+                $f("idplayer").pause();
+                $f("idplayertrace").pause();
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
-                playListBackground.play();
-                myplayList.play();
+                $f("idplayer").play();
+                $f("idplayertrace").play();
             }
             return false;
         });
 
         $(firstButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
-            playListBackground.play(0);
             ken.setUpdateTime(0);
-            myplayList.play(0);
             return false;
         });
 
@@ -175,10 +172,8 @@ $.fn.kenburns_extension = function() {
             var current_time = getRealTime(slidenumber, arrayTime);
 
             //**** BACKGROUND**************
-            changePositionBackground(current_time, playListBackground, background_duration);
+            changePositionBackground(current_time);
             //*****************************
-
-            myplayList.play(-1);
             ken.setUpdateTime(current_time);
             return false;
         });
@@ -198,7 +193,7 @@ $.fn.kenburns_extension = function() {
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
                 //**** BACKGROUND**************
-                changePositionBackground(current_time, playListBackground, background_duration);
+                changePositionBackground(current_time);
                 //*****************************
             }
             return false;
@@ -211,7 +206,7 @@ $.fn.kenburns_extension = function() {
                 var indexGeneral = (ken.getSlideNumber() + 1) % arrayTime.length;
                 var current_time = getRealTime(indexGeneral, arrayTime);
                 //**** BACKGROUND**************
-                changePositionBackground(current_time, playListBackground, background_duration);
+                changePositionBackground(current_time);
                 //*****************************
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
@@ -223,18 +218,15 @@ $.fn.kenburns_extension = function() {
     $(loaderDiv).hide();
 };
 
-function changePositionBackground(current_time, playListBackground, background_duration) {
+function changePositionBackground(current_time) {
     //**** BACKGROUND**************
-    var ret = getPosition(current_time, background_duration);
-    var position = ret[0];
-    var offsetForNextOrPrev = ret[1];
-
-    playListBackground.play(position);
-    $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(offsetForNextOrPrev) / 1000);
+    var ret = getPosition(current_time);
+    $f("idplayer").play(ret[0]);
+    $f("idplayer").seek(parseInt(ret[1]) / 1000);
     //*****************************
 }
 
-function getPosition(current_time, background_duration) {
+function getPosition(current_time) {
     var positionBackground = 0;
     var subTotal = 0;
     var offset = 0;
@@ -253,16 +245,9 @@ function getPosition(current_time, background_duration) {
 }
 
 
-function initSliders(args, caption, sliderDiv, arrayTime) {
-    var maxTime = 0;
-    for (var i = 0; i < arrayTime.length; i++) {
-        if (arrayTime[i] != null) {
-            maxTime += arrayTime[i];
-        }
-    }
-
+function initSliders(args, caption, statusBar, maxTime) {
     if (args.status_bar === true) {
-        $(sliderDiv).jqxSlider({
+        $(statusBar).jqxSlider({
             width: args.width,
             min: 0,
             max: maxTime,
@@ -285,7 +270,6 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
     });
     return slider;
 }
-
 
 function getStartTime(realtime, arrayTime) {
     var value = 0;
@@ -317,14 +301,14 @@ function getAudioBackground(indexPosition, arrayTime) {
     return position;
 }
 
-function slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, background_duration) {
+function slideMove(statusBar, pauseButton, ken, arrayTime) {
     var actuallyDataSlide = new Date().getTime();
     if ((actuallyDataSlide - previousDataSlide) > 1000) {
         $(pauseButton).parent().attr("class", "pause");
-        var currentTime = parseInt($(sliderDiv).jqxSlider('value'));
+        var currentTime = parseInt($(statusBar).jqxSlider('value'));
 
         //**** BACKGROUND**************
-        changePositionBackground(currentTime, playListBackground, background_duration);
+        changePositionBackground(currentTime);
         //*****************************
 
         ken.setUpdateTime(getStartTime(currentTime, arrayTime), arrayTime);
@@ -334,7 +318,7 @@ function slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, b
     return false;
 }
 
-function addFlowPlayer(panel, toJPlayerList_background, args) {
+function addFlowPlayer(panel, toJPlayerList_background, ken, args) {
     var jp_container = document.createElement("div");
     var pl_namePlayer = "idplayer";
     $(jp_container).attr("id", pl_namePlayer);
@@ -343,14 +327,26 @@ function addFlowPlayer(panel, toJPlayerList_background, args) {
     $(function() {
         $f(pl_namePlayer, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
             playlist: toJPlayerList_background,
+            onLoad: function() { // called when player has finished loading
+                this.setVolume(30); // set volume property
+                console.log("Caricato Background");
+//                if (args.autoplay){
+                    ken.play();
+                    console.log("ken - started");
+//                }
+            },
             clip: {
-                autoPlay: args.autoplay,
+                autoPlay: true,
                 autoBuffering: true,
+                loop: true,
                 provider: "audio"
             },
-            plugins: {
+            plugins: {//controls:null
                 controls: {
-                    playlist: true
+                    playlist: true,
+                    autoHide: false,
+                    fullscreen: false,
+                    height: 30
                 },
                 audio: {
                     url: "js/flowplayer.audio-3.2.10.swf"
@@ -361,7 +357,7 @@ function addFlowPlayer(panel, toJPlayerList_background, args) {
     return pl_namePlayer;
 }
 
-function addFlowPlayerTrace(panel, toJPlayerList, args) {
+function addFlowPlayerTrace(panel, toJPlayerList, ken, args) {
     var jp_container = document.createElement("div");
     var pl_namePlayerTrace = "idplayertrace";
     $(jp_container).attr("id", pl_namePlayerTrace);
@@ -370,14 +366,21 @@ function addFlowPlayerTrace(panel, toJPlayerList, args) {
     $(function() {
         $f(pl_namePlayerTrace, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
             playlist: toJPlayerList,
+            onLoad: function() { // called when player has finished loading
+                this.setVolume(100); // set volume property
+                console.log("Caricato Tracce");
+            },
             clip: {
-                autoPlay: args.autoplay,
+                autoPlay: true,
                 autoBuffering: true,
-                provider: "audio"
+                provider: "audio",
             },
             plugins: {
                 controls: {
-                    playlist: true
+                    playlist: true,
+                    autoHide: false,
+                    fullscreen: false,
+                    height: 30
                 },
                 audio: {
                     url: "js/flowplayer.audio-3.2.10.swf"
@@ -385,12 +388,11 @@ function addFlowPlayerTrace(panel, toJPlayerList, args) {
             }
         });
     });
-    return pl_namePlayerTrace;
 }
 
-function initAudio(args, main) {
-    var background_duration = [];
-//    //****************** AUDIO TRACE *********************
+function initAudio(args, main, ken) {
+
+    //****************** AUDIO TRACE *********************
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
     for (var i = 0; i < audioArray_background.length; i++) {
@@ -399,12 +401,12 @@ function initAudio(args, main) {
                 url: audioArray_background[i]["mp3"],
                 duration: audioArray_background[i]["duration"]
             });
-
             var duration = parseInt(audioArray_background[i]["duration"]) * 1000;
             background_duration.push(duration);
         }
     }
-    var myplayList_background = addFlowPlayer(main, toJPlayerList_background, args);
+    addFlowPlayer(main, toJPlayerList_background, ken, args);
+
 //    /*
 //     #!/bin/bash
 //     #for file in *.mp3
@@ -422,13 +424,12 @@ function initAudio(args, main) {
             });
         }
     }
-    var myplayList = addFlowPlayerTrace(main, toJPlayerList, args);
-    return [myplayList, myplayList_background, background_duration];
+    addFlowPlayerTrace(main, toJPlayerList, ken, args);
 }
 
-function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBackground, background_duration) {
+function startAnimation(args, statusBar, canvas, slider) {
     var background_track = 0;
-    var started = 0;
+
     var ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
@@ -438,112 +439,53 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         fade_time: args.fade_time,
         background_color: args.background_color,
         pan: args.pan,
-        autoplay: args.autoplay,
-        post_render_callback: function($canvas, context) {
-
+        autoplay: false,
+        post_render_callback: function($canvas, context, update_time) {
             if (args.status_bar === true && slideDrag === false) {
-                $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
+                $(statusBar).jqxSlider('setValue', parseInt(update_time));
             }
-
-            var ret = getPosition(ken.getUpdateTime(), background_duration);
-            if (ret[0] !== background_track) {
-                background_track = ret[0];
-                playListBackground.play(ret[0]);
-                $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
-            }
-
-            if (ken.getUpdateTime() > 5) {
-                playListBackground.play();
-                started = 1;
-            }
-
-            // Called after the effect is rendered
-            // Draw anything you like on to of the canvas
             return;
-
-//            context.save();
-            //var gradient = context.createLinearGradient(0, 0, 0, 60);  
-            //gradient.addColorStop(0.0, '#000');
-            //gradient.addColorStop(1.0, 'rgba(0,0,0,0)');
-            //context.fillStyle = gradient;
-            //context.fillRect(0, 0, context.canvas.width, 60);
-
-            //var drawing = new Image();
-            //drawing.src = "img/shadow.png";
-            //context.drawImage(drawing,0,0);
-//
-//            context.fillStyle = '#000';
-//            context.font = 'bold 20px serif';
-//            var width = $canvas.width();
-//            var height = $canvas.height();
-//            var text = "";
-//            var metric = context.measureText(text);
-//
-//            context.fillStyle = '#fff';
-//
-//            context.shadowOffsetX = 3;
-//            context.shadowOffsetY = 3;
-//            context.shadowBlur = 4;
-//            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
-//
-//            context.fillText(text, width - metric.width - 8, height - 8);
-//            context.restore();
         },
         post_display_image_callback: function(slide_number) {
+
             slider.goToSlide(slide_number);
+
             if (slide_number === 0) {
-//                setTimeout(function() {
-                playListBackground.play();
-//                }, 100);
+                $f("idplayer").play(0);
             }
-//            indexGeneral = slide_number;
             //it's usefull to set audio for more than one slide
-            if (myplayList.playlist[slide_number]["mp3"] !== "" && myplayList.playlist[slide_number]["mp3"] !== null) {
-                myplayList.play(slide_number);
-//                console.log("-- Play: " + slide_number);
+            var clip = $f("idplayertrace").getClip(slide_number);
+            if (clip.url !== null) {
+                $f("idplayertrace").play(slide_number);
             }
         }
     });
-
     return ken;
 }
 
-//function fadeIn(audio) {
-//    audio.volume = 1;
-//    audio.play();
-//
-////    var isSeeking = audio.seeking;
-////    var isSeekable = audio.seekable && audio.seekable.length > 0;
-////    console.log("---");
-////    console.log("Duration: " + audio.duration);
-////    console.log("isSeeking: " + isSeeking);
-////    console.log("isSeekable: " + isSeekable);
-////    console.log("---");
-//
-////    var vol = 0;
-////    var interval = 200;
-////    var intervalID = setInterval(function() {
-////        if (vol < 1) {
-////            vol += 0.1;
-////            if (vol >= 0 && vol <= 1)
-////                audio.volume = vol;
-////        } else {
-////            clearInterval(intervalID);
-////        }
-////    }, interval);
-//}
+function timeToSecond(time) {
+    if (time === 0) {
+        return 0;
+    }
+    var timeSplit = time.split(":");
+    return ((parseInt(timeSplit[0]) * 3600) + (parseInt(timeSplit[1]) * 60) + parseInt(timeSplit[2]));
+}
 
-function fadeOut(audioPrecedente) {
-    var vol = 0.1;
-    var interval = 200;
-    var intervalID = setInterval(function() {
-        if (vol >= 0.1) {
-            vol -= 0.1;
-            if (vol >= 0 && vol <= 1)
-                audioPrecedente.volume = vol;
-        } else {
-            audioPrecedente.pause();
-            clearInterval(intervalID);
-        }
-    }, interval);
+function secondToTime(second) {
+    var seconds = Math.floor(second), hours = Math.floor(seconds / 3600);
+    seconds -= hours * 3600;
+    var minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
+
+    if (hours < 10) {
+        hours = "0" + hours;
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+
+    return hours + ':' + minutes + ':' + seconds;
 }
