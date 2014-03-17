@@ -333,109 +333,96 @@ function slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, b
     }
     return false;
 }
+
+function addFlowPlayer(panel, toJPlayerList_background, args) {
+    var jp_container = document.createElement("div");
+    var pl_namePlayer = "idplayer";
+    $(jp_container).attr("id", pl_namePlayer);
+    $(jp_container).attr("style", "width: 600px; height:25px;");
+    $(panel).append(jp_container);
+    $(function() {
+        $f(pl_namePlayer, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
+            playlist: toJPlayerList_background,
+            clip: {
+                autoPlay: args.autoplay,
+                autoBuffering: true,
+                provider: "audio"
+            },
+            plugins: {
+                controls: {
+                    playlist: true
+                },
+                audio: {
+                    url: "js/flowplayer.audio-3.2.10.swf"
+                }
+            }
+        });
+    });
+    return pl_namePlayer;
+}
+
+function addFlowPlayerTrace(panel, toJPlayerList, args) {
+    var jp_container = document.createElement("div");
+    var pl_namePlayerTrace = "idplayertrace";
+    $(jp_container).attr("id", pl_namePlayerTrace);
+    $(jp_container).attr("style", "width: 600px; height:25px;");
+    $(panel).append(jp_container);
+    $(function() {
+        $f(pl_namePlayerTrace, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
+            playlist: toJPlayerList,
+            clip: {
+                autoPlay: args.autoplay,
+                autoBuffering: true,
+                provider: "audio"
+            },
+            plugins: {
+                controls: {
+                    playlist: true
+                },
+                audio: {
+                    url: "js/flowplayer.audio-3.2.10.swf"
+                }
+            }
+        });
+    });
+    return pl_namePlayerTrace;
+}
+
 function initAudio(args, main) {
     var background_duration = [];
-    //****************** AUDIO TRACE *********************
+//    //****************** AUDIO TRACE *********************
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
     for (var i = 0; i < audioArray_background.length; i++) {
-        if (audioArray_background[i] != null) {
-            var ogg = audioArray_background[i]["mp3"].replace(".mp3", ".ogg");
+        if (audioArray_background[i] !== null) {
             toJPlayerList_background.push({
-                mp3: audioArray_background[i]["mp3"],
-                oga: ogg
+                url: audioArray_background[i]["mp3"],
+                duration: audioArray_background[i]["duration"]
             });
 
-            var duration = audioArray_background[i]["duration"];
-            duration = ((parseInt(duration.split(":")[0]) * 60) + parseInt(duration.split(":")[1])) * 1000;
+            var duration = parseInt(audioArray_background[i]["duration"]) * 1000;
             background_duration.push(duration);
         }
     }
+    var myplayList_background = addFlowPlayer(main, toJPlayerList_background, args);
+//    /*
+//     #!/bin/bash
+//     #for file in *.mp3
+//     #    do avconv -i "${file}" "`echo ${file%.mp3}.ogg`";
+//     #done
+//     */
 
-    //****************************************************
-    var jplayerDiv_background = document.createElement("div");
-    $(jplayerDiv_background).attr("id", "jquery_jplayer_background_playlist").attr("class", "jp-jplayer");
-    var source_background = document.createElement("div");
-    $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
-    $(source_background).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
-                                    <div class="jp-playlist">\n\
-                                        <ol>\n\
-                                            <li></li>\n\
-                                        </ol>\n\
-                                    </div>\n\
-                               </div>');
-    $(main).append(jplayerDiv_background);
-    $(main).append(source_background);
-    var myplayList_background = new jPlayerPlaylist({
-        jPlayer: "#jquery_jplayer_background_playlist",
-        cssSelectorAncestor: "#jp_container_background_playlist"
-    }, toJPlayerList_background, {
-        wmode: "window",
-        solution: "flash, html",
-        supplied: "mp3,oga",
-        smoothPlayBar: true,
-        keyEnabled: true,
-        audioFullScreen: true,
-        preload: "auto",
-        volume: 0.2
-    });
-    $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
-    //****************************************************
-
-    /*
-     #!/bin/bash
-     #for file in *.mp3
-     #    do avconv -i "${file}" "`echo ${file%.mp3}.ogg`";
-     #done
-     */
-
-    //*** AUDIO TRACE ************************************
+//    //*** AUDIO TRACE ************************************
     var audioArray = args.audio_for_images;
     var toJPlayerList = [];
     for (var i = 0; i < audioArray.length; i++) {
-        if (audioArray[i] != null) {
-            var ogg = audioArray[i]["mp3"].replace(".mp3", ".ogg");
+        if (audioArray[i] !== null) {
             toJPlayerList.push({
-                mp3: audioArray[i]["mp3"],
-                oga: ogg
+                url: audioArray[i]["mp3"]
             });
         }
     }
-    //****************************************************
-    var jplayerDiv = document.createElement("div");
-    $(jplayerDiv).attr("id", "jquery_jplayer_playlist").attr("class", "jp-jplayer");
-    var source = document.createElement("div");
-    $(source).attr("id", "jp_container_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
-    $(source).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
-                        <div class="jp-playlist">\n\
-                            <ol>\n\
-                                <li></li>\n\
-                            </ol>\n\
-                        </div>\n\
-                    </div>');
-    $(main).append(jplayerDiv);
-    $(main).append(source);
-
-    var myplayList = new jPlayerPlaylist({
-        jPlayer: "#jquery_jplayer_playlist",
-        cssSelectorAncestor: "#jp_container_playlist"
-    }, toJPlayerList, {
-        wmode: "window",
-        solution: "flash, html",
-        supplied: "mp3, oga",
-        smoothPlayBar: true,
-        keyEnabled: true,
-        audioFullScreen: true,
-        preload: "auto",
-        volume: 1,
-        ended: function(event) {
-            $(this).jPlayer("stop");
-            return false;
-        }
-    });
-    $("#jquery_jplayer_playlist").unbind($.jPlayer.event.play);
-    //****************************************************
-
+    var myplayList = addFlowPlayerTrace(main, toJPlayerList, args);
     return [myplayList, myplayList_background, background_duration];
 }
 

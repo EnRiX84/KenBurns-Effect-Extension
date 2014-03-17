@@ -190,7 +190,6 @@ $.fn.kenburns_upload = function() {
         return false;
     });
 
-
     $(".createVideo").jqxButton().click(function(event) {
         event.preventDefault();
         generateVideo();

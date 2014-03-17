@@ -7,15 +7,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="author" content="Enrico Maria Caruso"/>
 
-        <script src="js/jquery-1.8.3.min.js"></script>
-        <script src="js/jquery-ui-1.10.4.min.js"></script>
-        <script src="js/jqx-all.js"></script>
-        <script src="js/jquery.bxslider.js"></script>
-        <script src="js/kenburns.js"></script>
-        <script src="js/kenburns_extension.js"></script>
-        <script src="js/jplayer.js"></script>
-        <script src="js/vkbeautify.js"></script>
-        <script src="js/fileserver.js"></script>
+        <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
+        <script type="text/javascript" src="js/jqx-all.js"></script>
+        <script type="text/javascript" src="js/jquery.bxslider.js"></script>
+        <script type="text/javascript" src="js/kenburns.js"></script>
+        <script type="text/javascript" src="js/kenburns_extension.js"></script>
+        <!--<script type="text/javascript" src="js/jplayer.js"></script>-->
+        <script type="text/javascript" src="js/vkbeautify.js"></script>
+        <script type="text/javascript" src="js/fileserver.js"></script>
+
+        <!-- Flow Player -->
+        <script type="text/javascript" src="js/flowplayer-3.2.12.min.js"></script>
 
         <link rel="stylesheet" type="text/css" href="css/jquery-ui190.css">
         <link rel="stylesheet" type="text/css" href="css/jqx.base.css">
@@ -24,10 +27,10 @@
         <link rel="stylesheet" type="text/css" href="css/jplayer.blue.monday.css">
 
         <!--Necessari per l'upload di files-->
-        <script src="js/kenburns_upload.js"></script>
-        <script src="js/jquery.ui.widget.js"></script>
-        <script src="js/jquery.iframe-transport.js"></script>
-        <script src="js/jquery.fileupload.js"></script>
+        <script type="text/javascript" src="js/kenburns_upload.js"></script>
+        <script type="text/javascript" src="js/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="js/jquery.iframe-transport.js"></script>
+        <script type="text/javascript" src="js/jquery.fileupload.js"></script>
 
         <title>Slider</title>
     </head>
@@ -36,7 +39,7 @@
         <div class='main'>
             <a href="https://github.com/EnRiX84/Ken-Burns-Slider-Extension/">Go to GitHub</a><br/><br/>
         </div>
-        <script>
+        <script type="text/javascript">
             $(function() {
 //                $('.uploadForm').kenburns_upload({});
                 $('.main').kenburns_extension({
@@ -46,7 +49,7 @@
                     fade_time: 6000, // fade time
                     background_color: '#000000', // background color
                     status_bar: true, //set if you want see the status bar
-                    autoplay: true, // set true if status_bar is false
+                    autoplay: false, // set true if status_bar is false
                     slide_controller: true, //set if you want see the slide controller
                     debug: false, // true if you want to show debug info.
                     images: [//select path of your images
@@ -82,18 +85,18 @@
                         {display_time: 11000, zoom: 1, src: './img/txt-end.png', caption: ''}, //27
                     ],
                     audio_background: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
-                        {mp3: './audio/Arisa_Sanremo_2014.mp3', duration: '2:02'},
-                        {mp3: './audio/sultano.mp3', duration: '2:02'}, // mm:ss        
+                        {mp3: './audio/Arisa_Sanremo_2014.mp3', duration: '120'}, //seconds
+                        {mp3: './audio/sultano.mp3', duration: '120'}, //seconds      
                     ],
                     audio_for_images: [//YOU MUST HAVE BOTH FILE EXTENSION .ogg and .mp3 for CROSS BROWSING (specific for firefox compatibility)
-                        {mp3: ''},
-                        {mp3: ''},
-                        {mp3: ''},
-                        {mp3: ''},
-                        {mp3: ''}, // 5
                         {mp3: './audio/Oman_Speech_06.mp3'},
                         {mp3: './audio/Oman_Speech_07.mp3'},
                         {mp3: './audio/Oman_Speech_08.mp3'},
+                        {mp3: './audio/Oman_Speech_09.mp3'},
+                        {mp3: './audio/Oman_Speech_10.mp3'}, // 5
+                        {mp3: './audio/Oman_Speech_11.mp3'},
+                        {mp3: './audio/Oman_Speech_12.mp3'},
+                        {mp3: './audio/Oman_Speech_13.mp3'},
                         {mp3: './audio/Oman_Speech_09.mp3'},
                         {mp3: './audio/Oman_Speech_10.mp3'}, // 10
                         {mp3: './audio/Oman_Speech_11.mp3'},
