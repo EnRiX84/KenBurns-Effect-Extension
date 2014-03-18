@@ -45,7 +45,7 @@ $.fn.kenburns_extension = function() {
     var loaderDiv = document.createElement("div");
     $(loaderDiv).html("Your browser do not support HTML 5 standard");
     var caption = document.createElement("ul");
-    $(caption).attr("class", "slider-wrapper");
+//    $(caption).attr("class", "slider-wrapper");
 
     var containerForCanvasLoaderSlider = document.createElement("div");
     $(containerForCanvasLoaderSlider).append(canvas);
@@ -253,8 +253,10 @@ function initSliders(args, caption, statusBar, maxTime) {
         auto: true,
         autoStart: false,
         adaptiveHeight: true,
+        mode: 'fade',
         pager: false,
-        mode: 'fade'
+//        infiniteLoop: false,
+//        hideControlOnEnd: true,
 //        pause: 800
     });
 
@@ -309,10 +311,9 @@ function slideMove(statusBar, pauseButton, ken, arrayTime) {
         //**** BACKGROUND**************
         changePositionBackground(currentTime);
         //*****************************
-
         ken.setUpdateTime(getStartTime(currentTime, arrayTime), arrayTime);
         slideDrag = false;
-        previousDataSlide = new Date().getTime();
+//        previousDataSlide = new Date().getTime();
     }
     return false;
 }
@@ -455,7 +456,10 @@ function startAnimation(args, statusBar, canvas) {
             return;
         },
         post_display_image_callback: function(slide_number) {
-            bxSlider.goToSlide(slide_number.toString());
+
+            bxSlider.goToSlide(parseInt(slide_number));
+            previousDataSlide = new Date().getTime();
+
             if (slide_number === 0) {
                 $f("idplayer").play(0);
             }
@@ -465,7 +469,6 @@ function startAnimation(args, statusBar, canvas) {
             if (clip.url !== null) {
                 $f("idplayertrace").play(slide_number);
             }
-
         }
     });
     return ken;
