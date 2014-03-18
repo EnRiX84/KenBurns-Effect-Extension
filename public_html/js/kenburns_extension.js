@@ -381,12 +381,16 @@ function initAudio(args, main) {
         audioFullScreen: true,
         preload: "metadata",
         volume: 0.2,
+        playlistOptions: {
+            autoPlay: true,
+            enableRemoveControls: true
+        },
         ready: function() { // The $.jPlayer.event.ready event
             $(this).jPlayer("load");
         }
     });
 //    $("#jpId").jPlayer("load");
-    $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
+//    $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
     //****************************************************
 
     /*
@@ -437,14 +441,15 @@ function initAudio(args, main) {
         preload: "metadata",
         volume: 1,
         ready: function() { // The $.jPlayer.event.ready event
+            console.log(this);
             $(this).jPlayer("load");
         },
-        ended: function(event) {
-            $(this).jPlayer("stop");
-            return false;
-        }
+//        ended: function(event) {
+//            $(this).jPlayer("stop");
+//            return false;
+//        }
     });
-    $("#jquery_jplayer_playlist").unbind($.jPlayer.event.play);
+//    $("#jquery_jplayer_playlist").unbind($.jPlayer.event.play);
     //****************************************************
 
     return [myplayList, myplayList_background, background_duration];
