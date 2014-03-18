@@ -44,7 +44,7 @@ $.fn.kenburns_extension = function() {
 
     var loaderDiv = document.createElement("div");
     $(loaderDiv).html("Your browser do not support HTML 5 standard");
-    var caption = document.createElement("ul");
+    var caption = document.createElement("div");
 //    $(caption).attr("class", "slider-wrapper");
 
     var containerForCanvasLoaderSlider = document.createElement("div");
@@ -63,12 +63,10 @@ $.fn.kenburns_extension = function() {
             maxTime += parseInt(images[i]["display_time"]);
             arrayTime.push(parseInt(images[i]["display_time"]));
 
-            var li = document.createElement("li");
             var div = document.createElement("div");
             $(div).attr("class", "slide");
             $(div).html(args.images[i]["caption"]);
-            $(li).append(div);
-            $(caption).append(li);
+            $(caption).append(div);
         }
     }
 
@@ -146,7 +144,7 @@ $.fn.kenburns_extension = function() {
         var lastButton = document.createElement("a");
         $(li4).append(lastButton);
 
-        $(pauseButton).click(function() {
+        $(pauseButton).mousedown(function() {
             if ($(this).parent().attr("class") === "pause") {
                 $(this).parent().attr("class", "play");
                 $f("idplayer").pause();
@@ -162,13 +160,13 @@ $.fn.kenburns_extension = function() {
             return false;
         });
 
-        $(firstButton).click(function() {
+        $(firstButton).mousedown(function() {
             $(pauseButton).parent().attr("class", "pause");
             ken.setUpdateTime(0);
             return false;
         });
 
-        $(lastButton).click(function() {
+        $(lastButton).mousedown(function() {
             $(pauseButton).parent().attr("class", "pause");
             var slidenumber = arrayTime.length - 1;
             var current_time = getRealTime(slidenumber, arrayTime);
@@ -181,7 +179,7 @@ $.fn.kenburns_extension = function() {
         });
 
         var previousData = new Date().getTime();
-        $(prevButton).click(function() {
+        $(prevButton).mousedown(function() {
             var actuallyData = new Date().getTime();
             if ((actuallyData - previousData) > 1000) {
                 $(pauseButton).parent().attr("class", "pause");
@@ -200,7 +198,7 @@ $.fn.kenburns_extension = function() {
             return false;
         });
 
-        $(nextButton).click(function() {
+        $(nextButton).mousedown(function() {
             var actuallyData = new Date().getTime();
             if ((actuallyData - previousData) > 1000) {
                 $(pauseButton).parent().attr("class", "pause");
@@ -324,32 +322,32 @@ function addFlowPlayer(panel, toJPlayerList_background, ken, args) {
     $(jp_container).attr("id", pl_namePlayer);
     $(jp_container).attr("style", "width: 600px; height:25px;");
     $(panel).append(jp_container);
-    $(function() {
-        $f(pl_namePlayer, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
-            playlist: toJPlayerList_background,
-            onLoad: function() { // called when player has finished loading
-                this.setVolume(20); // set volume property
+//    $(function() {
+    $f(pl_namePlayer, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
+        playlist: toJPlayerList_background,
+        onLoad: function() { // called when player has finished loading
+            this.setVolume(20); // set volume property
+        },
+        clip: {
+            autoPlay: false,
+            autoBuffering: true,
+            provider: "audio"
+        },
+        plugins: {//controls:null
+            controls: {
+                playlist: true,
+                autoHide: false,
+                fullscreen: false,
+                height: 30
             },
-            clip: {
-                autoPlay: false,
-                autoBuffering: true,
-                provider: "audio",
-                onStart: function() { // called when player has finished loading
-                }
-            },
-            plugins: {//controls:null
-                controls: {
-                    playlist: true,
-                    autoHide: false,
-                    fullscreen: false,
-                    height: 30
-                },
-                audio: {
-                    url: "js/flowplayer.audio-3.2.10.swf"
-                }
+            audio: {
+                url: "js/flowplayer.audio-3.2.10.swf"
             }
-        });
+        }
     });
+//    $f(pl_namePlayer).playlist("div.clips:first", {loop: true});
+//    });
+
     return pl_namePlayer;
 }
 
@@ -359,42 +357,43 @@ function addFlowPlayerTrace(panel, toJPlayerList, ken, args) {
     $(jp_container).attr("id", pl_namePlayerTrace);
     $(jp_container).attr("style", "width: 600px; height:25px;");
     $(panel).append(jp_container);
-    $(function() {
-        $f(pl_namePlayerTrace, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
-            playlist: toJPlayerList,
-            onLoad: function() { // called when player has finished loading
-                this.setVolume(100); // set volume property
-                if (args.autoplay) {
-                    if ($f("idplayer").isLoaded()) {
+
+//    $(function() {
+    $f(pl_namePlayerTrace, {src: "js/flowplayer-3.2.16.swf"}, {//, wmode: "transparent"
+        playlist: toJPlayerList,
+        onLoad: function() { // called when player has finished loading
+            this.setVolume(100); // set volume property
+            if (args.autoplay) {
+                if ($f("idplayer").isLoaded()) {
+                    ken.play();
+                    $f("idplayer").play(0);
+                } else {
+                    setTimeout(function() {
                         ken.play();
                         $f("idplayer").play(0);
-                    } else {
-                        setTimeout(function() {
-                            ken.play();
-                            $f("idplayer").play(0);
-                        }, 1000);
-                    }
-                }
-            },
-            clip: {
-                autoPlay: false,
-                autoBuffering: true,
-                provider: "audio",
-                onStart: function() { // called when player has finished loading
-                }
-            },
-            plugins: {
-                controls: {
-                    playlist: true,
-                    autoHide: false,
-                    fullscreen: false,
-                    height: 30
-                },
-                audio: {
-                    url: "js/flowplayer.audio-3.2.10.swf"
+                    }, 1000);
                 }
             }
-        });
+        },
+        clip: {
+            autoPlay: false,
+            autoBuffering: true,
+            provider: "audio",
+            onStart: function(event) {
+            }
+        },
+        plugins: {
+            controls: {
+                playlist: true,
+                autoHide: false,
+                fullscreen: false,
+                height: 30
+            },
+            audio: {
+                url: "js/flowplayer.audio-3.2.10.swf"
+            }
+        }
+//        });
     });
 }
 
@@ -407,8 +406,8 @@ function initAudio(args, main, ken) {
         if (audioArray_background[i] !== null) {
             toJPlayerList_background.push({
                 url: audioArray_background[i]["mp3"],
-                duration: audioArray_background[i]["duration"],
-                position: i,
+//                duration: parseInt(audioArray_background[i]["duration"]),
+                position: parseInt(i),
                 autoPlay: (i != 0) ? true : false
             });
             var duration = parseInt(audioArray_background[i]["duration"]) * 1000;
@@ -431,7 +430,7 @@ function initAudio(args, main, ken) {
         if (audioArray[i] !== null) {
             toJPlayerList.push({
                 url: audioArray[i]["mp3"],
-                position: i
+                position: parseInt(i)
             });
         }
     }
