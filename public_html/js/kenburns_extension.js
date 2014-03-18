@@ -146,10 +146,13 @@ $.fn.kenburns_extension = function() {
 
         $(pauseButton).mousedown(function() {
             if ($(this).parent().attr("class") === "pause") {
-                $(this).parent().attr("class", "play");
-                $f("idplayer").pause();
-                $f("idplayertrace").pause();
-                ken.pause();
+                var actuallyDataSlide = new Date().getTime();
+                if ((actuallyDataSlide - previousDataSlide) > 1000) {
+                    $(this).parent().attr("class", "play");
+                    $f("idplayer").pause();
+                    $f("idplayertrace").pause();
+                    ken.pause();
+                }
             } else {
                 $(this).parent().attr("class", "pause");
                 $f("idplayer").play();
@@ -255,7 +258,7 @@ function initSliders(args, caption, statusBar, maxTime) {
         pager: false,
 //        infiniteLoop: false,
 //        hideControlOnEnd: true,
-//        pause: 800
+
     });
 
     if (args.status_bar === true) {
@@ -461,8 +464,8 @@ function startAnimation(args, statusBar, canvas) {
         },
         post_display_image_callback: function(slide_number) {
 
-            bxSlider.goToSlide(parseInt(slide_number));
             previousDataSlide = new Date().getTime();
+            bxSlider.goToSlide(parseInt(slide_number));
 
             if (slide_number === 0) {
                 $f("idplayer").play(0);
