@@ -21,6 +21,7 @@ var previousDataSlide = new Date().getTime();
 var slideDrag = false;
 var background_duration = [];
 var current_slide = 0;
+var bxSlider;
 
 $.fn.kenburns_extension = function() {
     for (var i = 0; i < 9999; i++) {
@@ -54,17 +55,26 @@ $.fn.kenburns_extension = function() {
         if (images[i] !== null) {
             maxTime += parseInt(images[i]["display_time"]);
             arrayTime.push(parseInt(images[i]["display_time"]));
-            slides += '<div class="slide">' + args.images[i]["caption"] + '</div>';
+            slides += '<div id="id_slide' + i + '" class="slide">' + args.images[i]["caption"] + '</div>';
         }
     }
     $(caption).html(slides);
-
 
     var containerForCanvasLoaderSlider = document.createElement("div");
     $(containerForCanvasLoaderSlider).append(canvas);
     $(containerForCanvasLoaderSlider).append(loaderDiv);
     var sliderPosition = document.createElement("div");
     $(containerForCanvasLoaderSlider).append(sliderPosition);
+    $(html).append(containerForCanvasLoaderSlider);
+    $(html).append(caption);
+    //***********************************
+    $(this).append(html);
+
+    var pauseButton = document.createElement("a");
+
+    initSliders(args, caption, statusBar, maxTime);
+    var ken = startAnimation(args, statusBar, canvas);
+    initAudio(args, this, ken);
 
     //apply events to containerForCanvasLoaderSlider
     $(containerForCanvasLoaderSlider).mouseenter(function() {
@@ -76,18 +86,6 @@ $.fn.kenburns_extension = function() {
         $(statusBar).fadeOut("slow");
         $(slideShowController).fadeOut("slow");
     });
-
-    $(html).append(containerForCanvasLoaderSlider);
-    $(html).append(caption);
-    //***********************************
-
-    $(this).append(html);
-
-    var pauseButton = document.createElement("a");
-
-    var slider = initSliders(args, caption, statusBar, maxTime);
-    var ken = startAnimation(args, statusBar, canvas, slider);
-    initAudio(args, this, ken);
 
     $(statusBar).on('slideEnd', function(event) { //slideEnd
         slideMove(statusBar, pauseButton, ken, arrayTime);
@@ -244,6 +242,17 @@ function getPosition(current_time) {
 
 
 function initSliders(args, caption, statusBar, maxTime) {
+    bxSlider = $(caption).bxSlider({
+        controls: false,
+        speed: 800,
+        auto: true,
+        autoStart: false,
+        adaptiveHeight: true,
+        pager: false,
+        mode: 'fade'
+//        pause: 800
+    });
+
     if (args.status_bar === true) {
         $(statusBar).jqxSlider({
             width: args.width,
@@ -255,18 +264,6 @@ function initSliders(args, caption, statusBar, maxTime) {
             showButtons: false
         });
     }
-
-    var slider = $(caption).bxSlider({
-        controls: false,
-        speed: 1000,
-        auto: true,
-        autoStart: false,
-        adaptiveHeight: true,
-        pager: false,
-        mode: 'fade'
-//        pause: 6000
-    });
-    return slider;
 }
 
 function getStartTime(realtime, arrayTime) {
@@ -435,7 +432,7 @@ function initAudio(args, main, ken) {
     addFlowPlayerTrace(main, toJPlayerList, ken, args);
 }
 
-function startAnimation(args, statusBar, canvas, slider) {
+function startAnimation(args, statusBar, canvas) {
     var ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
@@ -453,17 +450,19 @@ function startAnimation(args, statusBar, canvas, slider) {
             return;
         },
         post_display_image_callback: function(slide_number) {
-            console.log("GO TO SLIDE");
-            slider.goToSlide(slide_number);
+
+            bxSlider.goToSlide(slide_number);
 
             if (slide_number === 0) {
                 $f("idplayer").play(0);
             }
+
             //it's usefull to set audio for more than one slide
             var clip = $f("idplayertrace").getClip(slide_number);
             if (clip.url !== null) {
                 $f("idplayertrace").play(slide_number);
             }
+
         }
     });
     return ken;

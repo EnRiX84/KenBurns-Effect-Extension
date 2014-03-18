@@ -27,7 +27,8 @@
         var top_frame_global = 0;
         var gap_time;
         var pause_time;
-
+        var future_time;
+        var time_passed;
 
         var $canvas = $(this);
         var ctx = this[0].getContext('2d');
@@ -251,7 +252,7 @@
             }
 //            var top_frame = Math.floor(update_time / (display_time - fade_time));						
 //            var frame_start_time = top_frame * (display_time - fade_time);			
-            var time_passed = update_time - frame_start_time;
+            time_passed = update_time - frame_start_time;
             function wrap_index(i) {
                 return (i + images.length) % images.length;
             }
@@ -324,11 +325,12 @@
                 if (autoplay) {
                     intervalVar = setInterval(update, frame_time);
                 }
-            })
+            });
         });
 
         this.play = function play() {
             gap_time = new Date().getTime() - pause_time;
+            future_time = 0;
             if (!autoplay) {
                 start_time = new Date().getTime();
                 autoplay = true;
@@ -336,6 +338,7 @@
             intervalVar = setInterval(update, frame_time);
             return;
         };
+
         this.pause = function pause() {
             stopped_time = true;
             pause_time = current_time;
@@ -360,7 +363,8 @@
         };
 
         this.setUpdateTime = function setUpdateTime(newTime) {
-            current_time = current_time - update_time + newTime;
+            start_time = new Date().getTime();
+            gap_time = -(newTime);
             stopped_time = true;
             for (var i = 0; i < 9999; i++) {
                 clearInterval(i);
@@ -368,16 +372,32 @@
             intervalVar = setInterval(update, frame_time);
         };
 
+//        this.setNextTime = function setNextTime(newTime) {
+//            start_time = new Date().getTime();
+//            gap_time = -(newTime);
+//            stopped_time = true;
+//            for (var i = 0; i < 9999; i++) {
+//                clearInterval(i);
+//            }
+//            intervalVar = setInterval(update, frame_time);
+//        };
+//
+//        this.setPreviousTime = function setPreviousTime(newTime) {
+//            start_time = new Date().getTime();
+//            gap_time = -(newTime);
+//            stopped_time = true;
+//            for (var i = 0; i < 9999; i++) {
+//                clearInterval(i);
+//            }
+//            intervalVar = setInterval(update, frame_time);
+//        };
+
         this.getSlideNumber = function getSlideNumber() {
             return top_frame_global;
         }
 
-
-
         return this;
     };
-
-
 
 })(jQuery);
 
