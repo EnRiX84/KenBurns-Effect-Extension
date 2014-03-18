@@ -83,19 +83,19 @@ $.fn.kenburns_extension = function() {
     $(containerForCanvasLoaderSlider).mouseenter(function() {
         $(sliderPosition).append(statusBar);
         $(sliderPosition).append(divForSlide);
-        $(statusBar).fadeIn("slow");
-        $(slideShowController).fadeIn("slow");
+        $(statusBar).fadeIn();
+        $(slideShowController).fadeIn();
     }).mouseleave(function() {
-        $(statusBar).fadeOut("slow");
-        $(slideShowController).fadeOut("slow");
+        $(statusBar).fadeOut();
+        $(slideShowController).fadeOut();
     });
 
     $(statusBar).on('slideEnd', function(event) { //slideEnd
-        slideMove(this, pauseButton, ken, arrayTime);
+        slideMove(this, slideShowController, pauseButton, ken, arrayTime);
     }).on('slideStart', function(event) {
         slideDrag = true;
     }).on('mousedown', function(event) {
-        slideMove(this, pauseButton, ken, arrayTime);
+        slideMove(this, slideShowController, pauseButton, ken, arrayTime);
     });
 
     if (args.slide_controller === true) {
@@ -304,7 +304,8 @@ function getAudioBackground(indexPosition, arrayTime) {
     return position;
 }
 
-function slideMove(statusBar, pauseButton, ken, arrayTime) {
+function slideMove(statusBar, slideShowController, pauseButton, ken, arrayTime) {
+
     var actuallyDataSlide = new Date().getTime();
     if ((actuallyDataSlide - previousDataSlide) > 1000) {
         $(pauseButton).parent().attr("class", "pause");
