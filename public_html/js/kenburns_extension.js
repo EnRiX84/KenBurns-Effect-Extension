@@ -342,6 +342,7 @@ function initAudio(args, main) {
         if (audioArray_background[i] != null) {
             var ogg = audioArray_background[i]["mp3"].replace(".mp3", ".ogg");
             toJPlayerList_background.push({
+                title: audioArray_background[i]["mp3"],
                 mp3: audioArray_background[i]["mp3"],
                 oga: ogg
             });
@@ -356,8 +357,10 @@ function initAudio(args, main) {
     var jplayerDiv_background = document.createElement("div");
     $(jplayerDiv_background).attr("id", "jquery_jplayer_background_playlist").attr("class", "jp-jplayer");
     var source_background = document.createElement("div");
-    $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
-    $(source_background).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
+    $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio");
+//    .attr("style", "visibility: hidden;");
+//     style="display: none; height: 0px; width: 0px;"
+    $(source_background).html('<div class="jp-type-playlist">\n\
                                     <div class="jp-playlist">\n\
                                         <ol>\n\
                                             <li></li>\n\
@@ -396,6 +399,7 @@ function initAudio(args, main) {
         if (audioArray[i] != null) {
             var ogg = audioArray[i]["mp3"].replace(".mp3", ".ogg");
             toJPlayerList.push({
+                title: audioArray[i]["mp3"],
                 mp3: audioArray[i]["mp3"],
                 oga: ogg
             });
@@ -405,8 +409,10 @@ function initAudio(args, main) {
     var jplayerDiv = document.createElement("div");
     $(jplayerDiv).attr("id", "jquery_jplayer_playlist").attr("class", "jp-jplayer");
     var source = document.createElement("div");
-    $(source).attr("id", "jp_container_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
-    $(source).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
+    $(source).attr("id", "jp_container_playlist").attr("class", "jp-audio");
+//    .attr("style", "visibility: hidden;")
+//     style="display: none; height: 0px; width: 0px;"
+    $(source).html('<div class="jp-type-playlist">\n\
                         <div class="jp-playlist">\n\
                             <ol>\n\
                                 <li></li>\n\
