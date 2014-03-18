@@ -69,11 +69,11 @@ $.fn.kenburns_extension = function() {
     $(containerForCanvasLoaderSlider).mouseenter(function() {
         $(sliderPosition).append(sliderDiv);
         $(sliderPosition).append(divForSlide);
-        $(sliderDiv).fadeIn("slow");
-        $(slideShowController).fadeIn("slow");
+        $(sliderDiv).fadeIn("fast");
+        $(slideShowController).fadeIn("fast");
     }).mouseleave(function() {
-        $(sliderDiv).fadeOut("slow");
-        $(slideShowController).fadeOut("slow");
+        $(sliderDiv).fadeOut("fast");
+        $(slideShowController).fadeOut("fast");
     });
 
     $(html).append(containerForCanvasLoaderSlider);
