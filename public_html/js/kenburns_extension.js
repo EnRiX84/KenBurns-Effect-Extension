@@ -333,10 +333,10 @@ function addFlowPlayer(panel, toJPlayerList_background, ken, args) {
             autoBuffering: true,
             provider: "audio",
             onCuepoint: [-500, function(clip) {
-
                     var index = clip.index + 1;
                     var clip = $f(pl_namePlayer).getClip(index);
                     if (clip !== null && clip.url !== null) {
+                        $f(pl_namePlayer).pause();
                         $f(pl_namePlayer).play(index);
                     }
                     return false;
@@ -354,9 +354,6 @@ function addFlowPlayer(panel, toJPlayerList_background, ken, args) {
             }
         }
     });
-//    $f(pl_namePlayer).playlist("div.clips:first", {loop: true});
-//    });
-
     return pl_namePlayer;
 }
 
