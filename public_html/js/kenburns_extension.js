@@ -44,21 +44,8 @@ $.fn.kenburns_extension = function() {
 
     var loaderDiv = document.createElement("div");
     $(loaderDiv).html("Your browser do not support HTML 5 standard");
-    var caption = document.createElement("div");
+    var caption = document.createElement("ul");
     $(caption).attr("class", "slider-wrapper");
-
-    var slides = "";
-    var maxTime = 0;
-    var arrayTime = [];
-    var images = args.images;
-    for (var i = 0; i < images.length; i++) {
-        if (images[i] !== null) {
-            maxTime += parseInt(images[i]["display_time"]);
-            arrayTime.push(parseInt(images[i]["display_time"]));
-            slides += '<div id="id_slide' + i + '" class="slide">' + args.images[i]["caption"] + '</div>';
-        }
-    }
-    $(caption).html(slides);
 
     var containerForCanvasLoaderSlider = document.createElement("div");
     $(containerForCanvasLoaderSlider).append(canvas);
@@ -67,6 +54,24 @@ $.fn.kenburns_extension = function() {
     $(containerForCanvasLoaderSlider).append(sliderPosition);
     $(html).append(containerForCanvasLoaderSlider);
     $(html).append(caption);
+
+    var maxTime = 0;
+    var arrayTime = [];
+    var images = args.images;
+    for (var i = 0; i < images.length; i++) {
+        if (images[i] !== null) {
+            maxTime += parseInt(images[i]["display_time"]);
+            arrayTime.push(parseInt(images[i]["display_time"]));
+
+            var li = document.createElement("li");
+            var div = document.createElement("div");
+            $(div).attr("class", "slide");
+            $(div).html(args.images[i]["caption"]);
+            $(li).append(div);
+            $(caption).append(li);
+        }
+    }
+
     //***********************************
     $(this).append(html);
 
@@ -88,11 +93,11 @@ $.fn.kenburns_extension = function() {
     });
 
     $(statusBar).on('slideEnd', function(event) { //slideEnd
-        slideMove(statusBar, pauseButton, ken, arrayTime);
+        slideMove(this, pauseButton, ken, arrayTime);
     }).on('slideStart', function(event) {
         slideDrag = true;
     }).on('mousedown', function(event) {
-        slideMove(statusBar, pauseButton, ken, arrayTime);
+        slideMove(this, pauseButton, ken, arrayTime);
     });
 
     if (args.slide_controller === true) {
@@ -450,9 +455,7 @@ function startAnimation(args, statusBar, canvas) {
             return;
         },
         post_display_image_callback: function(slide_number) {
-
-            bxSlider.goToSlide(slide_number);
-
+            bxSlider.goToSlide(slide_number.toString());
             if (slide_number === 0) {
                 $f("idplayer").play(0);
             }
