@@ -158,7 +158,7 @@ $.fn.kenburns_extension = function() {
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
-//                playListBackground.play();
+                playListBackground.play();
                 myplayList.play();
             }
             return false;
@@ -166,7 +166,7 @@ $.fn.kenburns_extension = function() {
 
         $(firstButton).click(function() {
             $(pauseButton).parent().attr("class", "pause");
-//            playListBackground.play(0);
+            playListBackground.play(0);
             ken.setUpdateTime(0);
             myplayList.play(0);
             return false;
@@ -232,8 +232,8 @@ function changePositionBackground(current_time, playListBackground, background_d
     var position = ret[0];
     var offsetForNextOrPrev = ret[1];
 
-//    playListBackground.play(position);
-//    $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(offsetForNextOrPrev) / 1000);
+    playListBackground.play(position);
+    $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(offsetForNextOrPrev) / 1000);
     //*****************************
 }
 
@@ -373,7 +373,6 @@ function initAudio(args, main) {
         jPlayer: "#jquery_jplayer_background_playlist",
         cssSelectorAncestor: "#jp_container_background_playlist"
     }, toJPlayerList_background, {
-        wmode: "window",
         solution: "flash, html",
         supplied: "mp3,oga",
         smoothPlayBar: true,
@@ -381,7 +380,9 @@ function initAudio(args, main) {
         audioFullScreen: true,
         preload: "auto",
         volume: 0.2,
+        swfPath: "js/"
     });
+    $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
     //****************************************************
 
     /*
@@ -423,7 +424,6 @@ function initAudio(args, main) {
         jPlayer: "#jquery_jplayer_playlist",
         cssSelectorAncestor: "#jp_container_playlist"
     }, toJPlayerList, {
-        wmode: "window",
         solution: "flash, html",
         supplied: "ogv,m4v,oga,mp3",
         smoothPlayBar: true,
@@ -431,8 +431,12 @@ function initAudio(args, main) {
         audioFullScreen: true,
         preload: "auto",
         volume: 1,
-        swfPath: "js/"
+        swfPath: "js/",
+        ended: function() {
+            $(this).jPlayer("stop");
+        }
     });
+    $("#jquery_jplayer_playlist").unbind($.jPlayer.event.play);
     //****************************************************
 
     return [myplayList, myplayList_background, background_duration];
@@ -455,16 +459,15 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             if (args.status_bar === true && slideDrag === false) {
                 $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
             }
-
             var ret = getPosition(ken.getUpdateTime(), background_duration);
             if (ret[0] !== background_track) {
                 background_track = ret[0];
-//                playListBackground.play(ret[0]);
-//                $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
+                playListBackground.play(ret[0]);
+                $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
             }
 
             if (ken.getUpdateTime() > 100) {
-//                playListBackground.play();
+                playListBackground.play();
                 started = 1;
             }
 
@@ -477,7 +480,7 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             slider.goToSlide(parseInt(slide_number));
 
             if (slide_number === 0) {
-//                playListBackground.play();
+                playListBackground.play();
             }
 
             //it's usefull to set audio for more than one slide
