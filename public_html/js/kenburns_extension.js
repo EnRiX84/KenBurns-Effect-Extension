@@ -148,10 +148,13 @@ $.fn.kenburns_extension = function() {
 
         $(pauseButton).click(function() {
             if ($(this).parent().attr("class") === "pause") {
-                $(this).parent().attr("class", "play");
-                ken.pause();
-                playListBackground.pause();
-                myplayList.pause();
+                var actuallyDataSlide = new Date().getTime();
+                if ((actuallyDataSlide - previousDataSlide) > 1000) {
+                    $(this).parent().attr("class", "play");
+                    ken.pause();
+                    playListBackground.pause();
+                    myplayList.pause();
+                }
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
@@ -252,7 +255,6 @@ function getPosition(current_time, background_duration) {
     return [positionBackground, offset];
 }
 
-
 function initSliders(args, caption, sliderDiv, arrayTime) {
     var maxTime = 0;
     for (var i = 0; i < arrayTime.length; i++) {
@@ -275,7 +277,7 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
 
     var slider = $(caption).bxSlider({
         controls: false,
-        speed: 1000,
+        speed: 800,
         auto: true,
         autoStart: false,
         adaptiveHeight: true,
@@ -285,7 +287,6 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
     });
     return slider;
 }
-
 
 function getStartTime(realtime, arrayTime) {
     var value = 0;
@@ -333,6 +334,7 @@ function slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, b
     }
     return false;
 }
+
 function initAudio(args, main) {
     var background_duration = [];
     //****************** AUDIO TRACE *********************
@@ -362,9 +364,7 @@ function initAudio(args, main) {
 //     style="display: none; height: 0px; width: 0px;"
     $(source_background).html('<div class="jp-type-playlist">\n\
                                     <div class="jp-playlist">\n\
-                                        <ol>\n\
-                                            <li></li>\n\
-                                        </ol>\n\
+                                        <ol><li></li></ol>\n\
                                     </div>\n\
                                </div>');
     $(main).append(jplayerDiv_background);
@@ -414,9 +414,7 @@ function initAudio(args, main) {
 //     style="display: none; height: 0px; width: 0px;"
     $(source).html('<div class="jp-type-playlist">\n\
                         <div class="jp-playlist">\n\
-                            <ol>\n\
-                                <li></li>\n\
-                            </ol>\n\
+                            <ol><li></li></ol>\n\
                         </div>\n\
                     </div>');
     $(main).append(jplayerDiv);
@@ -447,7 +445,7 @@ function initAudio(args, main) {
 
 function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBackground, background_duration) {
     var background_track = 0;
-    var started = 0;
+
     var ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
@@ -459,7 +457,6 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         pan: args.pan,
         autoplay: args.autoplay,
         post_render_callback: function($canvas, context) {
-
             if (args.status_bar === true && slideDrag === false) {
                 $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
             }
@@ -471,7 +468,7 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
                 $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
             }
 
-            if (ken.getUpdateTime() > 5) {
+            if (ken.getUpdateTime() > 100) {
                 playListBackground.play();
                 started = 1;
             }
@@ -479,47 +476,18 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
             // Called after the effect is rendered
             // Draw anything you like on to of the canvas
             return;
-
-//            context.save();
-            //var gradient = context.createLinearGradient(0, 0, 0, 60);  
-            //gradient.addColorStop(0.0, '#000');
-            //gradient.addColorStop(1.0, 'rgba(0,0,0,0)');
-            //context.fillStyle = gradient;
-            //context.fillRect(0, 0, context.canvas.width, 60);
-
-            //var drawing = new Image();
-            //drawing.src = "img/shadow.png";
-            //context.drawImage(drawing,0,0);
-//
-//            context.fillStyle = '#000';
-//            context.font = 'bold 20px serif';
-//            var width = $canvas.width();
-//            var height = $canvas.height();
-//            var text = "";
-//            var metric = context.measureText(text);
-//
-//            context.fillStyle = '#fff';
-//
-//            context.shadowOffsetX = 3;
-//            context.shadowOffsetY = 3;
-//            context.shadowBlur = 4;
-//            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
-//
-//            context.fillText(text, width - metric.width - 8, height - 8);
-//            context.restore();
         },
         post_display_image_callback: function(slide_number) {
-            slider.goToSlide(slide_number);
+            previousDataSlide = new Date().getTime();
+            slider.goToSlide(parseInt(slide_number));
+
             if (slide_number === 0) {
-//                setTimeout(function() {
                 playListBackground.play();
-//                }, 100);
             }
-//            indexGeneral = slide_number;
+
             //it's usefull to set audio for more than one slide
             if (myplayList.playlist[slide_number]["mp3"] !== "" && myplayList.playlist[slide_number]["mp3"] !== null) {
                 myplayList.play(slide_number);
-//                console.log("-- Play: " + slide_number);
             }
         }
     });
