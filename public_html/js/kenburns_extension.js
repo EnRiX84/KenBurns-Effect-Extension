@@ -331,7 +331,16 @@ function addFlowPlayer(panel, toJPlayerList_background, ken, args) {
         clip: {
             autoPlay: false,
             autoBuffering: true,
-            provider: "audio"
+            provider: "audio",
+            onCuepoint: [-500, function(clip) {
+
+                    var index = clip.index + 1;
+                    var clip = $f(pl_namePlayer).getClip(index);
+                    if (clip !== null && clip.url !== null) {
+                        $f(pl_namePlayer).play(index);
+                    }
+                    return false;
+                }],
         },
         plugins: {//controls:null
             controls: {
@@ -398,7 +407,6 @@ function addFlowPlayerTrace(panel, toJPlayerList, ken, args) {
 }
 
 function initAudio(args, main, ken) {
-
     //****************** AUDIO TRACE *********************
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
