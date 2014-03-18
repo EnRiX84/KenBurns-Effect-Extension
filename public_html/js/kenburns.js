@@ -25,6 +25,10 @@
     $.fn.kenburns = function(options) {
         var intervalVar;
         var top_frame_global = 0;
+        var gap_time;
+        var pause_time;
+        var future_time;
+        var time_passed;
 
         var $canvas = $(this);
         var ctx = this[0].getContext('2d');
@@ -223,12 +227,10 @@
 
         function update() {
             // Render the next frame	
-
             if (stopped_time == false) {
-                var d = new Date();
-                current_time = d.getTime();
+                current_time = new Date().getTime();
             } else {
-                current_time += 50;
+                current_time = new Date().getTime() - gap_time;
             }
 
             var elapsed_time = current_time - start_time;
@@ -250,7 +252,7 @@
             }
 //            var top_frame = Math.floor(update_time / (display_time - fade_time));						
 //            var frame_start_time = top_frame * (display_time - fade_time);			
-            var time_passed = update_time - frame_start_time;
+            time_passed = update_time - frame_start_time;
             function wrap_index(i) {
                 return (i + images.length) % images.length;
             }
@@ -276,7 +278,7 @@
             render_image(wrap_index(top_frame), (time_passed) / display_time, fade_in);
 
             if (options.post_render_callback) {
-                options.post_render_callback($canvas, ctx);
+                options.post_render_callback($canvas, ctx, update_time);
             }
 
             if (top_frame != last_frame) {
@@ -323,20 +325,26 @@
                 if (autoplay) {
                     intervalVar = setInterval(update, frame_time);
                 }
-            })
+            });
         });
 
         this.play = function play() {
+            gap_time = new Date().getTime() - pause_time;
+            future_time = 0;
             if (!autoplay) {
-                start_time = (new Date()).getTime();
+                start_time = new Date().getTime();
                 autoplay = true;
             }
             intervalVar = setInterval(update, frame_time);
             return;
         };
+
         this.pause = function pause() {
             stopped_time = true;
-            clearInterval(intervalVar);
+            pause_time = current_time;
+            for (var i = 0; i < 9999; i++) {
+                clearInterval(i);
+            }
             return;
         };
 
@@ -344,7 +352,9 @@
             start_time = (new Date()).getTime();
             update_time = 0;
             stopped_time = false;
-            clearInterval(intervalVar);
+            for (var i = 0; i < 9999; i++) {
+                clearInterval(i);
+            }
             return;
         };
 
@@ -353,11 +363,34 @@
         };
 
         this.setUpdateTime = function setUpdateTime(newTime) {
-            current_time = current_time - update_time + newTime;
+            start_time = new Date().getTime();
+            gap_time = -(newTime);
             stopped_time = true;
-            clearInterval(intervalVar);
+            for (var i = 0; i < 9999; i++) {
+                clearInterval(i);
+            }
             intervalVar = setInterval(update, frame_time);
         };
+
+//        this.setNextTime = function setNextTime(newTime) {
+//            start_time = new Date().getTime();
+//            gap_time = -(newTime);
+//            stopped_time = true;
+//            for (var i = 0; i < 9999; i++) {
+//                clearInterval(i);
+//            }
+//            intervalVar = setInterval(update, frame_time);
+//        };
+//
+//        this.setPreviousTime = function setPreviousTime(newTime) {
+//            start_time = new Date().getTime();
+//            gap_time = -(newTime);
+//            stopped_time = true;
+//            for (var i = 0; i < 9999; i++) {
+//                clearInterval(i);
+//            }
+//            intervalVar = setInterval(update, frame_time);
+//        };
 
         this.getSlideNumber = function getSlideNumber() {
             return top_frame_global;
@@ -365,6 +398,5 @@
 
         return this;
     };
+
 })(jQuery);
-
-
