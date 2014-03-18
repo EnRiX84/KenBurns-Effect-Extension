@@ -379,9 +379,13 @@ function initAudio(args, main) {
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
-        preload: "auto",
-        volume: 0.2
+        preload: "metadata",
+        volume: 0.2,
+        ready: function() { // The $.jPlayer.event.ready event
+            $(this).jPlayer("load");
+        }
     });
+//    $("#jpId").jPlayer("load");
     $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
     //****************************************************
 
@@ -430,8 +434,11 @@ function initAudio(args, main) {
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
-        preload: "auto",
+        preload: "metadata",
         volume: 1,
+        ready: function() { // The $.jPlayer.event.ready event
+            $(this).jPlayer("load");
+        },
         ended: function(event) {
             $(this).jPlayer("stop");
             return false;
