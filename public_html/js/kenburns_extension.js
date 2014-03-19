@@ -237,7 +237,7 @@ $.fn.kenburns_extension = function() {
 
 function checkOtherAudio(playlistAudioOther, indexGeneral) {
     var slide = indexGeneral;
-    console.log("SLIDE: " + slide);
+//    console.log("SLIDE: " + slide);
     if (slide === 6 || slide === 5 || slide === 26 || slide === 25) {
         if (slide === 6) {
             playlistAudioOther.play(0);
@@ -467,7 +467,7 @@ function initAudio(args, main) {
             $(this).jPlayer("stop");
         },
         canplay: function() {
-            console.log("can play");
+//            console.log("can play");
         }
     });
 

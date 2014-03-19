@@ -134,17 +134,11 @@
                     var iw = image.width;
                     var ih = image.height;
 
-                    console.log("iw: " + iw);
-                    console.log("ih: " + ih);
-
                     var zoom_level = Math.abs(zoom_levels[image_index]);
 
                     var zoom_in = zoom_levels[image_index] >= 0;
                     var r1 = fit(iw, ih, width, height);
                     var r2 = scale_rect(r1, zoom_level);
-
-                    console.log("ZOOM LEVEL: " + r1);
-                    console.log("ZOOM LEVEL: " + r2);
 
                     //var align_x = Math.floor(Math.random() * 3) - 1;
                     var align_x = (image_index < pan_directions.length) ?
@@ -199,7 +193,8 @@
                     ctx.globalAlpha = Math.min(1, transparency);
                     try {
                         ctx.drawImage(image_info.image, r[0], r[1], r[2] - r[0], r[3] - r[1], 0, 0, width, height);
-                    } catch (e) { }
+                    } catch (e) {
+                    }
                     ctx.restore();
                 }
             }
