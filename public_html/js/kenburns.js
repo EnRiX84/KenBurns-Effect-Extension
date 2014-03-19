@@ -44,7 +44,7 @@
         //var fade_ratio = fade_time - display_time
         var frames_per_second = options.frames_per_second || 30;
         var frame_time = (1 / frames_per_second) * 1000;
-        //var zoom_level = 1 / (options.zoom || 2);
+//        var zoom_level = 1 / (options.zoom || 2);
         var clear_color = options.background_color || '#000000';
         var last_frame = -1;
 
@@ -77,7 +77,7 @@
             total_time += parseInt(image_path.display_time);
             display_times.push(total_time);
 
-            zoom_level = 1 / parseFloat(image_path.zoom);
+            var zoom_level = 1 / parseFloat(image_path.zoom) || 2;
             zoom_levels.push(zoom_level);
         });
 
@@ -102,10 +102,7 @@
             var cy = (r[3] + r[1]) / 2;
             var scalew = w * scale;
             var scaleh = h * scale;
-            return [cx - scalew / 2,
-                cy - scaleh / 2,
-                cx + scalew / 2,
-                cy + scaleh / 2];
+            return [cx - scalew / 2, cy - scaleh / 2, cx + scalew / 2, cy + scaleh / 2];
         }
 
         function fit(src_w, src_h, dst_w, dst_h) {
@@ -137,10 +134,17 @@
                     var iw = image.width;
                     var ih = image.height;
 
+                    console.log("iw: " + iw);
+                    console.log("ih: " + ih);
+
                     var zoom_level = Math.abs(zoom_levels[image_index]);
+
                     var zoom_in = zoom_levels[image_index] >= 0;
                     var r1 = fit(iw, ih, width, height);
                     var r2 = scale_rect(r1, zoom_level);
+
+                    console.log("ZOOM LEVEL: " + r1);
+                    console.log("ZOOM LEVEL: " + r2);
 
                     //var align_x = Math.floor(Math.random() * 3) - 1;
                     var align_x = (image_index < pan_directions.length) ?
@@ -193,7 +197,9 @@
                 if (transparency > 0) {
                     ctx.save();
                     ctx.globalAlpha = Math.min(1, transparency);
-                    ctx.drawImage(image_info.image, r[0], r[1], r[2] - r[0], r[3] - r[1], 0, 0, width, height);
+                    try {
+                        ctx.drawImage(image_info.image, r[0], r[1], r[2] - r[0], r[3] - r[1], 0, 0, width, height);
+                    } catch (e) { }
                     ctx.restore();
                 }
             }

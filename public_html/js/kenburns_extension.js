@@ -155,12 +155,16 @@ $.fn.kenburns_extension = function() {
                     ken.pause();
                     playListBackground.pause();
                     playlistAudio.pause();
+                    playlistAudioOther.pause();
                 }
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
                 playListBackground.play();
                 playlistAudio.play();
+                if (ken.getSlideNumber() === 24 || ken.getSlideNumber() === 5) {
+                    playlistAudioOther.play();
+                }
             }
             return false;
         });
@@ -177,13 +181,13 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             var slidenumber = arrayTime.length - 1;
             var current_time = getRealTime(slidenumber, arrayTime);
+            playlistAudio.play(-1);
+            ken.setUpdateTime(current_time);
 
             //**** BACKGROUND**************
             changePositionBackground(current_time, playListBackground, background_duration);
             //*****************************
 
-            playlistAudio.play(-1);
-            ken.setUpdateTime(current_time);
             return false;
         });
 
@@ -201,9 +205,11 @@ $.fn.kenburns_extension = function() {
                 var current_time = getRealTime(indexGeneral, arrayTime);
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
+
                 //**** BACKGROUND**************
                 changePositionBackground(current_time, playListBackground, background_duration);
                 //*****************************
+                checkOtherAudio(playlistAudioOther, indexGeneral);
             }
             return false;
         });
@@ -214,11 +220,13 @@ $.fn.kenburns_extension = function() {
                 $(pauseButton).parent().attr("class", "pause");
                 var indexGeneral = (ken.getSlideNumber() + 1) % arrayTime.length;
                 var current_time = getRealTime(indexGeneral, arrayTime);
-                //**** BACKGROUND**************
-                changePositionBackground(current_time, playListBackground, background_duration);
-                //*****************************
                 ken.setUpdateTime(current_time);
                 previousData = new Date().getTime();
+
+                //**** BACKGROUND**************
+                changePositionBackground(current_time, playListBackground, background_duration);
+                checkOtherAudio(playlistAudioOther, indexGeneral);
+                //*****************************
             }
             return false;
         });
@@ -226,6 +234,23 @@ $.fn.kenburns_extension = function() {
     }
     $(loaderDiv).hide();
 };
+
+function checkOtherAudio(playlistAudioOther, indexGeneral) {
+    var slide = indexGeneral;
+    console.log("SLIDE: " + slide);
+    if (slide === 6 || slide === 5 || slide === 26 || slide === 25) {
+        if (slide === 6) {
+            playlistAudioOther.play(0);
+            $("#jquery_jplayer_playlist_other").jPlayer("play", 5);
+        }
+        if (slide === 26) {
+            playlistAudioOther.play(1);
+            $("#jquery_jplayer_playlist_other").jPlayer("play", 6);
+        }
+    } else {
+        playlistAudioOther.pause();
+    }
+}
 
 function changePositionBackground(current_time, playListBackground, background_duration) {
     //**** BACKGROUND**************
@@ -503,27 +528,17 @@ function initAudio(args, main) {
         keyEnabled: true,
         audioFullScreen: true,
         preload: "auto",
-        volume: 0.6,
+        volume: 0.5,
         swfPath: "js/",
         ended: function() {
             $(this).jPlayer("stop");
-        },
-        canplay: function() {
-            console.log("can play");
         }
     });
-
-//    $("#jquery_jplayer_playlist").jPlayer("onProgressChange", function(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime) {
-//        console.log(loadPercent);
-//        console.log(playedPercentRelative);
-//        console.log(playedPercentAbsolute);
-//        console.log(playedTime);
-//        console.log(totalTime);
-//    });
 
     $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
     $("#jquery_jplayer_playlist_other").unbind($.jPlayer.event.play);
     $("#jquery_jplayer_playlist").unbind($.jPlayer.event.play);
+
     //****************************************************
     return [playlistAudio, playlistAudio_background, playlistAudioOther, background_duration];
 }
@@ -562,9 +577,9 @@ function startAnimation(args, sliderDiv, canvas, slider, playlistAudio, playList
             return;
         },
         post_display_image_callback: function(slide_number) {
+
             previousDataSlide = new Date().getTime();
             slider.goToSlide(parseInt(slide_number));
-            playlistAudioOther.pause();
 
             if (slide_number === 0) {
                 playListBackground.play();
@@ -575,20 +590,55 @@ function startAnimation(args, sliderDiv, canvas, slider, playlistAudio, playList
             }
 
             if (slide_number === 25) {
-
-                $("#jquery_jplayer_playlist").jPlayer("volume", 0.75);
-
-                $("#jquery_jplayer_playlist").animate({
-                    volume: 0
-                }, 10000);
-
+                fadeOut("#jquery_jplayer_playlist");
                 playlistAudioOther.play(1);
             }
 
             //it's usefull to set audio for more than one slide
             if (playlistAudio.playlist[slide_number]["mp3"] !== "" && playlistAudio.playlist[slide_number]["mp3"] !== null) {
+                $("#jquery_jplayer_playlist").jPlayer("volume", 1);
                 playlistAudio.play(slide_number);
             }
         }
     });
+}
+
+function fadeIn(audio) {
+// audio.volume = 1;
+// audio.play();
+//
+//// var isSeeking = audio.seeking;
+//// var isSeekable = audio.seekable && audio.seekable.length > 0;
+//// console.log("---");
+//// console.log("Duration: " + audio.duration);
+//// console.log("isSeeking: " + isSeeking);
+//// console.log("isSeekable: " + isSeekable);
+//// console.log("---");
+//
+//// var vol = 0;
+//// var interval = 200;
+//// var intervalID = setInterval(function() {
+//// if (vol < 1) {
+//// vol += 0.1;
+//// if (vol >= 0 && vol <= 1)
+//// audio.volume = vol;
+//// } else {
+//// clearInterval(intervalID);
+//// }
+//// }, interval);
+}
+
+function fadeOut(audioPrecedente) {
+    var vol = 1;
+    var interval = 1000;
+    var intervalID = setInterval(function() {
+        if (vol > 0) {
+            vol -= 0.1;
+            if (vol >= 0 && vol <= 1)
+                $(audioPrecedente).jPlayer("volume", vol);
+        } else {
+            $(audioPrecedente).jPlayer("pause");
+            clearInterval(intervalID);
+        }
+    }, interval);
 }
