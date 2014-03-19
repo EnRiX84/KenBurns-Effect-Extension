@@ -19,6 +19,7 @@
 
 var previousDataSlide = new Date().getTime();
 var slideDrag = false;
+var ken;
 
 $.fn.kenburns_extension = function() {
 
@@ -84,20 +85,20 @@ $.fn.kenburns_extension = function() {
 
     var pauseButton = document.createElement("a");
     var list = initAudio(args, this);
-
-    var myplayList = list[0];
+    var playlistAudio = list[0];
     var playListBackground = list[1];
-    var background_duration = list[2];
+    var playlistAudioOther = list[2];
+    var background_duration = list[3];
 
     var slider = initSliders(args, caption, sliderDiv, arrayTime);
-    var ken = startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBackground, background_duration);
+    startAnimation(args, sliderDiv, canvas, slider, playlistAudio, playListBackground, playlistAudioOther, background_duration);
 
     $(sliderDiv).on('slideEnd', function(event) { //slideEnd
-        slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, background_duration);
+        slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, playlistAudioOther, background_duration);
     }).on('slideStart', function(event) {
         slideDrag = true;
     }).on('mousedown', function(event) {
-        slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, background_duration);
+        slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, playlistAudioOther, background_duration);
     });
 
     if (args.slide_controller === true) {
@@ -153,13 +154,13 @@ $.fn.kenburns_extension = function() {
                     $(this).parent().attr("class", "play");
                     ken.pause();
                     playListBackground.pause();
-                    myplayList.pause();
+                    playlistAudio.pause();
                 }
             } else {
                 $(this).parent().attr("class", "pause");
                 ken.play();
                 playListBackground.play();
-                myplayList.play();
+                playlistAudio.play();
             }
             return false;
         });
@@ -168,7 +169,7 @@ $.fn.kenburns_extension = function() {
             $(pauseButton).parent().attr("class", "pause");
             playListBackground.play(0);
             ken.setUpdateTime(0);
-            myplayList.play(0);
+            playlistAudio.play(0);
             return false;
         });
 
@@ -181,7 +182,7 @@ $.fn.kenburns_extension = function() {
             changePositionBackground(current_time, playListBackground, background_duration);
             //*****************************
 
-            myplayList.play(-1);
+            playlistAudio.play(-1);
             ken.setUpdateTime(current_time);
             return false;
         });
@@ -318,14 +319,14 @@ function getAudioBackground(indexPosition, arrayTime) {
     return position;
 }
 
-function slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, background_duration) {
+function slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, playlistAudioOther, background_duration) {
     var actuallyDataSlide = new Date().getTime();
     if ((actuallyDataSlide - previousDataSlide) > 1000) {
         $(pauseButton).parent().attr("class", "pause");
         var currentTime = parseInt($(sliderDiv).jqxSlider('value'));
 
         //**** BACKGROUND**************
-        changePositionBackground(currentTime, playListBackground, background_duration);
+        changePositionBackground(currentTime, playListBackground, playlistAudioOther, background_duration);
         //*****************************
 
         ken.setUpdateTime(getStartTime(currentTime, arrayTime), arrayTime);
@@ -337,7 +338,8 @@ function slideMove(sliderDiv, pauseButton, ken, arrayTime, playListBackground, b
 
 function initAudio(args, main) {
     var background_duration = [];
-    //****************** AUDIO TRACE *********************
+
+    //****************** BACKGROUND TRACE *********************
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
     for (var i = 0; i < audioArray_background.length; i++) {
@@ -355,26 +357,24 @@ function initAudio(args, main) {
         }
     }
 
-    //****************************************************
     var jplayerDiv_background = document.createElement("div");
     $(jplayerDiv_background).attr("id", "jquery_jplayer_background_playlist").attr("class", "jp-jplayer");
     var source_background = document.createElement("div");
-    $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio");
-//    .attr("style", "visibility: hidden;");
-//     style="display: none; height: 0px; width: 0px;"
-    $(source_background).html('<div class="jp-type-playlist">\n\
+    $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
+    $(source_background).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
                                     <div class="jp-playlist">\n\
                                         <ol><li></li></ol>\n\
                                     </div>\n\
                                </div>');
     $(main).append(jplayerDiv_background);
     $(main).append(source_background);
-    var myplayList_background = new jPlayerPlaylist({
+    var playlistAudio_background = new jPlayerPlaylist({
         jPlayer: "#jquery_jplayer_background_playlist",
         cssSelectorAncestor: "#jp_container_background_playlist"
     }, toJPlayerList_background, {
+        wmode: "window",
         solution: "flash, html",
-        supplied: "mp3,oga",
+        supplied: "ogv,m4v,oga,mp3",
         smoothPlayBar: true,
         keyEnabled: true,
         audioFullScreen: true,
@@ -382,8 +382,13 @@ function initAudio(args, main) {
         volume: 0.2,
         swfPath: "js/"
     });
-    $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
+
     //****************************************************
+
+
+    $("#jquery_jplayer_background_playlist").bind($.jPlayer.event.progress, function(e) {
+
+    });
 
     /*
      #!/bin/bash
@@ -405,7 +410,7 @@ function initAudio(args, main) {
             });
         }
     }
-    //****************************************************
+
     var jplayerDiv = document.createElement("div");
     $(jplayerDiv).attr("id", "jquery_jplayer_playlist").attr("class", "jp-jplayer");
     var source = document.createElement("div");
@@ -420,10 +425,11 @@ function initAudio(args, main) {
     $(main).append(jplayerDiv);
     $(main).append(source);
 
-    var myplayList = new jPlayerPlaylist({
+    var playlistAudio = new jPlayerPlaylist({
         jPlayer: "#jquery_jplayer_playlist",
         cssSelectorAncestor: "#jp_container_playlist"
     }, toJPlayerList, {
+        wmode: "window",
         solution: "flash, html",
         supplied: "ogv,m4v,oga,mp3",
         smoothPlayBar: true,
@@ -434,18 +440,98 @@ function initAudio(args, main) {
         swfPath: "js/",
         ended: function() {
             $(this).jPlayer("stop");
+        },
+        canplay: function() {
+            console.log("can play");
         }
     });
-    $("#jquery_jplayer_playlist").unbind($.jPlayer.event.play);
+
+//    $("#jquery_jplayer_playlist").jPlayer("onProgressChange", function(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime) {
+//        console.log(loadPercent);
+//        console.log(playedPercentRelative);
+//        console.log(playedPercentAbsolute);
+//        console.log(playedTime);
+//        console.log(totalTime);
+//    });
+
     //****************************************************
 
-    return [myplayList, myplayList_background, background_duration];
+
+
+
+
+
+
+
+
+    //*** OTHER TRACE ************************************
+    var other_audio = args.other_audio;
+    var toJPlayerListOther = [];
+    for (var i = 0; i < other_audio.length; i++) {
+        if (other_audio[i] != null) {
+            var ogg = other_audio[i]["mp3"].replace(".mp3", ".ogg");
+            toJPlayerListOther.push({
+                title: other_audio[i]["mp3"],
+                mp3: other_audio[i]["mp3"],
+                oga: ogg
+            });
+        }
+    }
+
+    var jplayerDiv = document.createElement("div");
+    $(jplayerDiv).attr("id", "jquery_jplayer_playlist_other").attr("class", "jp-jplayer");
+    var source = document.createElement("div");
+    $(source).attr("id", "jp_container_playlist_other").attr("class", "jp-audio");
+//    .attr("style", "visibility: hidden;")
+//     style="display: none; height: 0px; width: 0px;"
+    $(source).html('<div class="jp-type-playlist">\n\
+                        <div class="jp-playlist">\n\
+                            <ol><li></li></ol>\n\
+                        </div>\n\
+                    </div>');
+    $(main).append(jplayerDiv);
+    $(main).append(source);
+
+    var playlistAudioOther = new jPlayerPlaylist({
+        jPlayer: "#jquery_jplayer_playlist_other",
+        cssSelectorAncestor: "#jp_container_playlist_other"
+    }, toJPlayerListOther, {
+        wmode: "window",
+        solution: "flash, html",
+        supplied: "ogv,m4v,oga,mp3",
+        smoothPlayBar: true,
+        keyEnabled: true,
+        audioFullScreen: true,
+        preload: "auto",
+        volume: 0.6,
+        swfPath: "js/",
+        ended: function() {
+            $(this).jPlayer("stop");
+        },
+        canplay: function() {
+            console.log("can play");
+        }
+    });
+
+//    $("#jquery_jplayer_playlist").jPlayer("onProgressChange", function(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime) {
+//        console.log(loadPercent);
+//        console.log(playedPercentRelative);
+//        console.log(playedPercentAbsolute);
+//        console.log(playedTime);
+//        console.log(totalTime);
+//    });
+
+    $("#jquery_jplayer_background_playlist").unbind($.jPlayer.event.play);
+    $("#jquery_jplayer_playlist_other").unbind($.jPlayer.event.play);
+    $("#jquery_jplayer_playlist").unbind($.jPlayer.event.play);
+    //****************************************************
+    return [playlistAudio, playlistAudio_background, playlistAudioOther, background_duration];
 }
 
-function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBackground, background_duration) {
+function startAnimation(args, sliderDiv, canvas, slider, playlistAudio, playListBackground, playlistAudioOther, background_duration) {
     var background_track = 0;
 
-    var ken = $(canvas).kenburns({
+    ken = $(canvas).kenburns({
         debug: args.debug,
         images: args.images,
         display_times: args.display_times,
@@ -478,57 +564,31 @@ function startAnimation(args, sliderDiv, canvas, slider, myplayList, playListBac
         post_display_image_callback: function(slide_number) {
             previousDataSlide = new Date().getTime();
             slider.goToSlide(parseInt(slide_number));
+            playlistAudioOther.pause();
 
             if (slide_number === 0) {
                 playListBackground.play();
             }
 
+            if (slide_number === 5) {
+                playlistAudioOther.play(0);
+            }
+
+            if (slide_number === 25) {
+
+                $("#jquery_jplayer_playlist").jPlayer("volume", 0.75);
+
+                $("#jquery_jplayer_playlist").animate({
+                    volume: 0
+                }, 10000);
+
+                playlistAudioOther.play(1);
+            }
+
             //it's usefull to set audio for more than one slide
-            if (myplayList.playlist[slide_number]["mp3"] !== "" && myplayList.playlist[slide_number]["mp3"] !== null) {
-                myplayList.play(slide_number);
+            if (playlistAudio.playlist[slide_number]["mp3"] !== "" && playlistAudio.playlist[slide_number]["mp3"] !== null) {
+                playlistAudio.play(slide_number);
             }
         }
     });
-
-    return ken;
-}
-
-//function fadeIn(audio) {
-//    audio.volume = 1;
-//    audio.play();
-//
-////    var isSeeking = audio.seeking;
-////    var isSeekable = audio.seekable && audio.seekable.length > 0;
-////    console.log("---");
-////    console.log("Duration: " + audio.duration);
-////    console.log("isSeeking: " + isSeeking);
-////    console.log("isSeekable: " + isSeekable);
-////    console.log("---");
-//
-////    var vol = 0;
-////    var interval = 200;
-////    var intervalID = setInterval(function() {
-////        if (vol < 1) {
-////            vol += 0.1;
-////            if (vol >= 0 && vol <= 1)
-////                audio.volume = vol;
-////        } else {
-////            clearInterval(intervalID);
-////        }
-////    }, interval);
-//}
-
-function fadeOut(audioPrecedente) {
-    var vol = 0.1;
-    var interval = 200;
-    var intervalID = setInterval(function() {
-        if (vol >= 0.1) {
-            vol -= 0.1;
-            if (vol >= 0 && vol <= 1)
-                audioPrecedente.volume = vol;
-        } else {
-            audioPrecedente.pause();
-            clearInterval(intervalID);
-        }
-    }, interval);
 }
