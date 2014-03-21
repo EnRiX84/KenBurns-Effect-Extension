@@ -31,7 +31,7 @@ $.fn.kenburns_extension = function() {
     var arrayTime = [];
     var images = args.images;
     for (var i = 0; i < images.length; i++) {
-        if (images[i] != null)
+        if (images[i] !== null)
             arrayTime.push(parseInt(images[i]["display_time"]));
     }
     var html = document.createElement("div");
@@ -85,6 +85,7 @@ $.fn.kenburns_extension = function() {
 
     var pauseButton = document.createElement("a");
     var list = initAudio(args, this);
+
     var playlistAudio = list[0];
     var playListBackground = list[1];
     var playlistAudioOther = list[2];
@@ -268,7 +269,7 @@ function getPosition(current_time, background_duration) {
     var subTotal = 0;
     var offset = 0;
     for (var i = 0; i < background_duration.length; i++) {
-        if (background_duration[i] != null) {
+        if (background_duration[i] !== null) {
             offset += (i !== 0) ? background_duration[i - 1] : "";
             subTotal += background_duration[i];
             if (current_time <= subTotal) {
@@ -284,7 +285,7 @@ function getPosition(current_time, background_duration) {
 function initSliders(args, caption, sliderDiv, arrayTime) {
     var maxTime = 0;
     for (var i = 0; i < arrayTime.length; i++) {
-        if (arrayTime[i] != null) {
+        if (arrayTime[i] !== null) {
             maxTime += arrayTime[i];
         }
     }
@@ -311,13 +312,14 @@ function initSliders(args, caption, sliderDiv, arrayTime) {
         mode: 'fade'
 //        pause: 6000
     });
+
     return slider;
 }
 
 function getStartTime(realtime, arrayTime) {
     var value = 0;
     for (var i = 0; i < arrayTime.length; i++) {
-        if (arrayTime[i] != null) {
+        if (arrayTime[i] !== null) {
             value += arrayTime[i];
             if (value >= realtime) {
                 return value - arrayTime[i];
@@ -368,14 +370,13 @@ function initAudio(args, main) {
     var audioArray_background = args.audio_background;
     var toJPlayerList_background = [];
     for (var i = 0; i < audioArray_background.length; i++) {
-        if (audioArray_background[i] != null) {
+        if (audioArray_background[i] !== null) {
             var ogg = audioArray_background[i]["mp3"].replace(".mp3", ".ogg");
             toJPlayerList_background.push({
                 title: audioArray_background[i]["mp3"],
                 mp3: audioArray_background[i]["mp3"],
                 oga: ogg
             });
-
             var duration = audioArray_background[i]["duration"];
             duration = ((parseInt(duration.split(":")[0]) * 60) + parseInt(duration.split(":")[1])) * 1000;
             background_duration.push(duration);
@@ -385,8 +386,8 @@ function initAudio(args, main) {
     var jplayerDiv_background = document.createElement("div");
     $(jplayerDiv_background).attr("id", "jquery_jplayer_background_playlist").attr("class", "jp-jplayer");
     var source_background = document.createElement("div");
-    $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio").attr("style", "visibility: hidden;");
-    $(source_background).html('<div class="jp-type-playlist" style="display: none; height: 0px; width: 0px;">\n\
+    $(source_background).attr("id", "jp_container_background_playlist").attr("class", "jp-audio");
+    $(source_background).html('<div class="jp-type-playlist">\n\
                                     <div class="jp-playlist">\n\
                                         <ol><li></li></ol>\n\
                                     </div>\n\
@@ -397,7 +398,7 @@ function initAudio(args, main) {
         jPlayer: "#jquery_jplayer_background_playlist",
         cssSelectorAncestor: "#jp_container_background_playlist"
     }, toJPlayerList_background, {
-        wmode: "window",
+//        wmode: "window",
         solution: "flash, html",
         supplied: "ogv,m4v,oga,mp3",
         smoothPlayBar: true,
@@ -405,15 +406,15 @@ function initAudio(args, main) {
         audioFullScreen: true,
         preload: "auto",
         volume: 0.2,
-        swfPath: "js/"
+        swfPath: "js/flash_player/"
     });
-
-    //****************************************************
-
 
     $("#jquery_jplayer_background_playlist").bind($.jPlayer.event.progress, function(e) {
 
     });
+
+    //****************************************************
+
 
     /*
      #!/bin/bash
@@ -426,7 +427,7 @@ function initAudio(args, main) {
     var audioArray = args.audio_for_images;
     var toJPlayerList = [];
     for (var i = 0; i < audioArray.length; i++) {
-        if (audioArray[i] != null) {
+        if (audioArray[i] !== null) {
             var ogg = audioArray[i]["mp3"].replace(".mp3", ".ogg");
             toJPlayerList.push({
                 title: audioArray[i]["mp3"],
@@ -440,8 +441,6 @@ function initAudio(args, main) {
     $(jplayerDiv).attr("id", "jquery_jplayer_playlist").attr("class", "jp-jplayer");
     var source = document.createElement("div");
     $(source).attr("id", "jp_container_playlist").attr("class", "jp-audio");
-//    .attr("style", "visibility: hidden;")
-//     style="display: none; height: 0px; width: 0px;"
     $(source).html('<div class="jp-type-playlist">\n\
                         <div class="jp-playlist">\n\
                             <ol><li></li></ol>\n\
@@ -454,7 +453,7 @@ function initAudio(args, main) {
         jPlayer: "#jquery_jplayer_playlist",
         cssSelectorAncestor: "#jp_container_playlist"
     }, toJPlayerList, {
-        wmode: "window",
+//        wmode: "window",
         solution: "flash, html",
         supplied: "ogv,m4v,oga,mp3",
         smoothPlayBar: true,
@@ -462,38 +461,18 @@ function initAudio(args, main) {
         audioFullScreen: true,
         preload: "auto",
         volume: 1,
-        swfPath: "js/",
+        swfPath: "js/flash_player/",
         ended: function() {
             $(this).jPlayer("stop");
-        },
-        canplay: function() {
-//            console.log("can play");
         }
     });
-
-//    $("#jquery_jplayer_playlist").jPlayer("onProgressChange", function(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime) {
-//        console.log(loadPercent);
-//        console.log(playedPercentRelative);
-//        console.log(playedPercentAbsolute);
-//        console.log(playedTime);
-//        console.log(totalTime);
-//    });
-
     //****************************************************
-
-
-
-
-
-
-
-
 
     //*** OTHER TRACE ************************************
     var other_audio = args.other_audio;
     var toJPlayerListOther = [];
     for (var i = 0; i < other_audio.length; i++) {
-        if (other_audio[i] != null) {
+        if (other_audio[i] !== null) {
             var ogg = other_audio[i]["mp3"].replace(".mp3", ".ogg");
             toJPlayerListOther.push({
                 title: other_audio[i]["mp3"],
@@ -507,8 +486,6 @@ function initAudio(args, main) {
     $(jplayerDiv).attr("id", "jquery_jplayer_playlist_other").attr("class", "jp-jplayer");
     var source = document.createElement("div");
     $(source).attr("id", "jp_container_playlist_other").attr("class", "jp-audio");
-//    .attr("style", "visibility: hidden;")
-//     style="display: none; height: 0px; width: 0px;"
     $(source).html('<div class="jp-type-playlist">\n\
                         <div class="jp-playlist">\n\
                             <ol><li></li></ol>\n\
@@ -521,7 +498,7 @@ function initAudio(args, main) {
         jPlayer: "#jquery_jplayer_playlist_other",
         cssSelectorAncestor: "#jp_container_playlist_other"
     }, toJPlayerListOther, {
-        wmode: "window",
+//        wmode: "window",
         solution: "flash, html",
         supplied: "ogv,m4v,oga,mp3",
         smoothPlayBar: true,
@@ -529,7 +506,7 @@ function initAudio(args, main) {
         audioFullScreen: true,
         preload: "auto",
         volume: 0.5,
-        swfPath: "js/",
+        swfPath: "js/flash_player/",
         ended: function() {
             $(this).jPlayer("stop");
         }
@@ -556,18 +533,18 @@ function startAnimation(args, sliderDiv, canvas, slider, playlistAudio, playList
         background_color: args.background_color,
         pan: args.pan,
         autoplay: args.autoplay,
-        post_render_callback: function($canvas, context) {
+        post_render_callback: function($canvas, context, update_time) {
             if (args.status_bar === true && slideDrag === false) {
-                $(sliderDiv).jqxSlider('setValue', ken.getUpdateTime());
+                $(sliderDiv).jqxSlider('setValue', update_time);
             }
-            var ret = getPosition(ken.getUpdateTime(), background_duration);
+            var ret = getPosition(update_time, background_duration);
             if (ret[0] !== background_track) {
                 background_track = ret[0];
                 playListBackground.play(ret[0]);
                 $("#jquery_jplayer_background_playlist").jPlayer("play", parseInt(ret[1]) / 1000);
             }
 
-            if (ken.getUpdateTime() > 100) {
+            if (update_time > 100) {
                 playListBackground.play();
                 started = 1;
             }
@@ -604,28 +581,28 @@ function startAnimation(args, sliderDiv, canvas, slider, playlistAudio, playList
 }
 
 function fadeIn(audio) {
-// audio.volume = 1;
-// audio.play();
-//
-//// var isSeeking = audio.seeking;
-//// var isSeekable = audio.seekable && audio.seekable.length > 0;
-//// console.log("---");
-//// console.log("Duration: " + audio.duration);
-//// console.log("isSeeking: " + isSeeking);
-//// console.log("isSeekable: " + isSeekable);
-//// console.log("---");
-//
-//// var vol = 0;
-//// var interval = 200;
-//// var intervalID = setInterval(function() {
-//// if (vol < 1) {
-//// vol += 0.1;
-//// if (vol >= 0 && vol <= 1)
-//// audio.volume = vol;
-//// } else {
-//// clearInterval(intervalID);
-//// }
-//// }, interval);
+    audio.volume = 1;
+    audio.play();
+
+    var isSeeking = audio.seeking;
+    var isSeekable = audio.seekable && audio.seekable.length > 0;
+    console.log("---");
+    console.log("Duration: " + audio.duration);
+    console.log("isSeeking: " + isSeeking);
+    console.log("isSeekable: " + isSeekable);
+    console.log("---");
+
+    var vol = 0;
+    var interval = 200;
+    var intervalID = setInterval(function() {
+        if (vol < 1) {
+            vol += 0.1;
+            if (vol >= 0 && vol <= 1)
+                audio.volume = vol;
+        } else {
+            clearInterval(intervalID);
+        }
+    }, interval);
 }
 
 function fadeOut(audioPrecedente) {

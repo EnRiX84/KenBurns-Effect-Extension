@@ -170,7 +170,6 @@
                     if (load_callback) {
                         load_callback();
                     }
-
                 }
                 image_info.initialized = true;
                 image.src = image_info.path;
